@@ -1,0 +1,1500 @@
+# 🎯 Microservice Decomposition Task
+
+You are an expert software architect. Analyze the provided artifacts and decompose this monolithic application into optimal microservices.
+
+## **Required Output Format**
+
+Generate ONLY a JSON object with this exact structure (no additional text or explanation):
+
+```json
+{
+  "Service Name 1": [
+    "full.package.ClassName1",
+    "full.package.ClassName2"
+  ],
+  "Service Name 2": [
+    "full.package.ClassName3"
+  ]
+}
+```
+
+## **Critical Requirements**
+
+1. **ALL classes must be assigned** to exactly one service
+2. **Use exact class names** from the dependency graph
+3. **No duplicates or omissions**
+4. **Optimize for high cohesion and low coupling**
+5. **Create 3-6 services** based on business domains
+
+---
+
+## **Application Artifacts**
+
+### 🏗️ **Architectural Overview**
+High-level component structure and domain boundaries:
+
+```
+```mermaid
+graph TB
+    subgraph "User Interface (Thymeleaf)"
+        WebUI[Web UI]
+    end
+
+    subgraph "Application Components"
+        subgraph "Owner Management"
+            OwnerController["OwnerController, PetController, VisitController"]
+            OwnerRepositories["OwnerRepository, PetTypeRepository"]
+        end
+
+        subgraph "Veterinarian Management"
+            VetController[VetController]
+            VetRepository[VetRepository]
+        end
+
+        subgraph "System"
+            SystemControllers[WelcomeController, CrashController]
+            SystemConfig[WebConfiguration, CacheConfiguration]
+        end
+    end
+
+    subgraph "Shared Kernel"
+        SharedModel[Shared Domain Model <br/> (BaseEntity, Person, etc.)]
+    end
+
+    subgraph "Data Persistence"
+        Database[(Shared Relational Database <br/> H2 / MySQL / PostgreSQL)]
+    end
+
+    %% Interactions
+    WebUI --> OwnerController
+    WebUI --> VetController
+    WebUI --> SystemControllers
+
+    OwnerController --> OwnerRepositories
+    VetController --> VetRepository
+
+    OwnerRepositories --> SharedModel
+    VetRepository --> SharedModel
+
+    OwnerRepositories --> Database
+    VetRepository --> Database
+
+    SystemConfig -- "Applies Caching" --> VetRepository
+    SystemConfig -- "Applies i18n" --> WebUI
+```
+
+### Rationale
+
+The architecture is a modular monolith, with component boundaries drawn along clear domain lines: "Owner Management" for all customer-facing concerns and "Veterinarian Management" for staff-related information. These components communicate internally through direct method calls and share a common data model and a single database, which is characteristic of a monolithic design. Cross-cutting concerns like routing, caching, and internationalization are handled by a central "System" component that configures behavior across the application.
+```
+
+### 📋 **Component Responsibilities**
+Detailed component breakdown with interfaces and dependencies:
+
+```
+| Component Name | Responsibility | Interfaces (key endpoints or methods) | Depends On | Technologies |
+| :--- | :--- | :--- | :--- | :--- |
+| **Owner Management** | Manages all data related to pet owners, their pets, and clinic visits. Handles CRUD operations for these entities. | `OwnerController`: `/owners/**`<br>`PetController`: `/owners/{ownerId}/pets/**`<br>`VisitController`: `/owners/{ownerId}/pets/{petId}/visits/**` | Shared Kernel, Data Persistence | Spring Boot, Spring MVC, Spring Data JPA, Jakarta Validation |
+| **Veterinarian Management** | Manages veterinarian information, including their specialties. Provides read-only access to vet data. | `VetController`: `/vets.html`, `/vets` (JSON) | Shared Kernel, Data Persistence, System (Caching) | Spring Boot, Spring MVC, Spring Data, Spring Cache (JCache/Caffeine) |
+| **System** | Provides cross-cutting concerns and application-wide functionality like the welcome page, error handling, caching, and internationalization (i18n). | `WelcomeController`: `/`<br>`CrashController`: `/oups`<br>`CacheConfiguration`<br>`WebConfiguration` | User Interface, Veterinarian Management | Spring Boot, Spring MVC, Spring Cache |
+| **User Interface** | Renders the HTML views for all application features and presents data to the end-user. | N/A (Presentation Layer) | Owner Management, Veterinarian Management, System | Thymeleaf, HTML, CSS/SCSS, Bootstrap, WebJars |
+| **Shared Kernel** | Defines the core domain model entities (`BaseEntity`, `Person`, `NamedEntity`) and is shared by all other components. | Java classes (`Owner`, `Pet`, `Vet`, etc.) | N/A | Java, Jakarta Persistence (JPA) |
+| **Data Persistence** | Provides the underlying storage for all application data, including schema definitions and initial data loading. | JDBC/JPA Interface | N/A | H2, MySQL, PostgreSQL, Spring Data JPA, Hibernate |
+```
+
+### 🌐 **API Endpoints**
+HTTP endpoints grouped by component:
+
+```
+| Component Name | HTTP Method | Endpoint Path | Brief Description |
+| :--- | :--- | :--- | :--- |
+| **System** | GET | `/` | Displays the application's welcome page. |
+| **System** | GET | `/oups` | Triggers a runtime exception to demonstrate error handling. |
+| **Owner Management** | GET | `/owners/find` | Displays the form to find owners by last name. |
+| **Owner Management** | GET | `/owners` | Processes the owner search and displays a list of results or a single owner's details. |
+| **Owner Management** | GET | `/owners/new` | Displays the form for creating a new owner. |
+| **Owner Management** | POST | `/owners/new` | Processes the submission of the new owner form. |
+| **Owner Management** | GET | `/owners/{ownerId}` | Displays detailed information for a specific owner. |
+| **Owner Management** | GET | `/owners/{ownerId}/edit` | Displays the form for updating an existing owner's details. |
+| **Owner Management** | POST | `/owners/{ownerId}/edit` | Processes the submission of the owner update form. |
+| **Owner Management** | GET | `/owners/{ownerId}/pets/new` | Displays the form for adding a new pet to an owner. |
+| **Owner Management** | POST | `/owners/{ownerId}/pets/new` | Processes the submission of the new pet form. |
+| **Owner Management** | GET | `/owners/{ownerId}/pets/{petId}/edit` | Displays the form for updating an existing pet's details. |
+| **Owner Management** | POST | `/owners/{ownerId}/pets/{petId}/edit` | Processes the submission of the pet update form. |
+| **Owner Management** | GET | `/owners/{ownerId}/pets/{petId}/visits/new` | Displays the form for adding a new visit for a pet. |
+| **Owner Management** | POST | `/owners/{ownerId}/pets/{petId}/visits/new` | Processes the submission of the new visit form. |
+| **Veterinarian Management** | GET | `/vets.html` | Displays a paginated list of all veterinarians as an HTML page. |
+| **Veterinarian Management** | GET | `/vets` | Returns a list of all veterinarians in JSON format. |
+```
+
+### 🔧 **Technology Stack**
+Technology choices and patterns per component:
+
+```
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Owner Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Jakarta Validation | Relational (via Data Persistence) | HTTP, Direct Method Calls | MVC, Repository, Dependency Injection |
+| **Veterinarian Management** | Java | Spring Boot, Spring MVC, Spring Data, Spring Cache (JCache/Caffeine) | Relational (via Data Persistence) | HTTP, Direct Method Calls | MVC, Repository, Caching, Dependency Injection |
+| **System** | Java | Spring Boot, Spring MVC, Spring Cache | N/A | HTTP, AOP/Interceptors | Configuration, Controller, Interceptor |
+| **User Interface** | HTML, CSS/SCSS | Thymeleaf, Bootstrap, WebJars | N/A | HTTP | Server-Side Rendering (SSR), Template View |
+| **Shared Kernel** | Java | Jakarta Persistence (JPA) | N/A | In-memory object sharing | Domain Model, Entity, Mapped Superclass |
+| **Data Persistence** | Java, SQL | Spring Data JPA, Hibernate | H2, MySQL, PostgreSQL | JDBC | Repository, Data Access Object (DAO) |
+```
+
+### 🎯 **Proposed Decomposition**
+Initial microservice architecture proposal:
+
+```
+### Proposed Microservice Architecture
+
+```mermaid
+graph TD
+    subgraph "User"
+        User[End User]
+    end
+
+    subgraph "Presentation & API Gateway"
+        APIGateway[API Gateway / BFF]
+    end
+
+    subgraph "Customer Service"
+        CustomerService["(Owner, Pet, Visit Management)"]
+        CustomerDB[(Customer Database)]
+        CustomerService --> CustomerDB
+    end
+
+    subgraph "Vets Service"
+        VetsService["(Veterinarian Management)"]
+        VetsCache[Cache]
+        VetsDB[(Vets Database)]
+        VetsService -- "Caches Data" --> VetsCache
+        VetsService --> VetsDB
+    end
+
+    %% Interactions
+    User -- "HTTP Requests" --> APIGateway
+
+    APIGateway -- "Sync REST API Call <br/> (e.g., GET /owners)" --> CustomerService
+    APIGateway -- "Sync REST API Call <br/> (e.g., GET /vets)" --> VetsService
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+### Rationale
+
+This decomposition splits the monolith into three services based on the distinct bounded contexts of customer management and veterinarian reference data, with an API Gateway handling user-facing concerns. The behavioral analysis from the sequence diagrams directly informs the communication patterns: the "Finding an Owner" and "Adding a New Pet" scenarios depict synchronous, transactional workflows that are self-contained within the proposed **Customer Service**. In contrast, the "Viewing Veterinarians" scenario shows a read-heavy, cacheable data access pattern, justifying its isolation into a separate **Vets Service** that can be scaled and managed independently. Since the sequence diagrams reveal no direct interactions between the owner and veterinarian domains, a message bus is unnecessary; simple, synchronous REST calls from the **API Gateway** to the appropriate downstream service accurately model the required request-response communication.
+```
+
+### 📊 **Behavioral Analysis**
+Use cases, workflows, and interaction patterns:
+
+```
+### 1. Use Case Diagram
+
+This diagram provides a high-level overview of the main functionalities (use cases) available to a user of the PetClinic application. It shows what the system does from an external actor's perspective.
+
+**Rationale:**
+The application does not have distinct roles or authentication, so a single `User` actor is sufficient to represent anyone interacting with the system. The use cases cover all the primary features found in the controllers, such as managing owners, pets, visits, and viewing veterinarians.
+
+```mermaid
+graph TD
+    subgraph "Spring PetClinic System"
+        UC1(Find Owners)
+        UC2(View Owner Details)
+        UC3(Add New Owner)
+        UC4(Update Owner Information)
+        UC5(Add New Pet)
+        UC6(Update Pet Information)
+        UC7(Add Visit for Pet)
+        UC8(View Veterinarians)
+        UC9(Trigger Error Page)
+    end
+
+    User -- "Interacts with" --> UC1
+    User -- "Interacts with" --> UC3
+    User -- "Interacts with" --> UC8
+    User -- "Interacts with" --> UC9
+
+    UC2 -- "<<include>>" --> UC1
+    UC4 -- "<<include>>" --> UC2
+    UC5 -- "<<include>>" --> UC2
+    UC6 -- "<<include>>" --> UC2
+    UC7 -- "<<include>>" --> UC2
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+### 2. Sequence Diagrams
+
+Sequence diagrams are excellent for showing the step-by-step interactions between different components for a specific scenario.
+
+---
+
+#### a) Scenario: Finding an Owner
+
+This diagram illustrates the process of a user searching for an owner by their last name, resulting in a list of multiple owners.
+
+**Rationale:**
+This is a core read-operation of the application. The diagram shows the flow from the user's browser to the `OwnerController`, which then queries the `OwnerRepository`. It correctly depicts the role of Spring Data JPA in abstracting the direct database interaction. The decision logic for handling single, multiple, or no results is also captured.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Browser
+    participant OwnerController
+    participant OwnerRepository
+    participant Database
+
+    User->>Browser: Enters last name and submits search
+    Browser->>OwnerController: GET /owners?lastName=Davis
+    OwnerController->>OwnerRepository: findByLastNameStartingWith("Davis", pageable)
+    OwnerRepository->>Database: SELECT * FROM owners WHERE last_name LIKE 'Davis%'
+    Database-->>OwnerRepository: Returns owner records
+    OwnerRepository-->>OwnerController: Returns Page<Owner>
+    
+    alt Multiple owners found
+        OwnerController->>Browser: Renders and returns ownersList.html
+    else Single owner found
+        OwnerController->>Browser: Redirects to /owners/{id}
+    else No owners found
+        OwnerController->>Browser: Renders findOwners.html with error
+    end
+
+    Browser->>User: Displays list of owners
+```
+
+---
+
+#### b) Scenario: Adding a New Pet to an Owner
+
+This diagram shows the workflow for adding a new pet, including form display, submission, validation, and persistence.
+
+**Rationale:**
+This sequence demonstrates a key write-operation. It highlights the two-step process (GET for the form, POST for submission), the involvement of the `PetValidator` for business rule checks, and how the `OwnerRepository` is used to persist the new `Pet` by cascading the save from the parent `Owner` entity.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Browser
+    participant PetController
+    participant OwnerRepository
+    participant PetValidator
+    participant Database
+
+    User->>Browser: Clicks "Add New Pet" on owner's page
+    Browser->>PetController: GET /owners/1/pets/new
+    PetController-->>Browser: Renders and returns createOrUpdatePetForm.html
+
+    User->>Browser: Fills pet details and submits form
+    Browser->>PetController: POST /owners/1/pets/new (with form data)
+    
+    PetController->>PetValidator: validate(pet, result)
+    PetValidator-->>PetController: Returns validation result (no errors)
+
+    PetController->>OwnerRepository: save(owner)
+    note right of PetController: The new Pet is added to the Owner's pet list.<br/>The save operation is cascaded.
+    OwnerRepository->>Database: INSERT INTO pets (...)
+    Database-->>OwnerRepository: Confirms insert
+    OwnerRepository-->>PetController: Returns saved Owner
+    
+    PetController-->>Browser: HTTP 302 Redirect to /owners/1
+    Browser->>OwnerController: GET /owners/1 (following redirect)
+    OwnerController-->>Browser: Renders ownerDetails.html with the new pet
+    Browser->>User: Displays updated owner page
+```
+
+---
+
+#### c) Scenario: Viewing Veterinarians (with Caching)
+
+This diagram illustrates how the application fetches the list of veterinarians, showing both a cache miss (first request) and a cache hit (subsequent requests).
+
+**Rationale:**
+This scenario is important for demonstrating a non-functional requirement: performance optimization through caching. The diagram uses an `alt` block to clearly distinguish between the flow when data is not in the cache (requiring a database query) and when it is served directly from the cache, which is a key feature of the `VetRepository`.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Browser
+    participant VetController
+    participant VetRepository
+    participant Cache
+    participant Database
+
+    User->>Browser: Clicks "Veterinarians" link
+    Browser->>VetController: GET /vets.html
+
+    alt First Request (Cache Miss)
+        VetController->>VetRepository: findAll(pageable)
+        note over VetRepository: @Cacheable("vets")
+        VetRepository->>Cache: Check for cached vet list
+        Cache-->>VetRepository: Not found (miss)
+        VetRepository->>Database: SELECT * FROM vets
+        Database-->>VetRepository: Returns vet records
+        VetRepository->>Cache: Store vet list
+        Cache-->>VetRepository: Acknowledge storage
+        VetRepository-->>VetController: Returns List<Vet>
+    else Subsequent Requests (Cache Hit)
+        VetController->>VetRepository: findAll(pageable)
+        note over VetRepository: @Cacheable("vets")
+        VetRepository->>Cache: Check for cached vet list
+        Cache-->>VetRepository: Found (hit), returns cached list
+        VetRepository-->>VetController: Returns List<Vet>
+    end
+
+    VetController-->>Browser: Renders vetList.html
+    Browser->>User: Displays list of veterinarians
+```
+
+### 3. Activity Diagram
+
+This diagram models the business workflow or process flow of a complete user journey, focusing on the decisions and actions involved.
+
+---
+
+#### Workflow: Find an Owner and Add a Visit
+
+This diagram shows the end-to-end process a user follows to find a specific owner and then add a new clinic visit for one of their pets.
+
+**Rationale:**
+Unlike a sequence diagram, this activity diagram focuses on the flow of control rather than message passing between objects. It's effective at showing user decision points (`if/else` logic) and loops (e.g., re-submitting a form after a validation error), providing a clear picture of the user experience and application logic from a process perspective.
+
+```mermaid
+graph TD
+    subgraph "User Journey"
+        A[Start] --> B{Navigate to 'Find Owners'};
+        B --> C[Enter Last Name];
+        C --> D{Submit Search};
+        D --> E{System Searches for Owners};
+        E --> F{Owner(s) Found?};
+        F -- No --> G[Display 'Not Found' Message];
+        G --> C;
+        F -- Yes --> H{One or Multiple?};
+        H -- One --> J[Display Owner Details];
+        H -- Multiple --> I[Display Owner List];
+        I --> K{Select an Owner};
+        K --> J;
+        J --> L{Click 'Add Visit' for a Pet};
+        L --> M[Display 'New Visit' Form];
+        M --> N[Enter Visit Details];
+        N --> O{Submit Form};
+        O --> P{Validate Data};
+        P -- Invalid --> Q[Display Form with Errors];
+        Q --> N;
+        P -- Valid --> R[Save Visit to Database];
+        R --> S[Redirect to Owner Details Page];
+        S --> T[End];
+    end
+
+    style A fill:#8f8,stroke:#333,stroke-width:2px
+    style T fill:#f88,stroke:#333,stroke-width:2px
+```
+
+### 4. State Machine Diagram
+
+This diagram describes the different states an object can be in and the transitions between those states.
+
+---
+
+#### State: JPA Entity Lifecycle (Owner)
+
+This diagram shows the lifecycle of an `Owner` entity as managed by the Java Persistence API (JPA) provider (e.g., Hibernate).
+
+**Rationale:**
+While the application logic itself is simple, the underlying persistence framework has a complex behavioral model. This diagram clarifies the states of an entity object (`Transient`, `Managed`, `Detached`, `Removed`) and how repository method calls (`save`, `delete`) cause transitions between these states. This is crucial for understanding how data is managed and persisted.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> Transient: new Owner()
+
+    state "In Memory" as Transient {
+        note right of Transient
+            The object has just been instantiated.
+            It is not associated with any
+            database session or record.
+        end note
+    }
+    
+    state "In Persistence Context" as Managed {
+        note right of Managed
+            The object is associated with a
+            JPA session and maps to a
+            database record. Changes are tracked.
+        end note
+    }
+
+    state "Out of Context" as Detached {
+        note right of Detached
+            The object was once managed, but the
+            JPA session it was attached to
+            has closed. Changes are not tracked.
+        end note
+    }
+
+    state "Marked for Deletion" as Removed {
+         note right of Removed
+            The object is still managed but
+            is scheduled for deletion from the
+            database when the transaction commits.
+        end note
+    }
+
+    Transient --> Managed: ownerRepository.save(newOwner)
+    Managed --> Detached: Transaction commits / Session closes
+    Detached --> Managed: ownerRepository.save(detachedOwner) [merge]
+    Managed --> Managed: Entity is modified within a transaction
+    Managed --> Removed: ownerRepository.delete(owner)
+    Removed --> [*]: Transaction commits
+```
+```
+
+## **Dependency Graph Analysis**
+
+### 📊 **Graph Statistics**
+- **Total Classes**: 25
+- **Total Dependencies**: 100
+- **Average Dependencies per Class**: 4.0
+- **Relationship Types**: ASSOCIATES, CALLED_BY, CALLS, CREATED_BY, CREATES, EXTENDED_BY, EXTENDS, PERSISTED_BY, PERSISTS, USED_BY, USES
+
+### 📝 **All Classes to Assign**
+```
+org.springframework.samples.petclinic.PetClinicApplication
+org.springframework.samples.petclinic.PetClinicRuntimeHints
+org.springframework.samples.petclinic.model.BaseEntity
+org.springframework.samples.petclinic.model.NamedEntity
+org.springframework.samples.petclinic.model.Person
+org.springframework.samples.petclinic.owner.Owner
+org.springframework.samples.petclinic.owner.OwnerController
+org.springframework.samples.petclinic.owner.OwnerRepository
+org.springframework.samples.petclinic.owner.Pet
+org.springframework.samples.petclinic.owner.PetController
+org.springframework.samples.petclinic.owner.PetType
+org.springframework.samples.petclinic.owner.PetTypeFormatter
+org.springframework.samples.petclinic.owner.PetTypeRepository
+org.springframework.samples.petclinic.owner.PetValidator
+org.springframework.samples.petclinic.owner.Visit
+org.springframework.samples.petclinic.owner.VisitController
+org.springframework.samples.petclinic.system.CacheConfiguration
+org.springframework.samples.petclinic.system.CrashController
+org.springframework.samples.petclinic.system.WebConfiguration
+org.springframework.samples.petclinic.system.WelcomeController
+org.springframework.samples.petclinic.vet.Specialty
+org.springframework.samples.petclinic.vet.Vet
+org.springframework.samples.petclinic.vet.VetController
+org.springframework.samples.petclinic.vet.VetRepository
+org.springframework.samples.petclinic.vet.Vets
+```
+
+### 🔗 **Dependency Graph Structure**
+```json
+{
+  "metadata": {
+    "totalClasses": 25,
+    "relationshipCounts": {
+      "EXTENDS": 8,
+      "PERSISTS": 3,
+      "CALLS": 15,
+      "USES": 23,
+      "CREATES": 5,
+      "ASSOCIATES": 4
+    },
+    "relationshipTotalOccurrences": {
+      "EXTENDS": 8,
+      "PERSISTS": 3,
+      "CALLS": 43,
+      "USES": 117,
+      "CREATES": 7,
+      "ASSOCIATES": 4
+    }
+  },
+  "classes": {
+    "org.springframework.samples.petclinic.PetClinicApplication": {
+      "annotations": [
+        "@SpringBootApplication",
+        "@ImportRuntimeHints(PetClinicRuntimeHints.class)"
+      ],
+      "methods": [
+        {
+          "signature": "public static void main(null)"
+        }
+      ],
+      "relationships": {}
+    },
+    "org.springframework.samples.petclinic.PetClinicRuntimeHints": {
+      "methods": [
+        {
+          "signature": "public void registerHints(org.springframework.aot.hint.RuntimeHints, java.lang.ClassLoader)",
+          "annotations": [
+            "@Override"
+          ]
+        }
+      ],
+      "relationships": {}
+    },
+    "org.springframework.samples.petclinic.model.BaseEntity": {
+      "annotations": [
+        "@MappedSuperclass"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.Integer getId()"
+        },
+        {
+          "signature": "public void setId(java.lang.Integer)"
+        },
+        {
+          "signature": "public boolean isNew()"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private Integer id",
+          "annotations": [
+            "@Id",
+            "@GeneratedValue(strategy = GenerationType.IDENTITY)"
+          ]
+        }
+      ],
+      "relationships": {
+        "CALLED_BY": {
+          "org.springframework.samples.petclinic.owner.Owner": 1,
+          "org.springframework.samples.petclinic.owner.PetController": 4,
+          "org.springframework.samples.petclinic.owner.PetValidator": 1,
+          "org.springframework.samples.petclinic.owner.OwnerController": 4
+        },
+        "EXTENDED_BY": {
+          "org.springframework.samples.petclinic.model.Person": 1,
+          "org.springframework.samples.petclinic.model.NamedEntity": 1,
+          "org.springframework.samples.petclinic.owner.Visit": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.model.NamedEntity": {
+      "annotations": [
+        "@MappedSuperclass"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.String getName()"
+        },
+        {
+          "signature": "public void setName(java.lang.String)"
+        },
+        {
+          "signature": "public java.lang.String toString()",
+          "annotations": [
+            "@Override"
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private String name",
+          "annotations": [
+            "@Column(name = \"name\")",
+            "@NotBlank"
+          ]
+        }
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.BaseEntity": 1
+        },
+        "CALLED_BY": {
+          "org.springframework.samples.petclinic.owner.PetTypeFormatter": 1,
+          "org.springframework.samples.petclinic.owner.PetController": 5,
+          "org.springframework.samples.petclinic.owner.PetValidator": 1
+        },
+        "EXTENDED_BY": {
+          "org.springframework.samples.petclinic.owner.Pet": 1,
+          "org.springframework.samples.petclinic.owner.PetType": 1,
+          "org.springframework.samples.petclinic.vet.Specialty": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.model.Person": {
+      "annotations": [
+        "@MappedSuperclass"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.String getFirstName()"
+        },
+        {
+          "signature": "public void setFirstName(java.lang.String)"
+        },
+        {
+          "signature": "public java.lang.String getLastName()"
+        },
+        {
+          "signature": "public void setLastName(java.lang.String)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private String firstName",
+          "annotations": [
+            "@Column(name = \"first_name\")",
+            "@NotBlank"
+          ]
+        },
+        {
+          "declaration": "private String lastName",
+          "annotations": [
+            "@Column(name = \"last_name\")",
+            "@NotBlank"
+          ]
+        }
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.BaseEntity": 1
+        },
+        "CALLED_BY": {
+          "org.springframework.samples.petclinic.owner.OwnerController": 3
+        },
+        "EXTENDED_BY": {
+          "org.springframework.samples.petclinic.owner.Owner": 1,
+          "org.springframework.samples.petclinic.vet.Vet": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.Owner": {
+      "annotations": [
+        "@Entity",
+        "@Table(name = \"owners\")"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.String getAddress()"
+        },
+        {
+          "signature": "public void setAddress(java.lang.String)"
+        },
+        {
+          "signature": "public java.lang.String getCity()"
+        },
+        {
+          "signature": "public void setCity(java.lang.String)"
+        },
+        {
+          "signature": "public java.lang.String getTelephone()"
+        },
+        {
+          "signature": "public void setTelephone(java.lang.String)"
+        },
+        {
+          "signature": "public null getPets()"
+        },
+        {
+          "signature": "public void addPet(org.springframework.samples.petclinic.owner.Pet)"
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Pet getPet(java.lang.String)"
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Pet getPet(java.lang.Integer)"
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Pet getPet(java.lang.String, boolean)"
+        },
+        {
+          "signature": "public java.lang.String toString()",
+          "annotations": [
+            "@Override"
+          ]
+        },
+        {
+          "signature": "public void addVisit(java.lang.Integer, org.springframework.samples.petclinic.owner.Visit)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private String address",
+          "annotations": [
+            "@Column(name = \"address\")",
+            "@NotBlank"
+          ]
+        },
+        {
+          "declaration": "private String city",
+          "annotations": [
+            "@Column(name = \"city\")",
+            "@NotBlank"
+          ]
+        },
+        {
+          "declaration": "private String telephone",
+          "annotations": [
+            "@Column(name = \"telephone\")",
+            "@NotBlank",
+            "@Pattern(regexp = \"\\\\d{10}\", message = \"{telephone.invalid}\")"
+          ]
+        },
+        {
+          "declaration": "private final List<Pet> pets",
+          "annotations": [
+            "@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)",
+            "@JoinColumn(name = \"owner_id\")",
+            "@OrderBy(\"name\")"
+          ]
+        }
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.Person": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.owner.VisitController": 2,
+          "org.springframework.samples.petclinic.owner.PetController": 7,
+          "org.springframework.samples.petclinic.owner.OwnerController": 1
+        },
+        "CALLS": {
+          "org.springframework.samples.petclinic.owner.Pet": 1,
+          "org.springframework.samples.petclinic.model.BaseEntity": 1
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.owner.Pet": 12,
+          "org.springframework.samples.petclinic.owner.Visit": 5
+        },
+        "ASSOCIATES": {
+          "org.springframework.samples.petclinic.owner.Pet": 1
+        },
+        "PERSISTED_BY": {
+          "org.springframework.samples.petclinic.owner.OwnerRepository": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.OwnerController": {
+      "annotations": [
+        "@Controller"
+      ],
+      "methods": [
+        {
+          "signature": "public void setAllowedFields(org.springframework.web.bind.WebDataBinder)",
+          "annotations": [
+            "@InitBinder"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Owner findOwner(java.lang.Integer)",
+          "annotations": [
+            "@ModelAttribute(\"owner\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String initCreationForm()",
+          "annotations": [
+            "@GetMapping(\"/owners/new\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String processCreationForm(org.springframework.samples.petclinic.owner.Owner, org.springframework.validation.BindingResult, org.springframework.web.servlet.mvc.support.RedirectAttributes)",
+          "annotations": [
+            "@PostMapping(\"/owners/new\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String initFindForm()",
+          "annotations": [
+            "@GetMapping(\"/owners/find\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String processFindForm(int, org.springframework.samples.petclinic.owner.Owner, org.springframework.validation.BindingResult, org.springframework.ui.Model)",
+          "annotations": [
+            "@GetMapping(\"/owners\")"
+          ]
+        },
+        {
+          "signature": "private java.lang.String addPaginationModel(int, org.springframework.ui.Model, null)"
+        },
+        {
+          "signature": "private null findPaginatedForOwnersLastName(int, java.lang.String)"
+        },
+        {
+          "signature": "public java.lang.String initUpdateOwnerForm()",
+          "annotations": [
+            "@GetMapping(\"/owners/{ownerId}/edit\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String processUpdateOwnerForm(org.springframework.samples.petclinic.owner.Owner, org.springframework.validation.BindingResult, int, org.springframework.web.servlet.mvc.support.RedirectAttributes)",
+          "annotations": [
+            "@PostMapping(\"/owners/{ownerId}/edit\")"
+          ]
+        },
+        {
+          "signature": "public org.springframework.web.servlet.ModelAndView showOwner(int)",
+          "annotations": [
+            "@GetMapping(\"/owners/{ownerId}\")"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.OwnerController OwnerController(org.springframework.samples.petclinic.owner.OwnerRepository)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM"
+        },
+        {
+          "declaration": "private final OwnerRepository owners"
+        }
+      ],
+      "relationships": {
+        "CALLS": {
+          "org.springframework.samples.petclinic.model.BaseEntity": 4,
+          "org.springframework.samples.petclinic.model.Person": 3
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.owner.Owner": 13,
+          "org.springframework.samples.petclinic.owner.OwnerRepository": 2
+        },
+        "CREATES": {
+          "org.springframework.samples.petclinic.owner.Owner": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.OwnerRepository": {
+      "methods": [
+        {
+          "signature": "public abstract null findByLastNameStartingWith(java.lang.String, org.springframework.data.domain.Pageable)"
+        },
+        {
+          "signature": "public abstract null findById(java.lang.Integer)"
+        }
+      ],
+      "relationships": {
+        "PERSISTS": {
+          "org.springframework.samples.petclinic.owner.Owner": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.owner.VisitController": 2,
+          "org.springframework.samples.petclinic.owner.PetController": 2,
+          "org.springframework.samples.petclinic.owner.OwnerController": 2
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.Pet": {
+      "annotations": [
+        "@Entity",
+        "@Table(name = \"pets\")"
+      ],
+      "methods": [
+        {
+          "signature": "public void setBirthDate(java.time.LocalDate)"
+        },
+        {
+          "signature": "public java.time.LocalDate getBirthDate()"
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.PetType getType()"
+        },
+        {
+          "signature": "public void setType(org.springframework.samples.petclinic.owner.PetType)"
+        },
+        {
+          "signature": "public null getVisits()"
+        },
+        {
+          "signature": "public void addVisit(org.springframework.samples.petclinic.owner.Visit)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private LocalDate birthDate",
+          "annotations": [
+            "@Column(name = \"birth_date\")",
+            "@DateTimeFormat(pattern = \"yyyy-MM-dd\")"
+          ]
+        },
+        {
+          "declaration": "private PetType type",
+          "annotations": [
+            "@ManyToOne",
+            "@JoinColumn(name = \"type_id\")"
+          ]
+        },
+        {
+          "declaration": "private final Set<Visit> visits",
+          "annotations": [
+            "@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)",
+            "@JoinColumn(name = \"pet_id\")",
+            "@OrderBy(\"date ASC\")"
+          ]
+        }
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.NamedEntity": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.owner.VisitController": 1,
+          "org.springframework.samples.petclinic.owner.Owner": 1,
+          "org.springframework.samples.petclinic.owner.PetController": 2,
+          "org.springframework.samples.petclinic.owner.PetValidator": 2
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.owner.PetType": 3,
+          "org.springframework.samples.petclinic.owner.Visit": 4
+        },
+        "ASSOCIATES": {
+          "org.springframework.samples.petclinic.owner.PetType": 1,
+          "org.springframework.samples.petclinic.owner.Visit": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.PetController": {
+      "annotations": [
+        "@Controller",
+        "@RequestMapping(\"/owners/{ownerId}\")"
+      ],
+      "methods": [
+        {
+          "signature": "public null populatePetTypes()",
+          "annotations": [
+            "@ModelAttribute(\"types\")"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Owner findOwner(int)",
+          "annotations": [
+            "@ModelAttribute(\"owner\")"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Pet findPet(int, java.lang.Integer)",
+          "annotations": [
+            "@ModelAttribute(\"pet\")"
+          ]
+        },
+        {
+          "signature": "public void initOwnerBinder(org.springframework.web.bind.WebDataBinder)",
+          "annotations": [
+            "@InitBinder(\"owner\")"
+          ]
+        },
+        {
+          "signature": "public void initPetBinder(org.springframework.web.bind.WebDataBinder)",
+          "annotations": [
+            "@InitBinder(\"pet\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String initCreationForm(org.springframework.samples.petclinic.owner.Owner, org.springframework.ui.ModelMap)",
+          "annotations": [
+            "@GetMapping(\"/pets/new\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String processCreationForm(org.springframework.samples.petclinic.owner.Owner, org.springframework.samples.petclinic.owner.Pet, org.springframework.validation.BindingResult, org.springframework.web.servlet.mvc.support.RedirectAttributes)",
+          "annotations": [
+            "@PostMapping(\"/pets/new\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String initUpdateForm()",
+          "annotations": [
+            "@GetMapping(\"/pets/{petId}/edit\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String processUpdateForm(org.springframework.samples.petclinic.owner.Owner, org.springframework.samples.petclinic.owner.Pet, org.springframework.validation.BindingResult, org.springframework.web.servlet.mvc.support.RedirectAttributes)",
+          "annotations": [
+            "@PostMapping(\"/pets/{petId}/edit\")"
+          ]
+        },
+        {
+          "signature": "private void updatePetDetails(org.springframework.samples.petclinic.owner.Owner, org.springframework.samples.petclinic.owner.Pet)"
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.PetController PetController(org.springframework.samples.petclinic.owner.OwnerRepository, org.springframework.samples.petclinic.owner.PetTypeRepository)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private static final String VIEWS_PETS_CREATE_OR_UPDATE_FORM"
+        },
+        {
+          "declaration": "private final OwnerRepository owners"
+        },
+        {
+          "declaration": "private final PetTypeRepository types"
+        }
+      ],
+      "relationships": {
+        "CALLS": {
+          "org.springframework.samples.petclinic.owner.Pet": 8,
+          "org.springframework.samples.petclinic.owner.Owner": 7,
+          "org.springframework.samples.petclinic.model.BaseEntity": 4,
+          "org.springframework.samples.petclinic.model.NamedEntity": 5
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.owner.Pet": 17,
+          "org.springframework.samples.petclinic.owner.Owner": 14,
+          "org.springframework.samples.petclinic.owner.PetValidator": 1,
+          "org.springframework.samples.petclinic.owner.PetTypeRepository": 2,
+          "org.springframework.samples.petclinic.owner.OwnerRepository": 2
+        },
+        "CREATES": {
+          "org.springframework.samples.petclinic.owner.Pet": 2,
+          "org.springframework.samples.petclinic.owner.PetValidator": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.PetType": {
+      "annotations": [
+        "@Entity",
+        "@Table(name = \"types\")"
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.NamedEntity": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.owner.Pet": 1,
+          "org.springframework.samples.petclinic.owner.PetTypeFormatter": 4
+        },
+        "PERSISTED_BY": {
+          "org.springframework.samples.petclinic.owner.PetTypeRepository": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.PetTypeFormatter": {
+      "annotations": [
+        "@Component"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.String print(org.springframework.samples.petclinic.owner.PetType, java.util.Locale)",
+          "annotations": [
+            "@Override"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.PetType parse(java.lang.String, java.util.Locale)",
+          "annotations": [
+            "@Override"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.PetTypeFormatter PetTypeFormatter(org.springframework.samples.petclinic.owner.PetTypeRepository)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private final PetTypeRepository types"
+        }
+      ],
+      "relationships": {
+        "CALLS": {
+          "org.springframework.samples.petclinic.model.NamedEntity": 1
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.owner.PetType": 4,
+          "org.springframework.samples.petclinic.owner.PetTypeRepository": 2
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.PetTypeRepository": {
+      "methods": [
+        {
+          "signature": "public abstract null findPetTypes()",
+          "annotations": [
+            "@Query(\"SELECT ptype FROM PetType ptype ORDER BY ptype.name\")"
+          ]
+        }
+      ],
+      "relationships": {
+        "PERSISTS": {
+          "org.springframework.samples.petclinic.owner.PetType": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.owner.PetTypeFormatter": 2,
+          "org.springframework.samples.petclinic.owner.PetController": 2
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.PetValidator": {
+      "methods": [
+        {
+          "signature": "public void validate(java.lang.Object, org.springframework.validation.Errors)",
+          "annotations": [
+            "@Override"
+          ]
+        },
+        {
+          "signature": "public boolean supports(null)",
+          "annotations": [
+            "@Override"
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private static final String REQUIRED"
+        }
+      ],
+      "relationships": {
+        "CREATED_BY": {
+          "org.springframework.samples.petclinic.owner.PetController": 1
+        },
+        "CALLS": {
+          "org.springframework.samples.petclinic.owner.Pet": 2,
+          "org.springframework.samples.petclinic.model.BaseEntity": 1,
+          "org.springframework.samples.petclinic.model.NamedEntity": 1
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.owner.Pet": 2
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.Visit": {
+      "annotations": [
+        "@Entity",
+        "@Table(name = \"visits\")"
+      ],
+      "methods": [
+        {
+          "signature": "public java.time.LocalDate getDate()"
+        },
+        {
+          "signature": "public void setDate(java.time.LocalDate)"
+        },
+        {
+          "signature": "public java.lang.String getDescription()"
+        },
+        {
+          "signature": "public void setDescription(java.lang.String)"
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Visit Visit()"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private LocalDate date",
+          "annotations": [
+            "@Column(name = \"visit_date\")",
+            "@DateTimeFormat(pattern = \"yyyy-MM-dd\")"
+          ]
+        },
+        {
+          "declaration": "private String description",
+          "annotations": [
+            "@NotBlank"
+          ]
+        }
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.BaseEntity": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.owner.Pet": 1,
+          "org.springframework.samples.petclinic.owner.VisitController": 1,
+          "org.springframework.samples.petclinic.owner.Owner": 5
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.owner.VisitController": {
+      "annotations": [
+        "@Controller"
+      ],
+      "methods": [
+        {
+          "signature": "public void setAllowedFields(org.springframework.web.bind.WebDataBinder)",
+          "annotations": [
+            "@InitBinder"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.Visit loadPetWithVisit(int, int, null)",
+          "annotations": [
+            "@ModelAttribute(\"visit\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String initNewVisitForm()",
+          "annotations": [
+            "@GetMapping(\"/owners/{ownerId}/pets/{petId}/visits/new\")"
+          ]
+        },
+        {
+          "signature": "public java.lang.String processNewVisitForm(org.springframework.samples.petclinic.owner.Owner, int, org.springframework.samples.petclinic.owner.Visit, org.springframework.validation.BindingResult, org.springframework.web.servlet.mvc.support.RedirectAttributes)",
+          "annotations": [
+            "@PostMapping(\"/owners/{ownerId}/pets/{petId}/visits/new\")"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.owner.VisitController VisitController(org.springframework.samples.petclinic.owner.OwnerRepository)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private final OwnerRepository owners"
+        }
+      ],
+      "relationships": {
+        "CALLS": {
+          "org.springframework.samples.petclinic.owner.Pet": 1,
+          "org.springframework.samples.petclinic.owner.Owner": 2
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.owner.Pet": 3,
+          "org.springframework.samples.petclinic.owner.Owner": 6,
+          "org.springframework.samples.petclinic.owner.OwnerRepository": 2,
+          "org.springframework.samples.petclinic.owner.Visit": 9
+        },
+        "CREATES": {
+          "org.springframework.samples.petclinic.owner.Visit": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.system.CacheConfiguration": {
+      "annotations": [
+        "@Configuration(proxyBeanMethods = false)",
+        "@EnableCaching"
+      ],
+      "methods": [
+        {
+          "signature": "public org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer petclinicCacheConfigurationCustomizer()",
+          "annotations": [
+            "@Bean"
+          ]
+        },
+        {
+          "signature": "private javax.cache.configuration.Configuration<Object,Object> cacheConfiguration()"
+        }
+      ],
+      "relationships": {}
+    },
+    "org.springframework.samples.petclinic.system.CrashController": {
+      "annotations": [
+        "@Controller"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.String triggerException()",
+          "annotations": [
+            "@GetMapping(\"/oups\")"
+          ]
+        }
+      ],
+      "relationships": {}
+    },
+    "org.springframework.samples.petclinic.system.WebConfiguration": {
+      "annotations": [
+        "@Configuration",
+        "@SuppressWarnings(\"unused\")"
+      ],
+      "methods": [
+        {
+          "signature": "public org.springframework.web.servlet.LocaleResolver localeResolver()",
+          "annotations": [
+            "@Bean"
+          ]
+        },
+        {
+          "signature": "public org.springframework.web.servlet.i18n.LocaleChangeInterceptor localeChangeInterceptor()",
+          "annotations": [
+            "@Bean"
+          ]
+        },
+        {
+          "signature": "public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry)",
+          "annotations": [
+            "@Override"
+          ]
+        }
+      ],
+      "relationships": {}
+    },
+    "org.springframework.samples.petclinic.system.WelcomeController": {
+      "annotations": [
+        "@Controller"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.String welcome()",
+          "annotations": [
+            "@GetMapping(\"/\")"
+          ]
+        }
+      ],
+      "relationships": {}
+    },
+    "org.springframework.samples.petclinic.vet.Specialty": {
+      "annotations": [
+        "@Entity",
+        "@Table(name = \"specialties\")"
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.NamedEntity": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.vet.Vet": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.vet.Vet": {
+      "annotations": [
+        "@Entity",
+        "@Table(name = \"vets\")"
+      ],
+      "methods": [
+        {
+          "signature": "protected null getSpecialtiesInternal()"
+        },
+        {
+          "signature": "public null getSpecialties()",
+          "annotations": [
+            "@XmlElement"
+          ]
+        },
+        {
+          "signature": "public int getNrOfSpecialties()"
+        },
+        {
+          "signature": "public void addSpecialty(org.springframework.samples.petclinic.vet.Specialty)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private Set<Specialty> specialties",
+          "annotations": [
+            "@ManyToMany(fetch = FetchType.EAGER)",
+            "@JoinTable(name = \"vet_specialties\", joinColumns = @JoinColumn(name = \"vet_id\"), inverseJoinColumns = @JoinColumn(name = \"specialty_id\"))"
+          ]
+        }
+      ],
+      "relationships": {
+        "EXTENDS": {
+          "org.springframework.samples.petclinic.model.Person": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.vet.VetController": 1,
+          "org.springframework.samples.petclinic.vet.Vets": 1
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.vet.Specialty": 4
+        },
+        "ASSOCIATES": {
+          "org.springframework.samples.petclinic.vet.Specialty": 1
+        },
+        "PERSISTED_BY": {
+          "org.springframework.samples.petclinic.vet.VetRepository": 1
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.vet.VetController": {
+      "annotations": [
+        "@Controller"
+      ],
+      "methods": [
+        {
+          "signature": "public java.lang.String showVetList(int, org.springframework.ui.Model)",
+          "annotations": [
+            "@GetMapping(\"/vets.html\")"
+          ]
+        },
+        {
+          "signature": "private java.lang.String addPaginationModel(int, null, org.springframework.ui.Model)"
+        },
+        {
+          "signature": "private null findPaginated(int)"
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.vet.Vets showResourcesVetList()",
+          "annotations": [
+            "@GetMapping({ \"/vets\" })",
+            "@ResponseBody"
+          ]
+        },
+        {
+          "signature": "public org.springframework.samples.petclinic.vet.VetController VetController(org.springframework.samples.petclinic.vet.VetRepository)"
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private final VetRepository vetRepository"
+        }
+      ],
+      "relationships": {
+        "CALLS": {
+          "org.springframework.samples.petclinic.vet.Vets": 2
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.vet.Vets": 6,
+          "org.springframework.samples.petclinic.vet.VetRepository": 2,
+          "org.springframework.samples.petclinic.vet.Vet": 1
+        },
+        "CREATES": {
+          "org.springframework.samples.petclinic.vet.Vets": 2
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.vet.VetRepository": {
+      "methods": [
+        {
+          "signature": "public abstract null findAll()",
+          "annotations": [
+            "@Transactional(readOnly = true)",
+            "@Cacheable(\"vets\")"
+          ]
+        },
+        {
+          "signature": "public abstract null findAll(org.springframework.data.domain.Pageable)",
+          "annotations": [
+            "@Transactional(readOnly = true)",
+            "@Cacheable(\"vets\")"
+          ]
+        }
+      ],
+      "relationships": {
+        "PERSISTS": {
+          "org.springframework.samples.petclinic.vet.Vet": 1
+        },
+        "USED_BY": {
+          "org.springframework.samples.petclinic.vet.VetController": 2
+        }
+      }
+    },
+    "org.springframework.samples.petclinic.vet.Vets": {
+      "annotations": [
+        "@XmlRootElement"
+      ],
+      "methods": [
+        {
+          "signature": "public null getVetList()",
+          "annotations": [
+            "@XmlElement"
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "declaration": "private List<Vet> vets"
+        }
+      ],
+      "relationships": {
+        "USED_BY": {
+          "org.springframework.samples.petclinic.vet.VetController": 2
+        },
+        "USES": {
+          "org.springframework.samples.petclinic.vet.Vet": 1
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+
+
+**Generate the JSON decomposition now, ensuring ALL 25 classes are assigned exactly once:**

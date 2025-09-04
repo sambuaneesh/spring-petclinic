@@ -1,0 +1,27 @@
+{
+  "validation": {
+    "status": "success",
+    "output": "\n\ud83d\udccb Validation Results for: gemini_only_decomposition_results/decomposition.json\n============================================================\n\n\u26a0\ufe0f  WARNINGS (2):\n  1. Consider adding 'uncounted' category for unassigned classes\n  2. Service name 'Presentation & API Gateway' might benefit from clearer naming (e.g., ending with 'Service')\n\n\u2705 FORMAT VALID! Only minor warnings.\n\n\ud83d\udcca Statistics:\n  - Total Services: 3\n  - Total Classes: 25\n  - Average Classes per Service: 8.3\n\n\ud83d\udce6 Service Breakdown:\n  - Customer Service: 14 classes\n  - Presentation & API Gateway: 5 classes\n  - Vets Service: 6 classes\n"
+  },
+  "metrics": {
+    "status": "success",
+    "file": "gemini_only_decomposition_results/metrics.json",
+    "values": {
+      "cmod": 97.4866569626395,
+      "cid": 100.0,
+      "di": 97.4866569626395
+    }
+  },
+  "comparison": {
+    "status": "success",
+    "file": "gemini_only_decomposition_results/comparison.json",
+    "summary": {
+      "wins": 2,
+      "ties": 1,
+      "losses": 0,
+      "overall_winner": "Your Framework",
+      "avg_improvement_percent": 10.241160719465979,
+      "significant_improvement": true
+    }
+  }
+}
