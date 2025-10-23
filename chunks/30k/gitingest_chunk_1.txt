@@ -1,0 +1,3592 @@
+Directory structure:
+└── spring-projects-spring-petclinic/
+    ├── README.md
+    ├── docker-compose.yml
+    ├── gradlew
+    ├── gradlew.bat
+    ├── LICENSE.txt
+    ├── mvnw
+    ├── mvnw.cmd
+    ├── pom.xml
+    ├── .editorconfig
+    ├── .gitpod.yml
+    ├── gradle/
+    │   └── wrapper/
+    │       └── gradle-wrapper.properties
+    ├── k8s/
+    │   ├── db.yml
+    │   └── petclinic.yml
+    ├── src/
+    │   ├── checkstyle/
+    │   │   ├── nohttp-checkstyle-suppressions.xml
+    │   │   └── nohttp-checkstyle.xml
+    │   ├── main/
+    │   │   ├── java/
+    │   │   │   └── org/
+    │   │   │       └── springframework/
+    │   │   │           └── samples/
+    │   │   │               └── petclinic/
+    │   │   │                   ├── PetClinicApplication.java
+    │   │   │                   ├── PetClinicRuntimeHints.java
+    │   │   │                   ├── model/
+    │   │   │                   │   ├── BaseEntity.java
+    │   │   │                   │   ├── NamedEntity.java
+    │   │   │                   │   ├── package-info.java
+    │   │   │                   │   └── Person.java
+    │   │   │                   ├── owner/
+    │   │   │                   │   ├── Owner.java
+    │   │   │                   │   ├── OwnerController.java
+    │   │   │                   │   ├── OwnerRepository.java
+    │   │   │                   │   ├── Pet.java
+    │   │   │                   │   ├── PetController.java
+    │   │   │                   │   ├── PetType.java
+    │   │   │                   │   ├── PetTypeFormatter.java
+    │   │   │                   │   ├── PetTypeRepository.java
+    │   │   │                   │   ├── PetValidator.java
+    │   │   │                   │   ├── Visit.java
+    │   │   │                   │   └── VisitController.java
+    │   │   │                   ├── system/
+    │   │   │                   │   ├── CacheConfiguration.java
+    │   │   │                   │   ├── CrashController.java
+    │   │   │                   │   ├── WebConfiguration.java
+    │   │   │                   │   └── WelcomeController.java
+    │   │   │                   └── vet/
+    │   │   │                       ├── Specialty.java
+    │   │   │                       ├── Vet.java
+    │   │   │                       ├── VetController.java
+    │   │   │                       ├── VetRepository.java
+    │   │   │                       └── Vets.java
+    │   │   ├── resources/
+    │   │   │   ├── application-mysql.properties
+    │   │   │   ├── application-postgres.properties
+    │   │   │   ├── application.properties
+    │   │   │   ├── banner.txt
+    │   │   │   ├── db/
+    │   │   │   │   ├── h2/
+    │   │   │   │   │   ├── data.sql
+    │   │   │   │   │   └── schema.sql
+    │   │   │   │   ├── hsqldb/
+    │   │   │   │   │   ├── data.sql
+    │   │   │   │   │   └── schema.sql
+    │   │   │   │   ├── mysql/
+    │   │   │   │   │   ├── data.sql
+    │   │   │   │   │   ├── petclinic_db_setup_mysql.txt
+    │   │   │   │   │   ├── schema.sql
+    │   │   │   │   │   └── user.sql
+    │   │   │   │   └── postgres/
+    │   │   │   │       ├── data.sql
+    │   │   │   │       ├── petclinic_db_setup_postgres.txt
+    │   │   │   │       └── schema.sql
+    │   │   │   ├── messages/
+    │   │   │   │   ├── messages.properties
+    │   │   │   │   ├── messages_de.properties
+    │   │   │   │   ├── messages_en.properties
+    │   │   │   │   ├── messages_es.properties
+    │   │   │   │   ├── messages_fa.properties
+    │   │   │   │   ├── messages_ko.properties
+    │   │   │   │   ├── messages_pt.properties
+    │   │   │   │   ├── messages_ru.properties
+    │   │   │   │   └── messages_tr.properties
+    │   │   │   ├── static/
+    │   │   │   │   └── resources/
+    │   │   │   │       └── fonts/
+    │   │   │   │           ├── montserrat-webfont.eot
+    │   │   │   │           ├── montserrat-webfont.ttf
+    │   │   │   │           ├── montserrat-webfont.woff
+    │   │   │   │           ├── varela_round-webfont.eot
+    │   │   │   │           └── varela_round-webfont.woff
+    │   │   │   └── templates/
+    │   │   │       ├── error.html
+    │   │   │       ├── welcome.html
+    │   │   │       ├── fragments/
+    │   │   │       │   ├── inputField.html
+    │   │   │       │   ├── layout.html
+    │   │   │       │   └── selectField.html
+    │   │   │       ├── owners/
+    │   │   │       │   ├── createOrUpdateOwnerForm.html
+    │   │   │       │   ├── findOwners.html
+    │   │   │       │   ├── ownerDetails.html
+    │   │   │       │   └── ownersList.html
+    │   │   │       ├── pets/
+    │   │   │       │   ├── createOrUpdatePetForm.html
+    │   │   │       │   └── createOrUpdateVisitForm.html
+    │   │   │       └── vets/
+    │   │   │           └── vetList.html
+    │   │   └── scss/
+    │   │       ├── header.scss
+    │   │       ├── petclinic.scss
+    │   │       ├── responsive.scss
+    │   │       └── typography.scss
+    │   └── test/
+    │       ├── java/
+    │       │   └── org/
+    │       │       └── springframework/
+    │       │           └── samples/
+    │       │               └── petclinic/
+    │       │                   ├── MySqlIntegrationTests.java
+    │       │                   ├── MysqlTestApplication.java
+    │       │                   ├── PetClinicIntegrationTests.java
+    │       │                   ├── PostgresIntegrationTests.java
+    │       │                   ├── model/
+    │       │                   │   └── ValidatorTests.java
+    │       │                   ├── owner/
+    │       │                   │   ├── OwnerControllerTests.java
+    │       │                   │   ├── PetControllerTests.java
+    │       │                   │   ├── PetTypeFormatterTests.java
+    │       │                   │   ├── PetValidatorTests.java
+    │       │                   │   └── VisitControllerTests.java
+    │       │                   ├── service/
+    │       │                   │   ├── ClinicServiceTests.java
+    │       │                   │   └── EntityUtils.java
+    │       │                   ├── system/
+    │       │                   │   ├── CrashControllerIntegrationTests.java
+    │       │                   │   ├── CrashControllerTests.java
+    │       │                   │   └── I18nPropertiesSyncTest.java
+    │       │                   └── vet/
+    │       │                       ├── VetControllerTests.java
+    │       │                       └── VetTests.java
+    │       └── jmeter/
+    │           └── petclinic_test_plan.jmx
+    ├── .devcontainer/
+    │   ├── devcontainer.json
+    │   └── Dockerfile
+    ├── .github/
+    │   ├── dco.yml
+    │   └── workflows/
+    │       ├── deploy-and-test-cluster.yml
+    │       ├── gradle-build.yml
+    │       └── maven-build.yml
+    └── .mvn/
+        └── wrapper/
+            └── maven-wrapper.properties
+
+================================================
+FILE: README.md
+================================================
+# Spring PetClinic Sample Application [![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml)[![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml)
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/spring-projects/spring-petclinic) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=7517918)
+
+## Understanding the Spring Petclinic application with a few diagrams
+
+[See the presentation here](https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application)
+
+## Run Petclinic locally
+
+Spring Petclinic is a [Spring Boot](https://spring.io/guides/gs/spring-boot) application built using [Maven](https://spring.io/guides/gs/maven/) or [Gradle](https://spring.io/guides/gs/gradle/). You can build a jar file and run it from the command line (it should work just as well with Java 17 or newer):
+
+```bash
+git clone https://github.com/spring-projects/spring-petclinic.git
+cd spring-petclinic
+./mvnw package
+java -jar target/*.jar
+```
+
+(On Windows, or if your shell doesn't expand the glob, you might need to specify the JAR file name explicitly on the command line at the end there.)
+
+You can then access the Petclinic at <http://localhost:8080/>.
+
+<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
+
+Or you can run it from Maven directly using the Spring Boot Maven plugin. If you do this, it will pick up changes that you make in the project immediately (changes to Java source files require a compile as well - most people use an IDE for this):
+
+```bash
+./mvnw spring-boot:run
+```
+
+> NOTE: If you prefer to use Gradle, you can build the app using `./gradlew build` and look for the jar file in `build/libs`.
+
+## Building a Container
+
+There is no `Dockerfile` in this project. You can build a container image (if you have a docker daemon) using the Spring Boot build plugin:
+
+```bash
+./mvnw spring-boot:build-image
+```
+
+## In case you find a bug/suggested improvement for Spring Petclinic
+
+Our issue tracker is available [here](https://github.com/spring-projects/spring-petclinic/issues).
+
+## Database configuration
+
+In its default configuration, Petclinic uses an in-memory database (H2) which
+gets populated at startup with data. The h2 console is exposed at `http://localhost:8080/h2-console`,
+and it is possible to inspect the content of the database using the `jdbc:h2:mem:<uuid>` URL. The UUID is printed at startup to the console.
+
+A similar setup is provided for MySQL and PostgreSQL if a persistent database configuration is needed. Note that whenever the database type changes, the app needs to run with a different profile: `spring.profiles.active=mysql` for MySQL or `spring.profiles.active=postgres` for PostgreSQL. See the [Spring Boot documentation](https://docs.spring.io/spring-boot/how-to/properties-and-configuration.html#howto.properties-and-configuration.set-active-spring-profiles) for more detail on how to set the active profile.
+
+You can start MySQL or PostgreSQL locally with whatever installer works for your OS or use docker:
+
+```bash
+docker run -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:9.2
+```
+
+or
+
+```bash
+docker run -e POSTGRES_USER=petclinic -e POSTGRES_PASSWORD=petclinic -e POSTGRES_DB=petclinic -p 5432:5432 postgres:17.5
+```
+
+Further documentation is provided for [MySQL](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/mysql/petclinic_db_setup_mysql.txt)
+and [PostgreSQL](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/postgres/petclinic_db_setup_postgres.txt).
+
+Instead of vanilla `docker` you can also use the provided `docker-compose.yml` file to start the database containers. Each one has a service named after the Spring profile:
+
+```bash
+docker compose up mysql
+```
+
+or
+
+```bash
+docker compose up postgres
+```
+
+## Test Applications
+
+At development time we recommend you use the test applications set up as `main()` methods in `PetClinicIntegrationTests` (using the default H2 database and also adding Spring Boot Devtools), `MySqlTestApplication` and `PostgresIntegrationTests`. These are set up so that you can run the apps in your IDE to get fast feedback and also run the same classes as integration tests against the respective database. The MySql integration tests use Testcontainers to start the database in a Docker container, and the Postgres tests use Docker Compose to do the same thing.
+
+## Compiling the CSS
+
+There is a `petclinic.css` in `src/main/resources/static/resources/css`. It was generated from the `petclinic.scss` source, combined with the [Bootstrap](https://getbootstrap.com/) library. If you make changes to the `scss`, or upgrade Bootstrap, you will need to re-compile the CSS resources using the Maven profile "css", i.e. `./mvnw package -P css`. There is no build profile for Gradle to compile the CSS.
+
+## Working with Petclinic in your IDE
+
+### Prerequisites
+
+The following items should be installed in your system:
+
+- Java 17 or newer (full JDK, not a JRE)
+- [Git command line tool](https://help.github.com/articles/set-up-git)
+- Your preferred IDE
+  - Eclipse with the m2e plugin. Note: when m2e is available, there is an m2 icon in `Help -> About` dialog. If m2e is
+  not there, follow the install process [here](https://www.eclipse.org/m2e/)
+  - [Spring Tools Suite](https://spring.io/tools) (STS)
+  - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
+  - [VS Code](https://code.visualstudio.com)
+
+### Steps
+
+1. On the command line run:
+
+    ```bash
+    git clone https://github.com/spring-projects/spring-petclinic.git
+    ```
+
+1. Inside Eclipse or STS:
+
+    Open the project via `File -> Import -> Maven -> Existing Maven project`, then select the root directory of the cloned repo.
+
+    Then either build on the command line `./mvnw generate-resources` or use the Eclipse launcher (right-click on project and `Run As -> Maven install`) to generate the CSS. Run the application's main method by right-clicking on it and choosing `Run As -> Java Application`.
+
+1. Inside IntelliJ IDEA:
+
+    In the main menu, choose `File -> Open` and select the Petclinic [pom.xml](pom.xml). Click on the `Open` button.
+
+    - CSS files are generated from the Maven build. You can build them on the command line `./mvnw generate-resources` or right-click on the `spring-petclinic` project then `Maven -> Generates sources and Update Folders`.
+
+    - A run configuration named `PetClinicApplication` should have been created for you if you're using a recent Ultimate version. Otherwise, run the application by right-clicking on the `PetClinicApplication` main class and choosing `Run 'PetClinicApplication'`.
+
+1. Navigate to the Petclinic
+
+    Visit [http://localhost:8080](http://localhost:8080) in your browser.
+
+## Looking for something in particular?
+
+|Spring Boot Configuration | Class or Java property files  |
+|--------------------------|---|
+|The Main Class | [PetClinicApplication](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java) |
+|Properties Files | [application.properties](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources) |
+|Caching | [CacheConfiguration](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/system/CacheConfiguration.java) |
+
+## Interesting Spring Petclinic branches and forks
+
+The Spring Petclinic "main" branch in the [spring-projects](https://github.com/spring-projects/spring-petclinic)
+GitHub org is the "canonical" implementation based on Spring Boot and Thymeleaf. There are
+[quite a few forks](https://spring-petclinic.github.io/docs/forks.html) in the GitHub org
+[spring-petclinic](https://github.com/spring-petclinic). If you are interested in using a different technology stack to implement the Pet Clinic, please join the community there.
+
+## Interaction with other open-source projects
+
+One of the best parts about working on the Spring Petclinic application is that we have the opportunity to work in direct contact with many Open Source projects. We found bugs/suggested improvements on various topics such as Spring, Spring Data, Bean Validation and even Eclipse! In many cases, they've been fixed/implemented in just a few days.
+Here is a list of them:
+
+| Name | Issue |
+|------|-------|
+| Spring JDBC: simplify usage of NamedParameterJdbcTemplate | [SPR-10256](https://github.com/spring-projects/spring-framework/issues/14889) and [SPR-10257](https://github.com/spring-projects/spring-framework/issues/14890) |
+| Bean Validation / Hibernate Validator: simplify Maven dependencies and backward compatibility |[HV-790](https://hibernate.atlassian.net/browse/HV-790) and [HV-792](https://hibernate.atlassian.net/browse/HV-792) |
+| Spring Data: provide more flexibility when working with JPQL queries | [DATAJPA-292](https://github.com/spring-projects/spring-data-jpa/issues/704) |
+
+## Contributing
+
+The [issue tracker](https://github.com/spring-projects/spring-petclinic/issues) is the preferred channel for bug reports, feature requests and submitting pull requests.
+
+For pull requests, editor preferences are available in the [editor config](.editorconfig) for easy use in common text editors. Read more and download plugins at <https://editorconfig.org>. All commits must include a __Signed-off-by__ trailer at the end of each commit message to indicate that the contributor agrees to the Developer Certificate of Origin.
+For additional details, please refer to the blog post [Hello DCO, Goodbye CLA: Simplifying Contributions to Spring](https://spring.io/blog/2025/01/06/hello-dco-goodbye-cla-simplifying-contributions-to-spring).
+
+## License
+
+The Spring PetClinic sample application is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
+
+
+
+================================================
+FILE: docker-compose.yml
+================================================
+services:
+  mysql:
+    image: mysql:9.2
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_USER=petclinic
+      - MYSQL_PASSWORD=petclinic
+      - MYSQL_DATABASE=petclinic
+    volumes:
+      - "./conf.d:/etc/mysql/conf.d:ro"
+  postgres:
+    image: postgres:17.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=petclinic
+      - POSTGRES_USER=petclinic
+      - POSTGRES_DB=petclinic
+
+
+
+================================================
+FILE: gradlew
+================================================
+#!/bin/sh
+
+#
+# Copyright © 2015-2021 the original authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+##############################################################################
+#
+#   Gradle start up script for POSIX generated by Gradle.
+#
+#   Important for running:
+#
+#   (1) You need a POSIX-compliant shell to run this script. If your /bin/sh is
+#       noncompliant, but you have some other compliant shell such as ksh or
+#       bash, then to run this script, type that shell name before the whole
+#       command line, like:
+#
+#           ksh Gradle
+#
+#       Busybox and similar reduced shells will NOT work, because this script
+#       requires all of these POSIX shell features:
+#         * functions;
+#         * expansions «$var», «${var}», «${var:-default}», «${var+SET}»,
+#           «${var#prefix}», «${var%suffix}», and «$( cmd )»;
+#         * compound commands having a testable exit status, especially «case»;
+#         * various built-in commands including «command», «set», and «ulimit».
+#
+#   Important for patching:
+#
+#   (2) This script targets any POSIX shell, so it avoids extensions provided
+#       by Bash, Ksh, etc; in particular arrays are avoided.
+#
+#       The "traditional" practice of packing multiple parameters into a
+#       space-separated string is a well documented source of bugs and security
+#       problems, so this is (mostly) avoided, by progressively accumulating
+#       options in "$@", and eventually passing that to Java.
+#
+#       Where the inherited environment variables (DEFAULT_JVM_OPTS, JAVA_OPTS,
+#       and GRADLE_OPTS) rely on word-splitting, this is performed explicitly;
+#       see the in-line comments for details.
+#
+#       There are tweaks for specific operating systems such as AIX, CygWin,
+#       Darwin, MinGW, and NonStop.
+#
+#   (3) This script is generated from the Groovy template
+#       https://github.com/gradle/gradle/blob/HEAD/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+#       within the Gradle project.
+#
+#       You can find Gradle at https://github.com/gradle/gradle/.
+#
+##############################################################################
+
+# Attempt to set APP_HOME
+
+# Resolve links: $0 may be a link
+app_path=$0
+
+# Need this for daisy-chained symlinks.
+while
+    APP_HOME=${app_path%"${app_path##*/}"}  # leaves a trailing /; empty if no leading path
+    [ -h "$app_path" ]
+do
+    ls=$( ls -ld "$app_path" )
+    link=${ls#*' -> '}
+    case $link in             #(
+      /*)   app_path=$link ;; #(
+      *)    app_path=$APP_HOME$link ;;
+    esac
+done
+
+# This is normally unused
+# shellcheck disable=SC2034
+APP_BASE_NAME=${0##*/}
+# Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
+APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
+
+# Use the maximum available, or set MAX_FD != -1 to use that value.
+MAX_FD=maximum
+
+warn () {
+    echo "$*"
+} >&2
+
+die () {
+    echo
+    echo "$*"
+    echo
+    exit 1
+} >&2
+
+# OS specific support (must be 'true' or 'false').
+cygwin=false
+msys=false
+darwin=false
+nonstop=false
+case "$( uname )" in                #(
+  CYGWIN* )         cygwin=true  ;; #(
+  Darwin* )         darwin=true  ;; #(
+  MSYS* | MINGW* )  msys=true    ;; #(
+  NONSTOP* )        nonstop=true ;;
+esac
+
+CLASSPATH="\\\"\\\""
+
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+        # IBM's JDK on AIX uses strange locations for the executables
+        JAVACMD=$JAVA_HOME/jre/sh/java
+    else
+        JAVACMD=$JAVA_HOME/bin/java
+    fi
+    if [ ! -x "$JAVACMD" ] ; then
+        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+else
+    JAVACMD=java
+    if ! command -v java >/dev/null 2>&1
+    then
+        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+fi
+
+# Increase the maximum file descriptors if we can.
+if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
+    case $MAX_FD in #(
+      max*)
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        MAX_FD=$( ulimit -H -n ) ||
+            warn "Could not query maximum file descriptor limit"
+    esac
+    case $MAX_FD in  #(
+      '' | soft) :;; #(
+      *)
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        ulimit -n "$MAX_FD" ||
+            warn "Could not set maximum file descriptor limit to $MAX_FD"
+    esac
+fi
+
+# Collect all arguments for the java command, stacking in reverse order:
+#   * args from the command line
+#   * the main class name
+#   * -classpath
+#   * -D...appname settings
+#   * --module-path (only if needed)
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
+
+# For Cygwin or MSYS, switch paths to Windows format before running java
+if "$cygwin" || "$msys" ; then
+    APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
+    CLASSPATH=$( cygpath --path --mixed "$CLASSPATH" )
+
+    JAVACMD=$( cygpath --unix "$JAVACMD" )
+
+    # Now convert the arguments - kludge to limit ourselves to /bin/sh
+    for arg do
+        if
+            case $arg in                                #(
+              -*)   false ;;                            # don't mess with options #(
+              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
+                    [ -e "$t" ] ;;                      #(
+              *)    false ;;
+            esac
+        then
+            arg=$( cygpath --path --ignore --mixed "$arg" )
+        fi
+        # Roll the args list around exactly as many times as the number of
+        # args, so each arg winds up back in the position where it started, but
+        # possibly modified.
+        #
+        # NB: a `for` loop captures its iteration list before it begins, so
+        # changing the positional parameters here affects neither the number of
+        # iterations, nor the values presented in `arg`.
+        shift                   # remove old arg
+        set -- "$@" "$arg"      # push replacement arg
+    done
+fi
+
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+# Collect all arguments for the java command:
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
+#     and any embedded shellness will be escaped.
+#   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
+#     treated as '${Hostname}' itself on the command line.
+
+set -- \
+        "-Dorg.gradle.appname=$APP_BASE_NAME" \
+        -classpath "$CLASSPATH" \
+        -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+        "$@"
+
+# Stop when "xargs" is not available.
+if ! command -v xargs >/dev/null 2>&1
+then
+    die "xargs is not available"
+fi
+
+# Use "xargs" to parse quoted args.
+#
+# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
+#
+# In Bash we could simply go:
+#
+#   readarray ARGS < <( xargs -n1 <<<"$var" ) &&
+#   set -- "${ARGS[@]}" "$@"
+#
+# but POSIX shell has neither arrays nor command substitution, so instead we
+# post-process each arg (as a line of input to sed) to backslash-escape any
+# character that might be a shell metacharacter, then use eval to reverse
+# that process (while maintaining the separation between arguments), and wrap
+# the whole thing up as a single "set" statement.
+#
+# This will of course break if any of these variables contains a newline or
+# an unmatched quote.
+#
+
+eval "set -- $(
+        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
+        xargs -n1 |
+        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
+        tr '\n' ' '
+    )" '"$@"'
+
+exec "$JAVACMD" "$@"
+
+
+
+================================================
+FILE: gradlew.bat
+================================================
+@rem
+@rem Copyright 2015 the original author or authors.
+@rem
+@rem Licensed under the Apache License, Version 2.0 (the "License");
+@rem you may not use this file except in compliance with the License.
+@rem You may obtain a copy of the License at
+@rem
+@rem      https://www.apache.org/licenses/LICENSE-2.0
+@rem
+@rem Unless required by applicable law or agreed to in writing, software
+@rem distributed under the License is distributed on an "AS IS" BASIS,
+@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@rem See the License for the specific language governing permissions and
+@rem limitations under the License.
+@rem
+@rem SPDX-License-Identifier: Apache-2.0
+@rem
+
+@if "%DEBUG%"=="" @echo off
+@rem ##########################################################################
+@rem
+@rem  Gradle startup script for Windows
+@rem
+@rem ##########################################################################
+
+@rem Set local scope for the variables with windows NT shell
+if "%OS%"=="Windows_NT" setlocal
+
+set DIRNAME=%~dp0
+if "%DIRNAME%"=="" set DIRNAME=.
+@rem This is normally unused
+set APP_BASE_NAME=%~n0
+set APP_HOME=%DIRNAME%
+
+@rem Resolve any "." and ".." in APP_HOME to make it shorter.
+for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
+
+@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+
+@rem Find java.exe
+if defined JAVA_HOME goto findJavaFromJavaHome
+
+set JAVA_EXE=java.exe
+%JAVA_EXE% -version >NUL 2>&1
+if %ERRORLEVEL% equ 0 goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+goto fail
+
+:findJavaFromJavaHome
+set JAVA_HOME=%JAVA_HOME:"=%
+set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+
+if exist "%JAVA_EXE%" goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+goto fail
+
+:execute
+@rem Setup the command line
+
+set CLASSPATH=
+
+
+@rem Execute Gradle
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %*
+
+:end
+@rem End local scope for the variables with windows NT shell
+if %ERRORLEVEL% equ 0 goto mainEnd
+
+:fail
+rem Set variable GRADLE_EXIT_CONSOLE if you need the _script_ return code instead of
+rem the _cmd.exe /c_ return code!
+set EXIT_CODE=%ERRORLEVEL%
+if %EXIT_CODE% equ 0 set EXIT_CODE=1
+if not ""=="%GRADLE_EXIT_CONSOLE%" exit %EXIT_CODE%
+exit /b %EXIT_CODE%
+
+:mainEnd
+if "%OS%"=="Windows_NT" endlocal
+
+:omega
+
+
+
+================================================
+FILE: LICENSE.txt
+================================================
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        https://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+
+================================================
+FILE: mvnw
+================================================
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Apache Maven Wrapper startup batch script, version 3.3.2
+#
+# Optional ENV vars
+# -----------------
+#   JAVA_HOME - location of a JDK home dir, required when download maven via java source
+#   MVNW_REPOURL - repo url base for downloading maven distribution
+#   MVNW_USERNAME/MVNW_PASSWORD - user and password for downloading maven
+#   MVNW_VERBOSE - true: enable verbose log; debug: trace the mvnw script; others: silence the output
+# ----------------------------------------------------------------------------
+
+set -euf
+[ "${MVNW_VERBOSE-}" != debug ] || set -x
+
+# OS specific support.
+native_path() { printf %s\\n "$1"; }
+case "$(uname)" in
+CYGWIN* | MINGW*)
+  [ -z "${JAVA_HOME-}" ] || JAVA_HOME="$(cygpath --unix "$JAVA_HOME")"
+  native_path() { cygpath --path --windows "$1"; }
+  ;;
+esac
+
+# set JAVACMD and JAVACCMD
+set_java_home() {
+  # For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
+  if [ -n "${JAVA_HOME-}" ]; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ]; then
+      # IBM's JDK on AIX uses strange locations for the executables
+      JAVACMD="$JAVA_HOME/jre/sh/java"
+      JAVACCMD="$JAVA_HOME/jre/sh/javac"
+    else
+      JAVACMD="$JAVA_HOME/bin/java"
+      JAVACCMD="$JAVA_HOME/bin/javac"
+
+      if [ ! -x "$JAVACMD" ] || [ ! -x "$JAVACCMD" ]; then
+        echo "The JAVA_HOME environment variable is not defined correctly, so mvnw cannot run." >&2
+        echo "JAVA_HOME is set to \"$JAVA_HOME\", but \"\$JAVA_HOME/bin/java\" or \"\$JAVA_HOME/bin/javac\" does not exist." >&2
+        return 1
+      fi
+    fi
+  else
+    JAVACMD="$(
+      'set' +e
+      'unset' -f command 2>/dev/null
+      'command' -v java
+    )" || :
+    JAVACCMD="$(
+      'set' +e
+      'unset' -f command 2>/dev/null
+      'command' -v javac
+    )" || :
+
+    if [ ! -x "${JAVACMD-}" ] || [ ! -x "${JAVACCMD-}" ]; then
+      echo "The java/javac command does not exist in PATH nor is JAVA_HOME set, so mvnw cannot run." >&2
+      return 1
+    fi
+  fi
+}
+
+# hash string like Java String::hashCode
+hash_string() {
+  str="${1:-}" h=0
+  while [ -n "$str" ]; do
+    char="${str%"${str#?}"}"
+    h=$(((h * 31 + $(LC_CTYPE=C printf %d "'$char")) % 4294967296))
+    str="${str#?}"
+  done
+  printf %x\\n $h
+}
+
+verbose() { :; }
+[ "${MVNW_VERBOSE-}" != true ] || verbose() { printf %s\\n "${1-}"; }
+
+die() {
+  printf %s\\n "$1" >&2
+  exit 1
+}
+
+trim() {
+  # MWRAPPER-139:
+  #   Trims trailing and leading whitespace, carriage returns, tabs, and linefeeds.
+  #   Needed for removing poorly interpreted newline sequences when running in more
+  #   exotic environments such as mingw bash on Windows.
+  printf "%s" "${1}" | tr -d '[:space:]'
+}
+
+# parse distributionUrl and optional distributionSha256Sum, requires .mvn/wrapper/maven-wrapper.properties
+while IFS="=" read -r key value; do
+  case "${key-}" in
+  distributionUrl) distributionUrl=$(trim "${value-}") ;;
+  distributionSha256Sum) distributionSha256Sum=$(trim "${value-}") ;;
+  esac
+done <"${0%/*}/.mvn/wrapper/maven-wrapper.properties"
+[ -n "${distributionUrl-}" ] || die "cannot read distributionUrl property in ${0%/*}/.mvn/wrapper/maven-wrapper.properties"
+
+case "${distributionUrl##*/}" in
+maven-mvnd-*bin.*)
+  MVN_CMD=mvnd.sh _MVNW_REPO_PATTERN=/maven/mvnd/
+  case "${PROCESSOR_ARCHITECTURE-}${PROCESSOR_ARCHITEW6432-}:$(uname -a)" in
+  *AMD64:CYGWIN* | *AMD64:MINGW*) distributionPlatform=windows-amd64 ;;
+  :Darwin*x86_64) distributionPlatform=darwin-amd64 ;;
+  :Darwin*arm64) distributionPlatform=darwin-aarch64 ;;
+  :Linux*x86_64*) distributionPlatform=linux-amd64 ;;
+  *)
+    echo "Cannot detect native platform for mvnd on $(uname)-$(uname -m), use pure java version" >&2
+    distributionPlatform=linux-amd64
+    ;;
+  esac
+  distributionUrl="${distributionUrl%-bin.*}-$distributionPlatform.zip"
+  ;;
+maven-mvnd-*) MVN_CMD=mvnd.sh _MVNW_REPO_PATTERN=/maven/mvnd/ ;;
+*) MVN_CMD="mvn${0##*/mvnw}" _MVNW_REPO_PATTERN=/org/apache/maven/ ;;
+esac
+
+# apply MVNW_REPOURL and calculate MAVEN_HOME
+# maven home pattern: ~/.m2/wrapper/dists/{apache-maven-<version>,maven-mvnd-<version>-<platform>}/<hash>
+[ -z "${MVNW_REPOURL-}" ] || distributionUrl="$MVNW_REPOURL$_MVNW_REPO_PATTERN${distributionUrl#*"$_MVNW_REPO_PATTERN"}"
+distributionUrlName="${distributionUrl##*/}"
+distributionUrlNameMain="${distributionUrlName%.*}"
+distributionUrlNameMain="${distributionUrlNameMain%-bin}"
+MAVEN_USER_HOME="${MAVEN_USER_HOME:-${HOME}/.m2}"
+MAVEN_HOME="${MAVEN_USER_HOME}/wrapper/dists/${distributionUrlNameMain-}/$(hash_string "$distributionUrl")"
+
+exec_maven() {
+  unset MVNW_VERBOSE MVNW_USERNAME MVNW_PASSWORD MVNW_REPOURL || :
+  exec "$MAVEN_HOME/bin/$MVN_CMD" "$@" || die "cannot exec $MAVEN_HOME/bin/$MVN_CMD"
+}
+
+if [ -d "$MAVEN_HOME" ]; then
+  verbose "found existing MAVEN_HOME at $MAVEN_HOME"
+  exec_maven "$@"
+fi
+
+case "${distributionUrl-}" in
+*?-bin.zip | *?maven-mvnd-?*-?*.zip) ;;
+*) die "distributionUrl is not valid, must match *-bin.zip or maven-mvnd-*.zip, but found '${distributionUrl-}'" ;;
+esac
+
+# prepare tmp dir
+if TMP_DOWNLOAD_DIR="$(mktemp -d)" && [ -d "$TMP_DOWNLOAD_DIR" ]; then
+  clean() { rm -rf -- "$TMP_DOWNLOAD_DIR"; }
+  trap clean HUP INT TERM EXIT
+else
+  die "cannot create temp dir"
+fi
+
+mkdir -p -- "${MAVEN_HOME%/*}"
+
+# Download and Install Apache Maven
+verbose "Couldn't find MAVEN_HOME, downloading and installing it ..."
+verbose "Downloading from: $distributionUrl"
+verbose "Downloading to: $TMP_DOWNLOAD_DIR/$distributionUrlName"
+
+# select .zip or .tar.gz
+if ! command -v unzip >/dev/null; then
+  distributionUrl="${distributionUrl%.zip}.tar.gz"
+  distributionUrlName="${distributionUrl##*/}"
+fi
+
+# verbose opt
+__MVNW_QUIET_WGET=--quiet __MVNW_QUIET_CURL=--silent __MVNW_QUIET_UNZIP=-q __MVNW_QUIET_TAR=''
+[ "${MVNW_VERBOSE-}" != true ] || __MVNW_QUIET_WGET='' __MVNW_QUIET_CURL='' __MVNW_QUIET_UNZIP='' __MVNW_QUIET_TAR=v
+
+# normalize http auth
+case "${MVNW_PASSWORD:+has-password}" in
+'') MVNW_USERNAME='' MVNW_PASSWORD='' ;;
+has-password) [ -n "${MVNW_USERNAME-}" ] || MVNW_USERNAME='' MVNW_PASSWORD='' ;;
+esac
+
+if [ -z "${MVNW_USERNAME-}" ] && command -v wget >/dev/null; then
+  verbose "Found wget ... using wget"
+  wget ${__MVNW_QUIET_WGET:+"$__MVNW_QUIET_WGET"} "$distributionUrl" -O "$TMP_DOWNLOAD_DIR/$distributionUrlName" || die "wget: Failed to fetch $distributionUrl"
+elif [ -z "${MVNW_USERNAME-}" ] && command -v curl >/dev/null; then
+  verbose "Found curl ... using curl"
+  curl ${__MVNW_QUIET_CURL:+"$__MVNW_QUIET_CURL"} -f -L -o "$TMP_DOWNLOAD_DIR/$distributionUrlName" "$distributionUrl" || die "curl: Failed to fetch $distributionUrl"
+elif set_java_home; then
+  verbose "Falling back to use Java to download"
+  javaSource="$TMP_DOWNLOAD_DIR/Downloader.java"
+  targetZip="$TMP_DOWNLOAD_DIR/$distributionUrlName"
+  cat >"$javaSource" <<-END
+	public class Downloader extends java.net.Authenticator
+	{
+	  protected java.net.PasswordAuthentication getPasswordAuthentication()
+	  {
+	    return new java.net.PasswordAuthentication( System.getenv( "MVNW_USERNAME" ), System.getenv( "MVNW_PASSWORD" ).toCharArray() );
+	  }
+	  public static void main( String[] args ) throws Exception
+	  {
+	    setDefault( new Downloader() );
+	    java.nio.file.Files.copy( java.net.URI.create( args[0] ).toURL().openStream(), java.nio.file.Paths.get( args[1] ).toAbsolutePath().normalize() );
+	  }
+	}
+	END
+  # For Cygwin/MinGW, switch paths to Windows format before running javac and java
+  verbose " - Compiling Downloader.java ..."
+  "$(native_path "$JAVACCMD")" "$(native_path "$javaSource")" || die "Failed to compile Downloader.java"
+  verbose " - Running Downloader.java ..."
+  "$(native_path "$JAVACMD")" -cp "$(native_path "$TMP_DOWNLOAD_DIR")" Downloader "$distributionUrl" "$(native_path "$targetZip")"
+fi
+
+# If specified, validate the SHA-256 sum of the Maven distribution zip file
+if [ -n "${distributionSha256Sum-}" ]; then
+  distributionSha256Result=false
+  if [ "$MVN_CMD" = mvnd.sh ]; then
+    echo "Checksum validation is not supported for maven-mvnd." >&2
+    echo "Please disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties." >&2
+    exit 1
+  elif command -v sha256sum >/dev/null; then
+    if echo "$distributionSha256Sum  $TMP_DOWNLOAD_DIR/$distributionUrlName" | sha256sum -c >/dev/null 2>&1; then
+      distributionSha256Result=true
+    fi
+  elif command -v shasum >/dev/null; then
+    if echo "$distributionSha256Sum  $TMP_DOWNLOAD_DIR/$distributionUrlName" | shasum -a 256 -c >/dev/null 2>&1; then
+      distributionSha256Result=true
+    fi
+  else
+    echo "Checksum validation was requested but neither 'sha256sum' or 'shasum' are available." >&2
+    echo "Please install either command, or disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties." >&2
+    exit 1
+  fi
+  if [ $distributionSha256Result = false ]; then
+    echo "Error: Failed to validate Maven distribution SHA-256, your Maven distribution might be compromised." >&2
+    echo "If you updated your Maven version, you need to update the specified distributionSha256Sum property." >&2
+    exit 1
+  fi
+fi
+
+# unzip and move
+if command -v unzip >/dev/null; then
+  unzip ${__MVNW_QUIET_UNZIP:+"$__MVNW_QUIET_UNZIP"} "$TMP_DOWNLOAD_DIR/$distributionUrlName" -d "$TMP_DOWNLOAD_DIR" || die "failed to unzip"
+else
+  tar xzf${__MVNW_QUIET_TAR:+"$__MVNW_QUIET_TAR"} "$TMP_DOWNLOAD_DIR/$distributionUrlName" -C "$TMP_DOWNLOAD_DIR" || die "failed to untar"
+fi
+printf %s\\n "$distributionUrl" >"$TMP_DOWNLOAD_DIR/$distributionUrlNameMain/mvnw.url"
+mv -- "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain" "$MAVEN_HOME" || [ -d "$MAVEN_HOME" ] || die "fail to move MAVEN_HOME"
+
+clean || :
+exec_maven "$@"
+
+
+
+================================================
+FILE: mvnw.cmd
+================================================
+<# : batch portion
+@REM ----------------------------------------------------------------------------
+@REM Licensed to the Apache Software Foundation (ASF) under one
+@REM or more contributor license agreements.  See the NOTICE file
+@REM distributed with this work for additional information
+@REM regarding copyright ownership.  The ASF licenses this file
+@REM to you under the Apache License, Version 2.0 (the
+@REM "License"); you may not use this file except in compliance
+@REM with the License.  You may obtain a copy of the License at
+@REM
+@REM    https://www.apache.org/licenses/LICENSE-2.0
+@REM
+@REM Unless required by applicable law or agreed to in writing,
+@REM software distributed under the License is distributed on an
+@REM "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+@REM KIND, either express or implied.  See the License for the
+@REM specific language governing permissions and limitations
+@REM under the License.
+@REM ----------------------------------------------------------------------------
+
+@REM ----------------------------------------------------------------------------
+@REM Apache Maven Wrapper startup batch script, version 3.3.2
+@REM
+@REM Optional ENV vars
+@REM   MVNW_REPOURL - repo url base for downloading maven distribution
+@REM   MVNW_USERNAME/MVNW_PASSWORD - user and password for downloading maven
+@REM   MVNW_VERBOSE - true: enable verbose log; others: silence the output
+@REM ----------------------------------------------------------------------------
+
+@IF "%__MVNW_ARG0_NAME__%"=="" (SET __MVNW_ARG0_NAME__=%~nx0)
+@SET __MVNW_CMD__=
+@SET __MVNW_ERROR__=
+@SET __MVNW_PSMODULEP_SAVE=%PSModulePath%
+@SET PSModulePath=
+@FOR /F "usebackq tokens=1* delims==" %%A IN (`powershell -noprofile "& {$scriptDir='%~dp0'; $script='%__MVNW_ARG0_NAME__%'; icm -ScriptBlock ([Scriptblock]::Create((Get-Content -Raw '%~f0'))) -NoNewScope}"`) DO @(
+  IF "%%A"=="MVN_CMD" (set __MVNW_CMD__=%%B) ELSE IF "%%B"=="" (echo %%A) ELSE (echo %%A=%%B)
+)
+@SET PSModulePath=%__MVNW_PSMODULEP_SAVE%
+@SET __MVNW_PSMODULEP_SAVE=
+@SET __MVNW_ARG0_NAME__=
+@SET MVNW_USERNAME=
+@SET MVNW_PASSWORD=
+@IF NOT "%__MVNW_CMD__%"=="" (%__MVNW_CMD__% %*)
+@echo Cannot start maven from wrapper >&2 && exit /b 1
+@GOTO :EOF
+: end batch / begin powershell #>
+
+$ErrorActionPreference = "Stop"
+if ($env:MVNW_VERBOSE -eq "true") {
+  $VerbosePreference = "Continue"
+}
+
+# calculate distributionUrl, requires .mvn/wrapper/maven-wrapper.properties
+$distributionUrl = (Get-Content -Raw "$scriptDir/.mvn/wrapper/maven-wrapper.properties" | ConvertFrom-StringData).distributionUrl
+if (!$distributionUrl) {
+  Write-Error "cannot read distributionUrl property in $scriptDir/.mvn/wrapper/maven-wrapper.properties"
+}
+
+switch -wildcard -casesensitive ( $($distributionUrl -replace '^.*/','') ) {
+  "maven-mvnd-*" {
+    $USE_MVND = $true
+    $distributionUrl = $distributionUrl -replace '-bin\.[^.]*$',"-windows-amd64.zip"
+    $MVN_CMD = "mvnd.cmd"
+    break
+  }
+  default {
+    $USE_MVND = $false
+    $MVN_CMD = $script -replace '^mvnw','mvn'
+    break
+  }
+}
+
+# apply MVNW_REPOURL and calculate MAVEN_HOME
+# maven home pattern: ~/.m2/wrapper/dists/{apache-maven-<version>,maven-mvnd-<version>-<platform>}/<hash>
+if ($env:MVNW_REPOURL) {
+  $MVNW_REPO_PATTERN = if ($USE_MVND) { "/org/apache/maven/" } else { "/maven/mvnd/" }
+  $distributionUrl = "$env:MVNW_REPOURL$MVNW_REPO_PATTERN$($distributionUrl -replace '^.*'+$MVNW_REPO_PATTERN,'')"
+}
+$distributionUrlName = $distributionUrl -replace '^.*/',''
+$distributionUrlNameMain = $distributionUrlName -replace '\.[^.]*$','' -replace '-bin$',''
+$MAVEN_HOME_PARENT = "$HOME/.m2/wrapper/dists/$distributionUrlNameMain"
+if ($env:MAVEN_USER_HOME) {
+  $MAVEN_HOME_PARENT = "$env:MAVEN_USER_HOME/wrapper/dists/$distributionUrlNameMain"
+}
+$MAVEN_HOME_NAME = ([System.Security.Cryptography.MD5]::Create().ComputeHash([byte[]][char[]]$distributionUrl) | ForEach-Object {$_.ToString("x2")}) -join ''
+$MAVEN_HOME = "$MAVEN_HOME_PARENT/$MAVEN_HOME_NAME"
+
+if (Test-Path -Path "$MAVEN_HOME" -PathType Container) {
+  Write-Verbose "found existing MAVEN_HOME at $MAVEN_HOME"
+  Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
+  exit $?
+}
+
+if (! $distributionUrlNameMain -or ($distributionUrlName -eq $distributionUrlNameMain)) {
+  Write-Error "distributionUrl is not valid, must end with *-bin.zip, but found $distributionUrl"
+}
+
+# prepare tmp dir
+$TMP_DOWNLOAD_DIR_HOLDER = New-TemporaryFile
+$TMP_DOWNLOAD_DIR = New-Item -Itemtype Directory -Path "$TMP_DOWNLOAD_DIR_HOLDER.dir"
+$TMP_DOWNLOAD_DIR_HOLDER.Delete() | Out-Null
+trap {
+  if ($TMP_DOWNLOAD_DIR.Exists) {
+    try { Remove-Item $TMP_DOWNLOAD_DIR -Recurse -Force | Out-Null }
+    catch { Write-Warning "Cannot remove $TMP_DOWNLOAD_DIR" }
+  }
+}
+
+New-Item -Itemtype Directory -Path "$MAVEN_HOME_PARENT" -Force | Out-Null
+
+# Download and Install Apache Maven
+Write-Verbose "Couldn't find MAVEN_HOME, downloading and installing it ..."
+Write-Verbose "Downloading from: $distributionUrl"
+Write-Verbose "Downloading to: $TMP_DOWNLOAD_DIR/$distributionUrlName"
+
+$webclient = New-Object System.Net.WebClient
+if ($env:MVNW_USERNAME -and $env:MVNW_PASSWORD) {
+  $webclient.Credentials = New-Object System.Net.NetworkCredential($env:MVNW_USERNAME, $env:MVNW_PASSWORD)
+}
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$webclient.DownloadFile($distributionUrl, "$TMP_DOWNLOAD_DIR/$distributionUrlName") | Out-Null
+
+# If specified, validate the SHA-256 sum of the Maven distribution zip file
+$distributionSha256Sum = (Get-Content -Raw "$scriptDir/.mvn/wrapper/maven-wrapper.properties" | ConvertFrom-StringData).distributionSha256Sum
+if ($distributionSha256Sum) {
+  if ($USE_MVND) {
+    Write-Error "Checksum validation is not supported for maven-mvnd. `nPlease disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties."
+  }
+  Import-Module $PSHOME\Modules\Microsoft.PowerShell.Utility -Function Get-FileHash
+  if ((Get-FileHash "$TMP_DOWNLOAD_DIR/$distributionUrlName" -Algorithm SHA256).Hash.ToLower() -ne $distributionSha256Sum) {
+    Write-Error "Error: Failed to validate Maven distribution SHA-256, your Maven distribution might be compromised. If you updated your Maven version, you need to update the specified distributionSha256Sum property."
+  }
+}
+
+# unzip and move
+Expand-Archive "$TMP_DOWNLOAD_DIR/$distributionUrlName" -DestinationPath "$TMP_DOWNLOAD_DIR" | Out-Null
+Rename-Item -Path "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain" -NewName $MAVEN_HOME_NAME | Out-Null
+try {
+  Move-Item -Path "$TMP_DOWNLOAD_DIR/$MAVEN_HOME_NAME" -Destination $MAVEN_HOME_PARENT | Out-Null
+} catch {
+  if (! (Test-Path -Path "$MAVEN_HOME" -PathType Container)) {
+    Write-Error "fail to move MAVEN_HOME"
+  }
+} finally {
+  try { Remove-Item $TMP_DOWNLOAD_DIR -Recurse -Force | Out-Null }
+  catch { Write-Warning "Cannot remove $TMP_DOWNLOAD_DIR" }
+}
+
+Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
+
+
+
+================================================
+FILE: pom.xml
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.0</version>
+    <relativePath></relativePath>
+  </parent>
+
+  <groupId>org.springframework.samples</groupId>
+  <artifactId>spring-petclinic</artifactId>
+  <version>3.5.0-SNAPSHOT</version>
+
+  <name>petclinic</name>
+
+  <properties>
+
+    <!-- Generic properties -->
+    <java.version>17</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- Important for reproducible builds. Update using e.g. ./mvnw versions:set -DnewVersion=... -->
+    <project.build.outputTimestamp>2024-11-28T14:37:52Z</project.build.outputTimestamp>
+
+    <!-- Web dependencies -->
+    <webjars-locator.version>1.1.0</webjars-locator.version>
+    <webjars-bootstrap.version>5.3.6</webjars-bootstrap.version>
+    <webjars-font-awesome.version>4.7.0</webjars-font-awesome.version>
+
+    <checkstyle.version>10.25.0</checkstyle.version>
+    <jacoco.version>0.8.13</jacoco.version>
+    <libsass.version>0.3.4</libsass.version>
+    <lifecycle-mapping>1.0.0</lifecycle-mapping>
+    <maven-checkstyle.version>3.6.0</maven-checkstyle.version>
+    <nohttp-checkstyle.version>0.0.11</nohttp-checkstyle.version>
+    <spring-format.version>0.0.46</spring-format.version>
+
+  </properties>
+
+  <dependencies>
+    <!-- Spring and Spring Boot dependencies -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Databases - Uses H2 by default -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Caching -->
+    <dependency>
+      <groupId>javax.cache</groupId>
+      <artifactId>cache-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
+    </dependency>
+
+    <!-- Webjars -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>webjars-locator-lite</artifactId>
+      <version>${webjars-locator.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>bootstrap</artifactId>
+      <version>${webjars-bootstrap.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>font-awesome</artifactId>
+      <version>${webjars-font-awesome.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-docker-compose</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>mysql</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <message>This build requires at least Java ${java.version}, update your JVM, and run the build again</message>
+                  <version>${java.version}</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>io.spring.javaformat</groupId>
+        <artifactId>spring-javaformat-maven-plugin</artifactId>
+        <version>${spring-format.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven-checkstyle.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>${checkstyle.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>io.spring.nohttp</groupId>
+            <artifactId>nohttp-checkstyle</artifactId>
+            <version>${nohttp-checkstyle.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>nohttp-checkstyle-validation</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <configLocation>src/checkstyle/nohttp-checkstyle.xml</configLocation>
+              <sourceDirectories>${basedir}</sourceDirectories>
+              <includes>**/*</includes>
+              <excludes>**/.git/**/*,**/.idea/**/*,**/target/**/,**/.flattened-pom.xml,**/*.class</excludes>
+              <propertyExpansion>config_loc=${basedir}/src/checkstyle/</propertyExpansion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.graalvm.buildtools</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Spring Boot Actuator displays build-related information
+              if a META-INF/build-info.properties file is present -->
+            <goals>
+              <goal>build-info</goal>
+            </goals>
+            <configuration>
+              <additionalProperties>
+                <encoding.source>${project.build.sourceEncoding}</encoding.source>
+                <encoding.reporting>${project.reporting.outputEncoding}</encoding.reporting>
+                <java.source>${java.version}</java.source>
+                <java.target>${java.version}</java.target>
+              </additionalProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <phase>prepare-package</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Spring Boot Actuator displays build-related information if a git.properties file is
+      present at the classpath -->
+      <plugin>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+        <configuration>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+          <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+        </configuration>
+      </plugin>
+      <!-- Spring Boot Actuator displays sbom-related information if a CycloneDX SBOM file is
+      present at the classpath -->
+      <plugin>
+        <?m2e ignore?>
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+      </plugin>
+
+    </plugins>
+  </build>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>https://repo.spring.io/snapshot</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>https://repo.spring.io/snapshot</url>
+    </pluginRepository>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <profiles>
+    <profile>
+      <id>css</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack</id>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <?m2e execute onConfiguration,onIncremental?>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.webjars.npm</groupId>
+                      <artifactId>bootstrap</artifactId>
+                      <version>${webjars-bootstrap.version}</version>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}/webjars</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>com.gitlab.haynes</groupId>
+            <artifactId>libsass-maven-plugin</artifactId>
+            <version>${libsass.version}</version>
+            <configuration>
+              <inputPath>${basedir}/src/main/scss/</inputPath>
+              <outputPath>${basedir}/src/main/resources/static/resources/css/</outputPath>
+              <includePath>${project.build.directory}/webjars/META-INF/resources/webjars/bootstrap/${webjars-bootstrap.version}/scss/</includePath>
+            </configuration>
+            <executions>
+              <execution>
+                <?m2e execute onConfiguration,onIncremental?>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+                <phase>generate-resources</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- This plugin's configuration is used to store Eclipse m2e settings
+              only. It has no influence on the Maven build itself. -->
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>${lifecycle-mapping}</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <versionRange>[1,)</versionRange>
+                        <goals>
+                          <goal>check</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore></ignore>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <versionRange>[1,)</versionRange>
+                        <goals>
+                          <goal>build-info</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore></ignore>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>io.spring.javaformat</groupId>
+                        <artifactId>spring-javaformat-maven-plugin</artifactId>
+                        <versionRange>[0,)</versionRange>
+                        <goals>
+                          <goal>validate</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore></ignore>
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+</project>
+
+
+
+================================================
+FILE: .editorconfig
+================================================
+# top-most EditorConfig file
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+
+[*.{java,xml}]
+indent_size = 4
+trim_trailing_whitespace = true
+indent_style = tab
+tab_width = 4
+
+[{pom,wro}.xml]
+indent_size = 2
+indent_style = space
+
+[*.{html,sql,less}]
+indent_size = 2
+
+[*.gradle]
+indent_size = 2
+
+
+
+================================================
+FILE: .gitpod.yml
+================================================
+image:
+  file: ./.devcontainer/Dockerfile
+tasks:
+  - before: sudo usermod -a -G sdkman gitpod && sudo usermod -a -G nvm gitpod && sudo chown -R gitpod /usr/local/sdkman /usr/local/share/nvm
+  - init: ./mvnw install
+vscode:
+  extensions:
+  - vscjava.vscode-java-pack
+  - redhat.vscode-xml
+
+
+================================================
+FILE: gradle/wrapper/gradle-wrapper.properties
+================================================
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionSha256Sum=ed1a8d686605fd7c23bdf62c7fc7add1c5b23b2bbc3721e661934ef4a4911d7c
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.14.3-all.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+
+
+
+================================================
+FILE: k8s/db.yml
+================================================
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-db
+type: servicebinding.io/postgresql
+stringData:
+  type: "postgresql"
+  provider: "postgresql"
+  host: "demo-db"
+  port: "5432"
+  database: "petclinic"
+  username: "user"
+  password: "pass"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-db
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: demo-db
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-db
+  labels:
+    app: demo-db
+spec:
+  selector:
+    matchLabels:
+      app: demo-db
+  template:
+    metadata:
+      labels:
+        app: demo-db
+    spec:
+      containers:
+        - image: postgres:17.5
+          name: postgresql
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db
+                  key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db
+                  key: database
+          ports:
+            - containerPort: 5432
+              name: postgresql
+          livenessProbe:
+            tcpSocket:
+              port: postgresql
+          readinessProbe:
+            tcpSocket:
+              port: postgresql
+          startupProbe:
+            tcpSocket:
+              port: postgresql
+
+
+
+================================================
+FILE: k8s/petclinic.yml
+================================================
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: petclinic
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+  labels:
+    app: petclinic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic
+  template:
+    metadata:
+      labels:
+        app: petclinic
+    spec:
+      containers:
+        - name: workload
+          image: dsyer/petclinic
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: postgres
+            - name: SERVICE_BINDING_ROOT
+              value: /bindings
+            - name: SPRING_APPLICATION_JSON
+              value: |
+                {
+                  "management.endpoint.health.probes.add-additional-paths": true
+                }
+          ports:
+            - name: http
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          volumeMounts:
+            - mountPath: /bindings/secret
+              name: binding
+              readOnly: true
+      volumes:
+        - name: binding
+          projected:
+            sources:
+              - secret:
+                  name: demo-db
+
+
+
+================================================
+FILE: src/checkstyle/nohttp-checkstyle-suppressions.xml
+================================================
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+		"-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+		"https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+	<suppress files="node_modules[\\/].*" checks=".*"/>
+	<suppress files="node[\\/].*" checks=".*"/>
+	<suppress files="build[\\/].*" checks=".*"/>
+	<suppress files="target[\\/].*" checks=".*"/>
+	<suppress files=".+\.(jar|git|ico|p12|gif|jks|jpg|svg|log)" checks="NoHttp"/>
+</suppressions>
+
+
+
+================================================
+FILE: src/checkstyle/nohttp-checkstyle.xml
+================================================
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+		"-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+		"https://checkstyle.org/dtds/configuration_1_2.dtd">
+<module name="com.puppycrawl.tools.checkstyle.Checker">
+	<module name="io.spring.nohttp.checkstyle.check.NoHttpCheck"/>
+	<module name="SuppressionFilter">
+		<property name="file" value="${config_loc}/nohttp-checkstyle-suppressions.xml"/>
+	</module>
+</module>
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportRuntimeHints;
+
+/**
+ * PetClinic Spring Boot Application.
+ *
+ * @author Dave Syer
+ */
+@SpringBootApplication
+@ImportRuntimeHints(PetClinicRuntimeHints.class)
+public class PetClinicApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(PetClinicApplication.class, args);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/PetClinicRuntimeHints.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import org.springframework.aot.hint.RuntimeHints;
+import org.springframework.aot.hint.RuntimeHintsRegistrar;
+import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.petclinic.model.Person;
+import org.springframework.samples.petclinic.vet.Vet;
+
+public class PetClinicRuntimeHints implements RuntimeHintsRegistrar {
+
+	@Override
+	public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+		hints.resources().registerPattern("db/*"); // https://github.com/spring-projects/spring-boot/issues/32654
+		hints.resources().registerPattern("messages/*");
+		hints.resources().registerPattern("mysql-default-conf");
+		hints.serialization().registerType(BaseEntity.class);
+		hints.serialization().registerType(Person.class);
+		hints.serialization().registerType(Vet.class);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/model/BaseEntity.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.model;
+
+import java.io.Serializable;
+
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+
+/**
+ * Simple JavaBean domain object with an id property. Used as a base class for objects
+ * needing this property.
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ */
+@MappedSuperclass
+public class BaseEntity implements Serializable {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public boolean isNew() {
+		return this.id == null;
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/model/NamedEntity.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Simple JavaBean domain object adds a name property to <code>BaseEntity</code>. Used as
+ * a base class for objects needing these properties.
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Wick Dynex
+ */
+@MappedSuperclass
+public class NamedEntity extends BaseEntity {
+
+	@Column(name = "name")
+	@NotBlank
+	private String name;
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return this.getName();
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/model/package-info.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The classes in this package represent utilities used by the domain.
+ */
+package org.springframework.samples.petclinic.model;
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/model/Person.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Simple JavaBean domain object representing an person.
+ *
+ * @author Ken Krebs
+ */
+@MappedSuperclass
+public class Person extends BaseEntity {
+
+	@Column(name = "first_name")
+	@NotBlank
+	private String firstName;
+
+	@Column(name = "last_name")
+	@NotBlank
+	private String lastName;
+
+	public String getFirstName() {
+		return this.firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/Owner.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.samples.petclinic.model.Person;
+import org.springframework.util.Assert;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Simple JavaBean domain object representing an owner.
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Michael Isvy
+ * @author Oliver Drotbohm
+ * @author Wick Dynex
+ */
+@Entity
+@Table(name = "owners")
+public class Owner extends Person {
+
+	@Column(name = "address")
+	@NotBlank
+	private String address;
+
+	@Column(name = "city")
+	@NotBlank
+	private String city;
+
+	@Column(name = "telephone")
+	@NotBlank
+	@Pattern(regexp = "\\d{10}", message = "{telephone.invalid}")
+	private String telephone;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "owner_id")
+	@OrderBy("name")
+	private final List<Pet> pets = new ArrayList<>();
+
+	public String getAddress() {
+		return this.address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getCity() {
+		return this.city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getTelephone() {
+		return this.telephone;
+	}
+
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	public List<Pet> getPets() {
+		return this.pets;
+	}
+
+	public void addPet(Pet pet) {
+		if (pet.isNew()) {
+			getPets().add(pet);
+		}
+	}
+
+	/**
+	 * Return the Pet with the given name, or null if none found for this Owner.
+	 * @param name to test
+	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
+	 */
+	public Pet getPet(String name) {
+		return getPet(name, false);
+	}
+
+	/**
+	 * Return the Pet with the given id, or null if none found for this Owner.
+	 * @param id to test
+	 * @return the Pet with the given id, or null if no such Pet exists for this Owner
+	 */
+	public Pet getPet(Integer id) {
+		for (Pet pet : getPets()) {
+			if (!pet.isNew()) {
+				Integer compId = pet.getId();
+				if (compId.equals(id)) {
+					return pet;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Return the Pet with the given name, or null if none found for this Owner.
+	 * @param name to test
+	 * @param ignoreNew whether to ignore new pets (pets that are not saved yet)
+	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
+	 */
+	public Pet getPet(String name, boolean ignoreNew) {
+		for (Pet pet : getPets()) {
+			String compName = pet.getName();
+			if (compName != null && compName.equalsIgnoreCase(name)) {
+				if (!ignoreNew || !pet.isNew()) {
+					return pet;
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringCreator(this).append("id", this.getId())
+			.append("new", this.isNew())
+			.append("lastName", this.getLastName())
+			.append("firstName", this.getFirstName())
+			.append("address", this.address)
+			.append("city", this.city)
+			.append("telephone", this.telephone)
+			.toString();
+	}
+
+	/**
+	 * Adds the given {@link Visit} to the {@link Pet} with the given identifier.
+	 * @param petId the identifier of the {@link Pet}, must not be {@literal null}.
+	 * @param visit the visit to add, must not be {@literal null}.
+	 */
+	public void addVisit(Integer petId, Visit visit) {
+
+		Assert.notNull(petId, "Pet identifier must not be null!");
+		Assert.notNull(visit, "Visit must not be null!");
+
+		Pet pet = getPet(petId);
+
+		Assert.notNull(pet, "Invalid Pet identifier!");
+
+		pet.addVisit(visit);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/OwnerController.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import jakarta.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+/**
+ * @author Juergen Hoeller
+ * @author Ken Krebs
+ * @author Arjen Poutsma
+ * @author Michael Isvy
+ * @author Wick Dynex
+ */
+@Controller
+class OwnerController {
+
+	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
+
+	private final OwnerRepository owners;
+
+	public OwnerController(OwnerRepository owners) {
+		this.owners = owners;
+	}
+
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
+
+	@ModelAttribute("owner")
+	public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
+		return ownerId == null ? new Owner()
+				: this.owners.findById(ownerId)
+					.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId
+							+ ". Please ensure the ID is correct " + "and the owner exists in the database."));
+	}
+
+	@GetMapping("/owners/new")
+	public String initCreationForm() {
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/owners/new")
+	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "There was an error in creating the owner.");
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
+
+		this.owners.save(owner);
+		redirectAttributes.addFlashAttribute("message", "New Owner Created");
+		return "redirect:/owners/" + owner.getId();
+	}
+
+	@GetMapping("/owners/find")
+	public String initFindForm() {
+		return "owners/findOwners";
+	}
+
+	@GetMapping("/owners")
+	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
+			Model model) {
+		// allow parameterless GET request for /owners to return all records
+		if (owner.getLastName() == null) {
+			owner.setLastName(""); // empty string signifies broadest possible search
+		}
+
+		// find owners by last name
+		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, owner.getLastName());
+		if (ownersResults.isEmpty()) {
+			// no owners found
+			result.rejectValue("lastName", "notFound", "not found");
+			return "owners/findOwners";
+		}
+
+		if (ownersResults.getTotalElements() == 1) {
+			// 1 owner found
+			owner = ownersResults.iterator().next();
+			return "redirect:/owners/" + owner.getId();
+		}
+
+		// multiple owners found
+		return addPaginationModel(page, model, ownersResults);
+	}
+
+	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
+		List<Owner> listOwners = paginated.getContent();
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", paginated.getTotalPages());
+		model.addAttribute("totalItems", paginated.getTotalElements());
+		model.addAttribute("listOwners", listOwners);
+		return "owners/ownersList";
+	}
+
+	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname) {
+		int pageSize = 5;
+		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		return owners.findByLastNameStartingWith(lastname, pageable);
+	}
+
+	@GetMapping("/owners/{ownerId}/edit")
+	public String initUpdateOwnerForm() {
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/owners/{ownerId}/edit")
+	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
+			RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner.");
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
+
+		if (owner.getId() != ownerId) {
+			result.rejectValue("id", "mismatch", "The owner ID in the form does not match the URL.");
+			redirectAttributes.addFlashAttribute("error", "Owner ID mismatch. Please try again.");
+			return "redirect:/owners/{ownerId}/edit";
+		}
+
+		owner.setId(ownerId);
+		this.owners.save(owner);
+		redirectAttributes.addFlashAttribute("message", "Owner Values Updated");
+		return "redirect:/owners/{ownerId}";
+	}
+
+	/**
+	 * Custom handler for displaying an owner.
+	 * @param ownerId the ID of the owner to display
+	 * @return a ModelMap with the model attributes for the view
+	 */
+	@GetMapping("/owners/{ownerId}")
+	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
+		ModelAndView mav = new ModelAndView("owners/ownerDetails");
+		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
+		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+		mav.addObject(owner);
+		return mav;
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/OwnerRepository.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.annotation.Nonnull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+/**
+ * Repository class for <code>Owner</code> domain objects. All method names are compliant
+ * with Spring Data naming conventions so this interface can easily be extended for Spring
+ * Data. See:
+ * https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.query-creation
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Michael Isvy
+ * @author Wick Dynex
+ */
+public interface OwnerRepository extends JpaRepository<Owner, Integer> {
+
+	/**
+	 * Retrieve {@link Owner}s from the data store by last name, returning all owners
+	 * whose last name <i>starts</i> with the given name.
+	 * @param lastName Value to search for
+	 * @return a Collection of matching {@link Owner}s (or an empty Collection if none
+	 * found)
+	 */
+	Page<Owner> findByLastNameStartingWith(String lastName, Pageable pageable);
+
+	/**
+	 * Retrieve an {@link Owner} from the data store by id.
+	 * <p>
+	 * This method returns an {@link Optional} containing the {@link Owner} if found. If
+	 * no {@link Owner} is found with the provided id, it will return an empty
+	 * {@link Optional}.
+	 * </p>
+	 * @param id the id to search for
+	 * @return an {@link Optional} containing the {@link Owner} if found, or an empty
+	 * {@link Optional} if not found.
+	 * @throws IllegalArgumentException if the id is null (assuming null is not a valid
+	 * input for id)
+	 */
+	Optional<Owner> findById(@Nonnull Integer id);
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/Pet.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.petclinic.model.NamedEntity;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+
+/**
+ * Simple business object representing a pet.
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Wick Dynex
+ */
+@Entity
+@Table(name = "pets")
+public class Pet extends NamedEntity {
+
+	@Column(name = "birth_date")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate birthDate;
+
+	@ManyToOne
+	@JoinColumn(name = "type_id")
+	private PetType type;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "pet_id")
+	@OrderBy("date ASC")
+	private final Set<Visit> visits = new LinkedHashSet<>();
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public LocalDate getBirthDate() {
+		return this.birthDate;
+	}
+
+	public PetType getType() {
+		return this.type;
+	}
+
+	public void setType(PetType type) {
+		this.type = type;
+	}
+
+	public Collection<Visit> getVisits() {
+		return this.visits;
+	}
+
+	public void addVisit(Visit visit) {
+		getVisits().add(visit);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/PetController.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Optional;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import jakarta.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+/**
+ * @author Juergen Hoeller
+ * @author Ken Krebs
+ * @author Arjen Poutsma
+ * @author Wick Dynex
+ */
+@Controller
+@RequestMapping("/owners/{ownerId}")
+class PetController {
+
+	private static final String VIEWS_PETS_CREATE_OR_UPDATE_FORM = "pets/createOrUpdatePetForm";
+
+	private final OwnerRepository owners;
+
+	private final PetTypeRepository types;
+
+	public PetController(OwnerRepository owners, PetTypeRepository types) {
+		this.owners = owners;
+		this.types = types;
+	}
+
+	@ModelAttribute("types")
+	public Collection<PetType> populatePetTypes() {
+		return this.types.findPetTypes();
+	}
+
+	@ModelAttribute("owner")
+	public Owner findOwner(@PathVariable("ownerId") int ownerId) {
+		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
+		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+		return owner;
+	}
+
+	@ModelAttribute("pet")
+	public Pet findPet(@PathVariable("ownerId") int ownerId,
+			@PathVariable(name = "petId", required = false) Integer petId) {
+
+		if (petId == null) {
+			return new Pet();
+		}
+
+		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
+		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+		return owner.getPet(petId);
+	}
+
+	@InitBinder("owner")
+	public void initOwnerBinder(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
+
+	@InitBinder("pet")
+	public void initPetBinder(WebDataBinder dataBinder) {
+		dataBinder.setValidator(new PetValidator());
+	}
+
+	@GetMapping("/pets/new")
+	public String initCreationForm(Owner owner, ModelMap model) {
+		Pet pet = new Pet();
+		owner.addPet(pet);
+		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/pets/new")
+	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
+			RedirectAttributes redirectAttributes) {
+
+		if (StringUtils.hasText(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null)
+			result.rejectValue("name", "duplicate", "already exists");
+
+		LocalDate currentDate = LocalDate.now();
+		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+			result.rejectValue("birthDate", "typeMismatch.birthDate");
+		}
+
+		if (result.hasErrors()) {
+			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		}
+
+		owner.addPet(pet);
+		this.owners.save(owner);
+		redirectAttributes.addFlashAttribute("message", "New Pet has been Added");
+		return "redirect:/owners/{ownerId}";
+	}
+
+	@GetMapping("/pets/{petId}/edit")
+	public String initUpdateForm() {
+		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/pets/{petId}/edit")
+	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
+			RedirectAttributes redirectAttributes) {
+
+		String petName = pet.getName();
+
+		// checking if the pet name already exists for the owner
+		if (StringUtils.hasText(petName)) {
+			Pet existingPet = owner.getPet(petName, false);
+			if (existingPet != null && !existingPet.getId().equals(pet.getId())) {
+				result.rejectValue("name", "duplicate", "already exists");
+			}
+		}
+
+		LocalDate currentDate = LocalDate.now();
+		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+			result.rejectValue("birthDate", "typeMismatch.birthDate");
+		}
+
+		if (result.hasErrors()) {
+			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		}
+
+		updatePetDetails(owner, pet);
+		redirectAttributes.addFlashAttribute("message", "Pet details has been edited");
+		return "redirect:/owners/{ownerId}";
+	}
+
+	/**
+	 * Updates the pet details if it exists or adds a new pet to the owner.
+	 * @param owner The owner of the pet
+	 * @param pet The pet with updated details
+	 */
+	private void updatePetDetails(Owner owner, Pet pet) {
+		Pet existingPet = owner.getPet(pet.getId());
+		if (existingPet != null) {
+			// Update existing pet's properties
+			existingPet.setName(pet.getName());
+			existingPet.setBirthDate(pet.getBirthDate());
+			existingPet.setType(pet.getType());
+		}
+		else {
+			owner.addPet(pet);
+		}
+		this.owners.save(owner);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/PetType.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import org.springframework.samples.petclinic.model.NamedEntity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+/**
+ * @author Juergen Hoeller Can be Cat, Dog, Hamster...
+ */
+@Entity
+@Table(name = "types")
+public class PetType extends NamedEntity {
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/PetTypeFormatter.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import org.springframework.format.Formatter;
+import org.springframework.stereotype.Component;
+
+import java.text.ParseException;
+import java.util.Collection;
+import java.util.Locale;
+
+/**
+ * Instructs Spring MVC on how to parse and print elements of type 'PetType'. Starting
+ * from Spring 3.0, Formatters have come as an improvement in comparison to legacy
+ * PropertyEditors. See the following links for more details: - The Spring ref doc:
+ * https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#format
+ *
+ * @author Mark Fisher
+ * @author Juergen Hoeller
+ * @author Michael Isvy
+ */
+@Component
+public class PetTypeFormatter implements Formatter<PetType> {
+
+	private final PetTypeRepository types;
+
+	public PetTypeFormatter(PetTypeRepository types) {
+		this.types = types;
+	}
+
+	@Override
+	public String print(PetType petType, Locale locale) {
+		return petType.getName();
+	}
+
+	@Override
+	public PetType parse(String text, Locale locale) throws ParseException {
+		Collection<PetType> findPetTypes = this.types.findPetTypes();
+		for (PetType type : findPetTypes) {
+			if (type.getName().equals(text)) {
+				return type;
+			}
+		}
+		throw new ParseException("type not found: " + text, 0);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/PetTypeRepository.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.annotation.Nonnull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+/**
+ * Repository class for <code>PetType</code> domain objects.
+ *
+ * @author Patrick Baumgartner
+ */
+
+public interface PetTypeRepository extends JpaRepository<PetType, Integer> {
+
+	/**
+	 * Retrieve all {@link PetType}s from the data store.
+	 * @return a Collection of {@link PetType}s.
+	 */
+	@Query("SELECT ptype FROM PetType ptype ORDER BY ptype.name")
+	List<PetType> findPetTypes();
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/PetValidator.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import org.springframework.util.StringUtils;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+/**
+ * <code>Validator</code> for <code>Pet</code> forms.
+ * <p>
+ * We're not using Bean Validation annotations here because it is easier to define such
+ * validation rule in Java.
+ * </p>
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ */
+public class PetValidator implements Validator {
+
+	private static final String REQUIRED = "required";
+
+	@Override
+	public void validate(Object obj, Errors errors) {
+		Pet pet = (Pet) obj;
+		String name = pet.getName();
+		// name validation
+		if (!StringUtils.hasText(name)) {
+			errors.rejectValue("name", REQUIRED, REQUIRED);
+		}
+
+		// type validation
+		if (pet.isNew() && pet.getType() == null) {
+			errors.rejectValue("type", REQUIRED, REQUIRED);
+		}
+
+		// birth date validation
+		if (pet.getBirthDate() == null) {
+			errors.rejectValue("birthDate", REQUIRED, REQUIRED);
+		}
+	}
+
+	/**
+	 * This Validator validates *just* Pet instances
+	 */
+	@Override
+	public boolean supports(Class<?> clazz) {
+		return Pet.class.isAssignableFrom(clazz);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/Visit.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.petclinic.model.BaseEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Simple JavaBean domain object representing a visit.
+ *
+ * @author Ken Krebs
+ * @author Dave Syer
+ */
+@Entity
+@Table(name = "visits")
+public class Visit extends BaseEntity {
+
+	@Column(name = "visit_date")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate date;
+
+	@NotBlank
+	private String description;
+
+	/**
+	 * Creates a new instance of Visit for the current date
+	 */
+	public Visit() {
+		this.date = LocalDate.now();
+	}
+
+	public LocalDate getDate() {
+		return this.date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/owner/VisitController.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.owner;
+
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import jakarta.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+/**
+ * @author Juergen Hoeller
+ * @author Ken Krebs
+ * @author Arjen Poutsma
+ * @author Michael Isvy
+ * @author Dave Syer
+ * @author Wick Dynex
+ */
+@Controller
+class VisitController {
+
+	private final OwnerRepository owners;
+
+	public VisitController(OwnerRepository owners) {
+		this.owners = owners;
+	}
+
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
+
+	/**
+	 * Called before each and every @RequestMapping annotated method. 2 goals: - Make sure
+	 * we always have fresh data - Since we do not use the session scope, make sure that
+	 * Pet object always has an id (Even though id is not part of the form fields)
+	 * @param petId
+	 * @return Pet
+	 */
+	@ModelAttribute("visit")
+	public Visit loadPetWithVisit(@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId,
+			Map<String, Object> model) {
+		Optional<Owner> optionalOwner = owners.findById(ownerId);
+		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+
+		Pet pet = owner.getPet(petId);
+		model.put("pet", pet);
+		model.put("owner", owner);
+
+		Visit visit = new Visit();
+		pet.addVisit(visit);
+		return visit;
+	}
+
+	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is
+	// called
+	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/new")
+	public String initNewVisitForm() {
+		return "pets/createOrUpdateVisitForm";
+	}
+
+	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
+	// called
+	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
+	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
+			BindingResult result, RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			return "pets/createOrUpdateVisitForm";
+		}
+
+		owner.addVisit(petId, visit);
+		this.owners.save(owner);
+		redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
+		return "redirect:/owners/{ownerId}";
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/system/CacheConfiguration.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.system;
+
+import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.cache.configuration.MutableConfiguration;
+
+/**
+ * Cache configuration intended for caches providing the JCache API. This configuration
+ * creates the used cache for the application and enables statistics that become
+ * accessible via JMX.
+ */
+@Configuration(proxyBeanMethods = false)
+@EnableCaching
+class CacheConfiguration {
+
+	@Bean
+	public JCacheManagerCustomizer petclinicCacheConfigurationCustomizer() {
+		return cm -> cm.createCache("vets", cacheConfiguration());
+	}
+
+	/**
+	 * Create a simple configuration that enable statistics via the JCache programmatic
+	 * configuration API.
+	 * <p>
+	 * Within the configuration object that is provided by the JCache API standard, there
+	 * is only a very limited set of configuration options. The really relevant
+	 * configuration options (like the size limit) must be set via a configuration
+	 * mechanism that is provided by the selected JCache implementation.
+	 */
+	private javax.cache.configuration.Configuration<Object, Object> cacheConfiguration() {
+		return new MutableConfiguration<>().setStatisticsEnabled(true);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/system/CrashController.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.system;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+/**
+ * Controller used to showcase what happens when an exception is thrown
+ *
+ * @author Michael Isvy
+ * <p/>
+ * Also see how a view that resolves to "error" has been added ("error.html").
+ */
+@Controller
+class CrashController {
+
+	@GetMapping("/oups")
+	public String triggerException() {
+		throw new RuntimeException(
+				"Expected: controller used to showcase what " + "happens when an exception is thrown");
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/system/WebConfiguration.java
+================================================
+package org.springframework.samples.petclinic.system;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+
+import java.util.Locale;
+
+/**
+ * Configures internationalization (i18n) support for the application.
+ *
+ * <p>
+ * Handles loading language-specific messages, tracking the user's language, and allowing
+ * language changes via the URL parameter (e.g., <code>?lang=de</code>).
+ * </p>
+ *
+ * @author Anuj Ashok Potdar
+ */
+@Configuration
+@SuppressWarnings("unused")
+public class WebConfiguration implements WebMvcConfigurer {
+
+	/**
+	 * Uses session storage to remember the user’s language setting across requests.
+	 * Defaults to English if nothing is specified.
+	 * @return session-based {@link LocaleResolver}
+	 */
+	@Bean
+	public LocaleResolver localeResolver() {
+		SessionLocaleResolver resolver = new SessionLocaleResolver();
+		resolver.setDefaultLocale(Locale.ENGLISH);
+		return resolver;
+	}
+
+	/**
+	 * Allows the app to switch languages using a URL parameter like
+	 * <code>?lang=es</code>.
+	 * @return a {@link LocaleChangeInterceptor} that handles the change
+	 */
+	@Bean
+	public LocaleChangeInterceptor localeChangeInterceptor() {
+		LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
+		interceptor.setParamName("lang");
+		return interceptor;
+	}
+
+	/**
+	 * Registers the locale change interceptor so it can run on each request.
+	 * @param registry where interceptors are added
+	 */
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(localeChangeInterceptor());
+	}
+
+}

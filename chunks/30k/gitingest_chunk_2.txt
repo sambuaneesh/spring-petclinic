@@ -1,0 +1,3559 @@
+
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/system/WelcomeController.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.system;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+class WelcomeController {
+
+	@GetMapping("/")
+	public String welcome() {
+		return "welcome";
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/vet/Specialty.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.vet;
+
+import org.springframework.samples.petclinic.model.NamedEntity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+/**
+ * Models a {@link Vet Vet's} specialty (for example, dentistry).
+ *
+ * @author Juergen Hoeller
+ */
+@Entity
+@Table(name = "specialties")
+public class Specialty extends NamedEntity {
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/vet/Vet.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.vet;
+
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.samples.petclinic.model.NamedEntity;
+import org.springframework.samples.petclinic.model.Person;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.xml.bind.annotation.XmlElement;
+
+/**
+ * Simple JavaBean domain object representing a veterinarian.
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Arjen Poutsma
+ */
+@Entity
+@Table(name = "vets")
+public class Vet extends Person {
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),
+			inverseJoinColumns = @JoinColumn(name = "specialty_id"))
+	private Set<Specialty> specialties;
+
+	protected Set<Specialty> getSpecialtiesInternal() {
+		if (this.specialties == null) {
+			this.specialties = new HashSet<>();
+		}
+		return this.specialties;
+	}
+
+	@XmlElement
+	public List<Specialty> getSpecialties() {
+		return getSpecialtiesInternal().stream()
+			.sorted(Comparator.comparing(NamedEntity::getName))
+			.collect(Collectors.toList());
+	}
+
+	public int getNrOfSpecialties() {
+		return getSpecialtiesInternal().size();
+	}
+
+	public void addSpecialty(Specialty specialty) {
+		getSpecialtiesInternal().add(specialty);
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/vet/VetController.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.vet;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+/**
+ * @author Juergen Hoeller
+ * @author Mark Fisher
+ * @author Ken Krebs
+ * @author Arjen Poutsma
+ */
+@Controller
+class VetController {
+
+	private final VetRepository vetRepository;
+
+	public VetController(VetRepository vetRepository) {
+		this.vetRepository = vetRepository;
+	}
+
+	@GetMapping("/vets.html")
+	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
+		// Here we are returning an object of type 'Vets' rather than a collection of Vet
+		// objects so it is simpler for Object-Xml mapping
+		Vets vets = new Vets();
+		Page<Vet> paginated = findPaginated(page);
+		vets.getVetList().addAll(paginated.toList());
+		return addPaginationModel(page, paginated, model);
+	}
+
+	private String addPaginationModel(int page, Page<Vet> paginated, Model model) {
+		List<Vet> listVets = paginated.getContent();
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", paginated.getTotalPages());
+		model.addAttribute("totalItems", paginated.getTotalElements());
+		model.addAttribute("listVets", listVets);
+		return "vets/vetList";
+	}
+
+	private Page<Vet> findPaginated(int page) {
+		int pageSize = 5;
+		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		return vetRepository.findAll(pageable);
+	}
+
+	@GetMapping({ "/vets" })
+	public @ResponseBody Vets showResourcesVetList() {
+		// Here we are returning an object of type 'Vets' rather than a collection of Vet
+		// objects so it is simpler for JSon/Object mapping
+		Vets vets = new Vets();
+		vets.getVetList().addAll(this.vetRepository.findAll());
+		return vets;
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/vet/VetRepository.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.vet;
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+
+/**
+ * Repository class for <code>Vet</code> domain objects All method names are compliant
+ * with Spring Data naming conventions so this interface can easily be extended for Spring
+ * Data. See:
+ * https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.query-creation
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Michael Isvy
+ */
+public interface VetRepository extends Repository<Vet, Integer> {
+
+	/**
+	 * Retrieve all <code>Vet</code>s from the data store.
+	 * @return a <code>Collection</code> of <code>Vet</code>s
+	 */
+	@Transactional(readOnly = true)
+	@Cacheable("vets")
+	Collection<Vet> findAll() throws DataAccessException;
+
+	/**
+	 * Retrieve all <code>Vet</code>s from data store in Pages
+	 * @param pageable
+	 * @return
+	 * @throws DataAccessException
+	 */
+	@Transactional(readOnly = true)
+	@Cacheable("vets")
+	Page<Vet> findAll(Pageable pageable) throws DataAccessException;
+
+}
+
+
+
+================================================
+FILE: src/main/java/org/springframework/samples/petclinic/vet/Vets.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.vet;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+/**
+ * Simple domain object representing a list of veterinarians. Mostly here to be used for
+ * the 'vets' {@link org.springframework.web.servlet.view.xml.MarshallingView}.
+ *
+ * @author Arjen Poutsma
+ */
+@XmlRootElement
+public class Vets {
+
+	private List<Vet> vets;
+
+	@XmlElement
+	public List<Vet> getVetList() {
+		if (vets == null) {
+			vets = new ArrayList<>();
+		}
+		return vets;
+	}
+
+}
+
+
+
+================================================
+FILE: src/main/resources/application-mysql.properties
+================================================
+# database init, supports mysql too
+database=mysql
+spring.datasource.url=${MYSQL_URL:jdbc:mysql://localhost/petclinic}
+spring.datasource.username=${MYSQL_USER:petclinic}
+spring.datasource.password=${MYSQL_PASS:petclinic}
+# SQL is written to be idempotent so this is safe
+spring.sql.init.mode=always
+
+
+
+================================================
+FILE: src/main/resources/application-postgres.properties
+================================================
+# database init, supports postgres too
+database=postgres
+spring.datasource.url=${POSTGRES_URL:jdbc:postgresql://localhost/petclinic}
+spring.datasource.username=${POSTGRES_USER:petclinic}
+spring.datasource.password=${POSTGRES_PASS:petclinic}
+# SQL is written to be idempotent so this is safe
+spring.sql.init.mode=always
+
+
+
+================================================
+FILE: src/main/resources/application.properties
+================================================
+# database init, supports mysql too
+database=h2
+spring.sql.init.schema-locations=classpath*:db/${database}/schema.sql
+spring.sql.init.data-locations=classpath*:db/${database}/data.sql
+
+# Web
+spring.thymeleaf.mode=HTML
+
+# JPA
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.open-in-view=false
+
+# Internationalization
+spring.messages.basename=messages/messages
+
+# Actuator
+management.endpoints.web.exposure.include=*
+
+# Logging
+logging.level.org.springframework=INFO
+# logging.level.org.springframework.web=DEBUG
+# logging.level.org.springframework.context.annotation=TRACE
+
+# Maximum time static resources should be cached
+spring.web.resources.cache.cachecontrol.max-age=12h
+
+
+
+================================================
+FILE: src/main/resources/banner.txt
+================================================
+
+
+              |\      _,,,--,,_
+             /,`.-'`'   ._  \-;;,_
+  _______ __|,4-  ) )_   .;.(__`'-'__     ___ __    _ ___ _______
+ |       | '---''(_/._)-'(_\_)   |   |   |   |  |  | |   |       |
+ |    _  |    ___|_     _|       |   |   |   |   |_| |   |       | __ _ _
+ |   |_| |   |___  |   | |       |   |   |   |       |   |       | \ \ \ \
+ |    ___|    ___| |   | |      _|   |___|   |  _    |   |      _|  \ \ \ \
+ |   |   |   |___  |   | |     |_|       |   | | |   |   |     |_    ) ) ) )
+ |___|   |_______| |___| |_______|_______|___|_|  |__|___|_______|  / / / /
+ ==================================================================/_/_/_/
+
+:: Built with Spring Boot :: ${spring-boot.version}
+
+
+
+
+================================================
+FILE: src/main/resources/db/h2/data.sql
+================================================
+INSERT INTO vets VALUES (default, 'James', 'Carter');
+INSERT INTO vets VALUES (default, 'Helen', 'Leary');
+INSERT INTO vets VALUES (default, 'Linda', 'Douglas');
+INSERT INTO vets VALUES (default, 'Rafael', 'Ortega');
+INSERT INTO vets VALUES (default, 'Henry', 'Stevens');
+INSERT INTO vets VALUES (default, 'Sharon', 'Jenkins');
+
+INSERT INTO specialties VALUES (default, 'radiology');
+INSERT INTO specialties VALUES (default, 'surgery');
+INSERT INTO specialties VALUES (default, 'dentistry');
+
+INSERT INTO vet_specialties VALUES (2, 1);
+INSERT INTO vet_specialties VALUES (3, 2);
+INSERT INTO vet_specialties VALUES (3, 3);
+INSERT INTO vet_specialties VALUES (4, 2);
+INSERT INTO vet_specialties VALUES (5, 1);
+
+INSERT INTO types VALUES (default, 'cat');
+INSERT INTO types VALUES (default, 'dog');
+INSERT INTO types VALUES (default, 'lizard');
+INSERT INTO types VALUES (default, 'snake');
+INSERT INTO types VALUES (default, 'bird');
+INSERT INTO types VALUES (default, 'hamster');
+
+INSERT INTO owners VALUES (default, 'George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023');
+INSERT INTO owners VALUES (default, 'Betty', 'Davis', '638 Cardinal Ave.', 'Sun Prairie', '6085551749');
+INSERT INTO owners VALUES (default, 'Eduardo', 'Rodriquez', '2693 Commerce St.', 'McFarland', '6085558763');
+INSERT INTO owners VALUES (default, 'Harold', 'Davis', '563 Friendly St.', 'Windsor', '6085553198');
+INSERT INTO owners VALUES (default, 'Peter', 'McTavish', '2387 S. Fair Way', 'Madison', '6085552765');
+INSERT INTO owners VALUES (default, 'Jean', 'Coleman', '105 N. Lake St.', 'Monona', '6085552654');
+INSERT INTO owners VALUES (default, 'Jeff', 'Black', '1450 Oak Blvd.', 'Monona', '6085555387');
+INSERT INTO owners VALUES (default, 'Maria', 'Escobito', '345 Maple St.', 'Madison', '6085557683');
+INSERT INTO owners VALUES (default, 'David', 'Schroeder', '2749 Blackhawk Trail', 'Madison', '6085559435');
+INSERT INTO owners VALUES (default, 'Carlos', 'Estaban', '2335 Independence La.', 'Waunakee', '6085555487');
+
+INSERT INTO pets VALUES (default, 'Leo', '2010-09-07', 1, 1);
+INSERT INTO pets VALUES (default, 'Basil', '2012-08-06', 6, 2);
+INSERT INTO pets VALUES (default, 'Rosy', '2011-04-17', 2, 3);
+INSERT INTO pets VALUES (default, 'Jewel', '2010-03-07', 2, 3);
+INSERT INTO pets VALUES (default, 'Iggy', '2010-11-30', 3, 4);
+INSERT INTO pets VALUES (default, 'George', '2010-01-20', 4, 5);
+INSERT INTO pets VALUES (default, 'Samantha', '2012-09-04', 1, 6);
+INSERT INTO pets VALUES (default, 'Max', '2012-09-04', 1, 6);
+INSERT INTO pets VALUES (default, 'Lucky', '2011-08-06', 5, 7);
+INSERT INTO pets VALUES (default, 'Mulligan', '2007-02-24', 2, 8);
+INSERT INTO pets VALUES (default, 'Freddy', '2010-03-09', 5, 9);
+INSERT INTO pets VALUES (default, 'Lucky', '2010-06-24', 2, 10);
+INSERT INTO pets VALUES (default, 'Sly', '2012-06-08', 1, 10);
+
+INSERT INTO visits VALUES (default, 7, '2013-01-01', 'rabies shot');
+INSERT INTO visits VALUES (default, 8, '2013-01-02', 'rabies shot');
+INSERT INTO visits VALUES (default, 8, '2013-01-03', 'neutered');
+INSERT INTO visits VALUES (default, 7, '2013-01-04', 'spayed');
+
+
+
+================================================
+FILE: src/main/resources/db/h2/schema.sql
+================================================
+DROP TABLE vet_specialties IF EXISTS;
+DROP TABLE vets IF EXISTS;
+DROP TABLE specialties IF EXISTS;
+DROP TABLE visits IF EXISTS;
+DROP TABLE pets IF EXISTS;
+DROP TABLE types IF EXISTS;
+DROP TABLE owners IF EXISTS;
+
+
+CREATE TABLE vets (
+  id         INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name  VARCHAR(30)
+);
+CREATE INDEX vets_last_name ON vets (last_name);
+
+CREATE TABLE specialties (
+  id   INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  name VARCHAR(80)
+);
+CREATE INDEX specialties_name ON specialties (name);
+
+CREATE TABLE vet_specialties (
+  vet_id       INTEGER NOT NULL,
+  specialty_id INTEGER NOT NULL
+);
+ALTER TABLE vet_specialties ADD CONSTRAINT fk_vet_specialties_vets FOREIGN KEY (vet_id) REFERENCES vets (id);
+ALTER TABLE vet_specialties ADD CONSTRAINT fk_vet_specialties_specialties FOREIGN KEY (specialty_id) REFERENCES specialties (id);
+
+CREATE TABLE types (
+  id   INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  name VARCHAR(80)
+);
+CREATE INDEX types_name ON types (name);
+
+CREATE TABLE owners (
+  id         INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name  VARCHAR_IGNORECASE(30),
+  address    VARCHAR(255),
+  city       VARCHAR(80),
+  telephone  VARCHAR(20)
+);
+CREATE INDEX owners_last_name ON owners (last_name);
+
+CREATE TABLE pets (
+  id         INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  name       VARCHAR(30),
+  birth_date DATE,
+  type_id    INTEGER NOT NULL,
+  owner_id   INTEGER
+);
+ALTER TABLE pets ADD CONSTRAINT fk_pets_owners FOREIGN KEY (owner_id) REFERENCES owners (id);
+ALTER TABLE pets ADD CONSTRAINT fk_pets_types FOREIGN KEY (type_id) REFERENCES types (id);
+CREATE INDEX pets_name ON pets (name);
+
+CREATE TABLE visits (
+  id          INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  pet_id      INTEGER,
+  visit_date  DATE,
+  description VARCHAR(255)
+);
+ALTER TABLE visits ADD CONSTRAINT fk_visits_pets FOREIGN KEY (pet_id) REFERENCES pets (id);
+CREATE INDEX visits_pet_id ON visits (pet_id);
+
+
+
+================================================
+FILE: src/main/resources/db/hsqldb/data.sql
+================================================
+INSERT INTO vets VALUES (1, 'James', 'Carter');
+INSERT INTO vets VALUES (2, 'Helen', 'Leary');
+INSERT INTO vets VALUES (3, 'Linda', 'Douglas');
+INSERT INTO vets VALUES (4, 'Rafael', 'Ortega');
+INSERT INTO vets VALUES (5, 'Henry', 'Stevens');
+INSERT INTO vets VALUES (6, 'Sharon', 'Jenkins');
+
+INSERT INTO specialties VALUES (1, 'radiology');
+INSERT INTO specialties VALUES (2, 'surgery');
+INSERT INTO specialties VALUES (3, 'dentistry');
+
+INSERT INTO vet_specialties VALUES (2, 1);
+INSERT INTO vet_specialties VALUES (3, 2);
+INSERT INTO vet_specialties VALUES (3, 3);
+INSERT INTO vet_specialties VALUES (4, 2);
+INSERT INTO vet_specialties VALUES (5, 1);
+
+INSERT INTO types VALUES (1, 'cat');
+INSERT INTO types VALUES (2, 'dog');
+INSERT INTO types VALUES (3, 'lizard');
+INSERT INTO types VALUES (4, 'snake');
+INSERT INTO types VALUES (5, 'bird');
+INSERT INTO types VALUES (6, 'hamster');
+
+INSERT INTO owners VALUES (1, 'George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023');
+INSERT INTO owners VALUES (2, 'Betty', 'Davis', '638 Cardinal Ave.', 'Sun Prairie', '6085551749');
+INSERT INTO owners VALUES (3, 'Eduardo', 'Rodriquez', '2693 Commerce St.', 'McFarland', '6085558763');
+INSERT INTO owners VALUES (4, 'Harold', 'Davis', '563 Friendly St.', 'Windsor', '6085553198');
+INSERT INTO owners VALUES (5, 'Peter', 'McTavish', '2387 S. Fair Way', 'Madison', '6085552765');
+INSERT INTO owners VALUES (6, 'Jean', 'Coleman', '105 N. Lake St.', 'Monona', '6085552654');
+INSERT INTO owners VALUES (7, 'Jeff', 'Black', '1450 Oak Blvd.', 'Monona', '6085555387');
+INSERT INTO owners VALUES (8, 'Maria', 'Escobito', '345 Maple St.', 'Madison', '6085557683');
+INSERT INTO owners VALUES (9, 'David', 'Schroeder', '2749 Blackhawk Trail', 'Madison', '6085559435');
+INSERT INTO owners VALUES (10, 'Carlos', 'Estaban', '2335 Independence La.', 'Waunakee', '6085555487');
+
+INSERT INTO pets VALUES (1, 'Leo', '2010-09-07', 1, 1);
+INSERT INTO pets VALUES (2, 'Basil', '2012-08-06', 6, 2);
+INSERT INTO pets VALUES (3, 'Rosy', '2011-04-17', 2, 3);
+INSERT INTO pets VALUES (4, 'Jewel', '2010-03-07', 2, 3);
+INSERT INTO pets VALUES (5, 'Iggy', '2010-11-30', 3, 4);
+INSERT INTO pets VALUES (6, 'George', '2010-01-20', 4, 5);
+INSERT INTO pets VALUES (7, 'Samantha', '2012-09-04', 1, 6);
+INSERT INTO pets VALUES (8, 'Max', '2012-09-04', 1, 6);
+INSERT INTO pets VALUES (9, 'Lucky', '2011-08-06', 5, 7);
+INSERT INTO pets VALUES (10, 'Mulligan', '2007-02-24', 2, 8);
+INSERT INTO pets VALUES (11, 'Freddy', '2010-03-09', 5, 9);
+INSERT INTO pets VALUES (12, 'Lucky', '2010-06-24', 2, 10);
+INSERT INTO pets VALUES (13, 'Sly', '2012-06-08', 1, 10);
+
+INSERT INTO visits VALUES (1, 7, '2013-01-01', 'rabies shot');
+INSERT INTO visits VALUES (2, 8, '2013-01-02', 'rabies shot');
+INSERT INTO visits VALUES (3, 8, '2013-01-03', 'neutered');
+INSERT INTO visits VALUES (4, 7, '2013-01-04', 'spayed');
+
+
+
+================================================
+FILE: src/main/resources/db/hsqldb/schema.sql
+================================================
+DROP TABLE vet_specialties IF EXISTS;
+DROP TABLE vets IF EXISTS;
+DROP TABLE specialties IF EXISTS;
+DROP TABLE visits IF EXISTS;
+DROP TABLE pets IF EXISTS;
+DROP TABLE types IF EXISTS;
+DROP TABLE owners IF EXISTS;
+
+
+CREATE TABLE vets (
+  id         INTEGER IDENTITY PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name  VARCHAR(30)
+);
+CREATE INDEX vets_last_name ON vets (last_name);
+
+CREATE TABLE specialties (
+  id   INTEGER IDENTITY PRIMARY KEY,
+  name VARCHAR(80)
+);
+CREATE INDEX specialties_name ON specialties (name);
+
+CREATE TABLE vet_specialties (
+  vet_id       INTEGER NOT NULL,
+  specialty_id INTEGER NOT NULL
+);
+ALTER TABLE vet_specialties ADD CONSTRAINT fk_vet_specialties_vets FOREIGN KEY (vet_id) REFERENCES vets (id);
+ALTER TABLE vet_specialties ADD CONSTRAINT fk_vet_specialties_specialties FOREIGN KEY (specialty_id) REFERENCES specialties (id);
+
+CREATE TABLE types (
+  id   INTEGER IDENTITY PRIMARY KEY,
+  name VARCHAR(80)
+);
+CREATE INDEX types_name ON types (name);
+
+CREATE TABLE owners (
+  id         INTEGER IDENTITY PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name  VARCHAR_IGNORECASE(30),
+  address    VARCHAR(255),
+  city       VARCHAR(80),
+  telephone  VARCHAR(20)
+);
+CREATE INDEX owners_last_name ON owners (last_name);
+
+CREATE TABLE pets (
+  id         INTEGER IDENTITY PRIMARY KEY,
+  name       VARCHAR(30),
+  birth_date DATE,
+  type_id    INTEGER NOT NULL,
+  owner_id   INTEGER
+);
+ALTER TABLE pets ADD CONSTRAINT fk_pets_owners FOREIGN KEY (owner_id) REFERENCES owners (id);
+ALTER TABLE pets ADD CONSTRAINT fk_pets_types FOREIGN KEY (type_id) REFERENCES types (id);
+CREATE INDEX pets_name ON pets (name);
+
+CREATE TABLE visits (
+  id          INTEGER IDENTITY PRIMARY KEY,
+  pet_id      INTEGER,
+  visit_date  DATE,
+  description VARCHAR(255)
+);
+ALTER TABLE visits ADD CONSTRAINT fk_visits_pets FOREIGN KEY (pet_id) REFERENCES pets (id);
+CREATE INDEX visits_pet_id ON visits (pet_id);
+
+
+
+================================================
+FILE: src/main/resources/db/mysql/data.sql
+================================================
+INSERT IGNORE INTO vets VALUES (1, 'James', 'Carter');
+INSERT IGNORE INTO vets VALUES (2, 'Helen', 'Leary');
+INSERT IGNORE INTO vets VALUES (3, 'Linda', 'Douglas');
+INSERT IGNORE INTO vets VALUES (4, 'Rafael', 'Ortega');
+INSERT IGNORE INTO vets VALUES (5, 'Henry', 'Stevens');
+INSERT IGNORE INTO vets VALUES (6, 'Sharon', 'Jenkins');
+
+INSERT IGNORE INTO specialties VALUES (1, 'radiology');
+INSERT IGNORE INTO specialties VALUES (2, 'surgery');
+INSERT IGNORE INTO specialties VALUES (3, 'dentistry');
+
+INSERT IGNORE INTO vet_specialties VALUES (2, 1);
+INSERT IGNORE INTO vet_specialties VALUES (3, 2);
+INSERT IGNORE INTO vet_specialties VALUES (3, 3);
+INSERT IGNORE INTO vet_specialties VALUES (4, 2);
+INSERT IGNORE INTO vet_specialties VALUES (5, 1);
+
+INSERT IGNORE INTO types VALUES (1, 'cat');
+INSERT IGNORE INTO types VALUES (2, 'dog');
+INSERT IGNORE INTO types VALUES (3, 'lizard');
+INSERT IGNORE INTO types VALUES (4, 'snake');
+INSERT IGNORE INTO types VALUES (5, 'bird');
+INSERT IGNORE INTO types VALUES (6, 'hamster');
+
+INSERT IGNORE INTO owners VALUES (1, 'George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023');
+INSERT IGNORE INTO owners VALUES (2, 'Betty', 'Davis', '638 Cardinal Ave.', 'Sun Prairie', '6085551749');
+INSERT IGNORE INTO owners VALUES (3, 'Eduardo', 'Rodriquez', '2693 Commerce St.', 'McFarland', '6085558763');
+INSERT IGNORE INTO owners VALUES (4, 'Harold', 'Davis', '563 Friendly St.', 'Windsor', '6085553198');
+INSERT IGNORE INTO owners VALUES (5, 'Peter', 'McTavish', '2387 S. Fair Way', 'Madison', '6085552765');
+INSERT IGNORE INTO owners VALUES (6, 'Jean', 'Coleman', '105 N. Lake St.', 'Monona', '6085552654');
+INSERT IGNORE INTO owners VALUES (7, 'Jeff', 'Black', '1450 Oak Blvd.', 'Monona', '6085555387');
+INSERT IGNORE INTO owners VALUES (8, 'Maria', 'Escobito', '345 Maple St.', 'Madison', '6085557683');
+INSERT IGNORE INTO owners VALUES (9, 'David', 'Schroeder', '2749 Blackhawk Trail', 'Madison', '6085559435');
+INSERT IGNORE INTO owners VALUES (10, 'Carlos', 'Estaban', '2335 Independence La.', 'Waunakee', '6085555487');
+
+INSERT IGNORE INTO pets VALUES (1, 'Leo', '2000-09-07', 1, 1);
+INSERT IGNORE INTO pets VALUES (2, 'Basil', '2002-08-06', 6, 2);
+INSERT IGNORE INTO pets VALUES (3, 'Rosy', '2001-04-17', 2, 3);
+INSERT IGNORE INTO pets VALUES (4, 'Jewel', '2000-03-07', 2, 3);
+INSERT IGNORE INTO pets VALUES (5, 'Iggy', '2000-11-30', 3, 4);
+INSERT IGNORE INTO pets VALUES (6, 'George', '2000-01-20', 4, 5);
+INSERT IGNORE INTO pets VALUES (7, 'Samantha', '1995-09-04', 1, 6);
+INSERT IGNORE INTO pets VALUES (8, 'Max', '1995-09-04', 1, 6);
+INSERT IGNORE INTO pets VALUES (9, 'Lucky', '1999-08-06', 5, 7);
+INSERT IGNORE INTO pets VALUES (10, 'Mulligan', '1997-02-24', 2, 8);
+INSERT IGNORE INTO pets VALUES (11, 'Freddy', '2000-03-09', 5, 9);
+INSERT IGNORE INTO pets VALUES (12, 'Lucky', '2000-06-24', 2, 10);
+INSERT IGNORE INTO pets VALUES (13, 'Sly', '2002-06-08', 1, 10);
+
+INSERT IGNORE INTO visits VALUES (1, 7, '2010-03-04', 'rabies shot');
+INSERT IGNORE INTO visits VALUES (2, 8, '2011-03-04', 'rabies shot');
+INSERT IGNORE INTO visits VALUES (3, 8, '2009-06-04', 'neutered');
+INSERT IGNORE INTO visits VALUES (4, 7, '2008-09-04', 'spayed');
+
+
+
+================================================
+FILE: src/main/resources/db/mysql/petclinic_db_setup_mysql.txt
+================================================
+================================================================================
+===        Spring PetClinic sample application - MySQL Configuration         ===
+================================================================================
+
+@author Sam Brannen
+@author Costin Leau
+@author Dave Syer
+
+--------------------------------------------------------------------------------
+
+1) Download and install the MySQL database (e.g., MySQL Community Server 5.1.x),
+   which can be found here: https://dev.mysql.com/downloads/. Or run the
+   "docker-compose.yml" from the root of the project (if you have docker installed
+   locally):
+
+        $ docker-compose up
+        ...
+        mysql_1_eedb4818d817 | MySQL init process done. Ready for start up.
+        ...
+
+2) (Once only) create the PetClinic database and user by executing the "db/mysql/user.sql"
+   scripts. You can connect to the database running in the docker container using 
+   `mysql -u root -h localhost --protocol tcp`, but you don't need to run the script there
+   because the petclinic user is already set up if you use the provided `docker-compose.yml`.
+
+3) Run the app with `spring.profiles.active=mysql` (e.g. as a System property via the command
+   line, but any way that sets that property in a Spring Boot app should work). For example use
+   
+   mvn spring-boot:run -Dspring-boot.run.profiles=mysql
+
+   To activate the profile on the command line.
+
+N.B. the "petclinic" database has to exist for the app to work with the JDBC URL value
+as it is configured by default. This condition is taken care of automatically by the 
+docker-compose configuration provided, or by the `user.sql` script if you run that as
+root.
+
+
+
+================================================
+FILE: src/main/resources/db/mysql/schema.sql
+================================================
+CREATE TABLE IF NOT EXISTS vets (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name VARCHAR(30),
+  INDEX(last_name)
+) engine=InnoDB;
+
+CREATE TABLE IF NOT EXISTS specialties (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(80),
+  INDEX(name)
+) engine=InnoDB;
+
+CREATE TABLE IF NOT EXISTS vet_specialties (
+  vet_id INT(4) UNSIGNED NOT NULL,
+  specialty_id INT(4) UNSIGNED NOT NULL,
+  FOREIGN KEY (vet_id) REFERENCES vets(id),
+  FOREIGN KEY (specialty_id) REFERENCES specialties(id),
+  UNIQUE (vet_id,specialty_id)
+) engine=InnoDB;
+
+CREATE TABLE IF NOT EXISTS types (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(80),
+  INDEX(name)
+) engine=InnoDB;
+
+CREATE TABLE IF NOT EXISTS owners (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name VARCHAR(30),
+  address VARCHAR(255),
+  city VARCHAR(80),
+  telephone VARCHAR(20),
+  INDEX(last_name)
+) engine=InnoDB;
+
+CREATE TABLE IF NOT EXISTS pets (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(30),
+  birth_date DATE,
+  type_id INT(4) UNSIGNED NOT NULL,
+  owner_id INT(4) UNSIGNED,
+  INDEX(name),
+  FOREIGN KEY (owner_id) REFERENCES owners(id),
+  FOREIGN KEY (type_id) REFERENCES types(id)
+) engine=InnoDB;
+
+CREATE TABLE IF NOT EXISTS visits (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  pet_id INT(4) UNSIGNED,
+  visit_date DATE,
+  description VARCHAR(255),
+  FOREIGN KEY (pet_id) REFERENCES pets(id)
+) engine=InnoDB;
+
+
+
+================================================
+FILE: src/main/resources/db/mysql/user.sql
+================================================
+CREATE DATABASE IF NOT EXISTS petclinic;
+
+ALTER DATABASE petclinic
+  DEFAULT CHARACTER SET utf8
+  DEFAULT COLLATE utf8_general_ci;
+
+GRANT ALL PRIVILEGES ON petclinic.* TO 'petclinic'@'%' IDENTIFIED BY 'petclinic';
+
+
+
+================================================
+FILE: src/main/resources/db/postgres/data.sql
+================================================
+INSERT INTO vets (first_name, last_name) SELECT 'James', 'Carter' WHERE NOT EXISTS (SELECT * FROM vets WHERE id=1);
+INSERT INTO vets (first_name, last_name) SELECT 'Helen', 'Leary' WHERE NOT EXISTS (SELECT * FROM vets WHERE id=2);
+INSERT INTO vets (first_name, last_name) SELECT 'Linda', 'Douglas' WHERE NOT EXISTS (SELECT * FROM vets WHERE id=3);
+INSERT INTO vets (first_name, last_name) SELECT 'Rafael', 'Ortega' WHERE NOT EXISTS (SELECT * FROM vets WHERE id=4);
+INSERT INTO vets (first_name, last_name) SELECT 'Henry', 'Stevens' WHERE NOT EXISTS (SELECT * FROM vets WHERE id=5);
+INSERT INTO vets (first_name, last_name) SELECT 'Sharon', 'Jenkins' WHERE NOT EXISTS (SELECT * FROM vets WHERE id=6);
+
+INSERT INTO specialties (name) SELECT 'radiology' WHERE NOT EXISTS (SELECT * FROM specialties WHERE name='radiology');
+INSERT INTO specialties (name) SELECT 'surgery' WHERE NOT EXISTS (SELECT * FROM specialties WHERE name='surgery'); 
+INSERT INTO specialties (name) SELECT 'dentistry' WHERE NOT EXISTS (SELECT * FROM specialties WHERE name='dentistry');
+
+INSERT INTO vet_specialties VALUES (2, 1) ON CONFLICT (vet_id, specialty_id) DO NOTHING;
+INSERT INTO vet_specialties VALUES (3, 2) ON CONFLICT (vet_id, specialty_id) DO NOTHING;
+INSERT INTO vet_specialties VALUES (3, 3) ON CONFLICT (vet_id, specialty_id) DO NOTHING;
+INSERT INTO vet_specialties VALUES (4, 2) ON CONFLICT (vet_id, specialty_id) DO NOTHING;
+INSERT INTO vet_specialties VALUES (5, 1) ON CONFLICT (vet_id, specialty_id) DO NOTHING;
+
+INSERT INTO types (name) SELECT 'cat' WHERE NOT EXISTS (SELECT * FROM types WHERE name='cat');
+INSERT INTO types (name) SELECT 'dog' WHERE NOT EXISTS (SELECT * FROM types WHERE name='dog');
+INSERT INTO types (name) SELECT 'lizard' WHERE NOT EXISTS (SELECT * FROM types WHERE name='lizard');
+INSERT INTO types (name) SELECT 'snake' WHERE NOT EXISTS (SELECT * FROM types WHERE name='snake');
+INSERT INTO types (name) SELECT 'bird' WHERE NOT EXISTS (SELECT * FROM types WHERE name='bird');
+INSERT INTO types (name) SELECT 'hamster' WHERE NOT EXISTS (SELECT * FROM types WHERE name='hamster');
+
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=1);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Betty', 'Davis', '638 Cardinal Ave.', 'Sun Prairie', '6085551749' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=2);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Eduardo', 'Rodriquez', '2693 Commerce St.', 'McFarland', '6085558763' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=3);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Harold', 'Davis', '563 Friendly St.', 'Windsor', '6085553198' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=4);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Peter', 'McTavish', '2387 S. Fair Way', 'Madison', '6085552765' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=5);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Jean', 'Coleman', '105 N. Lake St.', 'Monona', '6085552654' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=6);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Jeff', 'Black', '1450 Oak Blvd.', 'Monona', '6085555387' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=7);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Maria', 'Escobito', '345 Maple St.', 'Madison', '6085557683' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=8);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'David', 'Schroeder', '2749 Blackhawk Trail', 'Madison', '6085559435' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=9);
+INSERT INTO owners (first_name, last_name, address, city, telephone) SELECT 'Carlos', 'Estaban', '2335 Independence La.', 'Waunakee', '6085555487' WHERE NOT EXISTS (SELECT * FROM owners WHERE id=10);
+
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Leo', '2000-09-07', 1, 1 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=1);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Basil', '2002-08-06', 6, 2 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=2);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Rosy', '2001-04-17', 2, 3 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=3);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Jewel', '2000-03-07', 2, 3 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=4);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Iggy', '2000-11-30', 3, 4 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=5);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'George', '2000-01-20', 4, 5 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=6);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Samantha', '1995-09-04', 1, 6 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=7);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Max', '1995-09-04', 1, 6 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=8);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Lucky', '1999-08-06', 5, 7 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=9);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Mulligan', '1997-02-24', 2, 8 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=10);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Freddy', '2000-03-09', 5, 9 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=11);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Lucky', '2000-06-24', 2, 10 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=12);
+INSERT INTO pets (name, birth_date, type_id, owner_id) SELECT 'Sly', '2002-06-08', 1, 10 WHERE NOT EXISTS (SELECT * FROM pets WHERE id=13);
+
+INSERT INTO visits (pet_id, visit_date, description) SELECT 7, '2010-03-04', 'rabies shot' WHERE NOT EXISTS (SELECT * FROM visits WHERE id=1);
+INSERT INTO visits (pet_id, visit_date, description) SELECT 8, '2011-03-04', 'rabies shot' WHERE NOT EXISTS (SELECT * FROM visits WHERE id=2);
+INSERT INTO visits (pet_id, visit_date, description) SELECT 8, '2009-06-04', 'neutered' WHERE NOT EXISTS (SELECT * FROM visits WHERE id=3);
+INSERT INTO visits (pet_id, visit_date, description) SELECT 7, '2008-09-04', 'spayed' WHERE NOT EXISTS (SELECT * FROM visits WHERE id=4);
+
+
+
+================================================
+FILE: src/main/resources/db/postgres/petclinic_db_setup_postgres.txt
+================================================
+===============================================================================
+===     Spring PetClinic sample application - PostgreSQL Configuration     ===
+===============================================================================
+
+--------------------------------------------------------------------------------
+
+1) Run the "docker-compose.yml" from the root of the project:
+
+        $ docker-compose up
+        ...
+        spring-petclinic-postgres-1  | The files belonging to this database system will be owned by user "postgres".
+        ...
+
+2) Run the app with `spring.profiles.active=postgres` (e.g. as a System property via the command
+   line, but any way that sets that property in a Spring Boot app should work). For example use
+
+   mvn spring-boot:run -Dspring-boot.run.profiles=postgres
+
+   To activate the profile on the command line.
+
+
+
+================================================
+FILE: src/main/resources/db/postgres/schema.sql
+================================================
+CREATE TABLE IF NOT EXISTS vets (
+  id         INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  first_name TEXT,
+  last_name  TEXT
+);
+CREATE INDEX ON vets (last_name);
+
+CREATE TABLE IF NOT EXISTS specialties (
+  id   INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  name TEXT
+);
+CREATE INDEX ON specialties (name);
+
+CREATE TABLE IF NOT EXISTS vet_specialties (
+  vet_id       INT NOT NULL REFERENCES vets (id),
+  specialty_id INT NOT NULL REFERENCES specialties (id),
+  UNIQUE (vet_id, specialty_id)
+);
+
+CREATE TABLE IF NOT EXISTS types (
+  id   INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  name TEXT
+);
+CREATE INDEX ON types (name);
+
+CREATE TABLE IF NOT EXISTS owners (
+  id         INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  first_name TEXT,
+  last_name  TEXT,
+  address    TEXT,
+  city       TEXT,
+  telephone  TEXT
+);
+CREATE INDEX ON owners (last_name);
+
+CREATE TABLE IF NOT EXISTS pets (
+  id         INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  name       TEXT,
+  birth_date DATE,
+  type_id    INT NOT NULL REFERENCES types (id),
+  owner_id   INT REFERENCES owners (id)
+);
+CREATE INDEX ON pets (name);
+CREATE INDEX ON pets (owner_id);
+
+CREATE TABLE IF NOT EXISTS visits (
+  id          INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  pet_id      INT REFERENCES pets (id),
+  visit_date  DATE,
+  description TEXT
+);
+CREATE INDEX ON visits (pet_id);
+
+
+
+================================================
+FILE: src/main/resources/messages/messages.properties
+================================================
+welcome=Welcome
+required=is required
+notFound=has not been found
+duplicate=is already in use
+nonNumeric=must be all numeric
+duplicateFormSubmission=Duplicate form submission is not allowed
+typeMismatch.date=invalid date
+typeMismatch.birthDate=invalid date
+owner=Owner
+firstName=First Name
+lastName=Last Name
+address=Address
+city=City
+telephone=Telephone
+owners=Owners
+addOwner=Add Owner
+findOwner=Find Owner
+findOwners=Find Owners
+updateOwner=Update Owner
+vets=Veterinarians
+name=Name
+specialties=Specialties
+none=none
+pages=pages
+first=First
+next=Next
+previous=Previous
+last=Last
+somethingHappened=Something happened...
+pets=Pets
+home=Home
+error=Error
+telephone.invalid=Telephone must be a 10-digit number
+layoutTitle=PetClinic :: a Spring Framework demonstration
+pet=Pet
+birthDate=Birth Date
+type=Type
+previousVisits=Previous Visits
+date=Date
+description=Description
+new=New 
+addVisit=Add Visit
+editPet=Edit Pet
+ownerInformation=Owner Information
+visitDate=Visit Date
+editOwner=Edit Owner
+addNewPet=Add New Pet
+petsAndVisits=Pets and Visits
+
+
+
+================================================
+FILE: src/main/resources/messages/messages_de.properties
+================================================
+welcome=Willkommen
+required=muss angegeben werden
+notFound=wurde nicht gefunden
+duplicate=ist bereits vergeben
+nonNumeric=darf nur numerisch sein
+duplicateFormSubmission=Wiederholtes Absenden des Formulars ist nicht erlaubt
+typeMismatch.date=ung�ltiges Datum
+typeMismatch.birthDate=ung�ltiges Datum
+owner=Besitzer
+firstName=Vorname
+lastName=Nachname
+address=Adresse
+city=Stadt
+telephone=Telefon
+owners=Besitzer
+addOwner=Besitzer hinzufügen
+findOwner=Besitzer finden
+findOwners=Besitzer suchen
+updateOwner=Besitzer aktualisieren
+vets=Tierärzte
+name=Name
+specialties=Fachgebiete
+none=keine
+pages=Seiten
+first=Erste
+next=Nächste
+previous=Vorherige
+last=Letzte
+somethingHappened=Etwas ist passiert...
+pets=Haustiere
+home=Startseite
+error=Fehler
+telephone.invalid=Telefonnummer muss aus 10 Ziffern bestehen
+layoutTitle=PetClinic :: eine Demonstration des Spring Frameworks
+pet=Haustier
+birthDate=Geburtsdatum
+type=Typ
+previousVisits=Frühere Besuche
+date=Datum
+description=Beschreibung
+new=Neu
+addVisit=Besuch hinzufügen
+editPet=Haustier bearbeiten
+ownerInformation=Besitzerinformationen
+visitDate=Besuchsdatum
+editOwner=Besitzer bearbeiten
+addNewPet=Neues Haustier hinzufügen
+petsAndVisits=Haustiere und Besuche
+
+
+
+================================================
+FILE: src/main/resources/messages/messages_en.properties
+================================================
+# This file is intentionally empty. Message look-ups will fall back to the default "messages.properties" file.
+
+
+================================================
+FILE: src/main/resources/messages/messages_es.properties
+================================================
+welcome=Bienvenido
+required=Es requerido
+notFound=No ha sido encontrado
+duplicate=Ya se encuentra en uso
+nonNumeric=Sólo debe contener numeros
+duplicateFormSubmission=No se permite el envío de formularios duplicados
+typeMismatch.date=Fecha invalida
+typeMismatch.birthDate=Fecha invalida
+owner=Propietario
+firstName=Nombre
+lastName=Apellido
+address=Dirección
+city=Ciudad
+telephone=Teléfono
+owners=Propietarios
+addOwner=Añadir propietario
+findOwner=Buscar propietario
+findOwners=Buscar propietarios
+updateOwner=Actualizar propietario
+vets=Veterinarios
+name=Nombre
+specialties=Especialidades
+none=ninguno
+pages=páginas
+first=Primero
+next=Siguiente
+previous=Anterior
+last=Último
+somethingHappened=Algo pasó...
+pets=Mascotas
+home=Inicio
+error=Error
+telephone.invalid=El número de teléfono debe tener 10 dígitos
+layoutTitle=PetClinic :: una demostración de Spring Framework
+pet=Mascota
+birthDate=Fecha de nacimiento
+type=Tipo
+previousVisits=Visitas anteriores
+date=Fecha
+description=Descripción
+new=Nuevo
+addVisit=Agregar visita
+editPet=Editar mascota
+ownerInformation=Información del propietario
+visitDate=Fecha de visita
+editOwner=Editar propietario
+addNewPet=Agregar nueva mascota
+petsAndVisits=Mascotas y visitas
+
+
+
+================================================
+FILE: src/main/resources/messages/messages_fa.properties
+================================================
+welcome=خوش آمدید
+required=الزامی
+notFound=یافت نشد
+duplicate=قبلا استفاده شده
+nonNumeric=باید عددی باشد
+duplicateFormSubmission=ارسال تکراری فرم مجاز نیست
+typeMismatch.date=تاریخ نامعتبر
+typeMismatch.birthDate=تاریخ تولد نامعتبر
+owner=مالک
+firstName=نام
+lastName=نام خانوادگی
+address=آدرس
+city=شهر
+telephone=تلفن
+owners=مالکان
+addOwner=افزودن مالک
+findOwner=یافتن مالک
+findOwners=یافتن مالکان
+updateOwner=ویرایش مالک
+vets=دامپزشکان
+name=نام
+specialties=تخصص‌ها
+none=هیچ‌کدام
+pages=صفحات
+first=اول
+next=بعدی
+previous=قبلی
+last=آخر
+somethingHappened=مشکلی پیش آمد...
+pets=حیوانات خانگی
+home=خانه
+error=خطا
+telephone.invalid=شماره تلفن باید ۱۰ رقمی باشد
+layoutTitle=PetClinic :: یک نمایش از Spring Framework
+pet=حیوان خانگی
+birthDate=تاریخ تولد
+type=نوع
+previousVisits=ویزیت‌های قبلی
+date=تاریخ
+description=توضیحات
+new=جدید
+addVisit=افزودن ویزیت
+editPet=ویرایش حیوان خانگی
+ownerInformation=اطلاعات مالک
+visitDate=تاریخ ویزیت
+editOwner=ویرایش مالک
+addNewPet=افزودن حیوان خانگی جدید
+petsAndVisits=حیوانات و ویزیت‌ها
+
+
+
+================================================
+FILE: src/main/resources/messages/messages_ko.properties
+================================================
+[Binary file]
+
+
+================================================
+FILE: src/main/resources/messages/messages_pt.properties
+================================================
+welcome=Bem-vindo
+required=E necessario
+notFound=Nao foi encontrado
+duplicate=Ja esta em uso
+nonNumeric=Deve ser tudo numerico
+duplicateFormSubmission=O envio duplicado de formulario nao e permitido
+typeMismatch.date=Data invalida
+typeMismatch.birthDate=Data de nascimento invalida
+owner=Proprietário
+firstName=Primeiro Nome
+lastName=Sobrenome
+address=Endereço
+city=Cidade
+telephone=Telefone
+owners=Proprietários
+addOwner=Adicionar proprietário
+findOwner=Encontrar proprietário
+findOwners=Encontrar proprietários
+updateOwner=Atualizar proprietário
+vets=Veterinários
+name=Nome
+specialties=Especialidades
+none=nenhum
+pages=páginas
+first=Primeiro
+next=Próximo
+previous=Anterior
+last=Último
+somethingHappened=Algo aconteceu...
+pets=Animais de estimação
+home=Início
+error=Erro
+telephone.invalid=O número de telefone deve conter 10 dígitos
+layoutTitle=PetClinic :: uma demonstração do Spring Framework
+pet=Animal de estimação
+birthDate=Data de nascimento
+type=Tipo
+previousVisits=Visitas anteriores
+date=Data
+description=Descrição
+new=Novo
+addVisit=Adicionar visita
+editPet=Editar animal
+ownerInformation=Informações do proprietário
+visitDate=Data da visita
+editOwner=Editar proprietário
+addNewPet=Adicionar novo animal
+petsAndVisits=Animais e visitas
+
+
+
+================================================
+FILE: src/main/resources/messages/messages_ru.properties
+================================================
+welcome=Добро пожаловать
+required=необходимо
+notFound=не найдено
+duplicate=уже используется
+nonNumeric=должно быть все числовое значение
+duplicateFormSubmission=Дублирование формы не допускается
+typeMismatch.date=неправильная даные
+typeMismatch.birthDate=неправильная дата
+owner=Владелец
+firstName=Имя
+lastName=Фамилия
+address=Адрес
+city=Город
+telephone=Телефон
+owners=Владельцы
+addOwner=Добавить владельца
+findOwner=Найти владельца
+findOwners=Найти владельцев
+updateOwner=Обновить владельца
+vets=Ветеринары
+name=Имя
+specialties=Специальности
+none=нет
+pages=страницы
+first=Первый
+next=Следующий
+previous=Предыдущий
+last=Последний
+somethingHappened=Что-то пошло не так...
+pets=Питомцы
+home=Главная
+error=Ошибка
+telephone.invalid=Телефон должен содержать 10 цифр
+layoutTitle=PetClinic :: демонстрация Spring Framework
+pet=Питомец
+birthDate=Дата рождения
+type=Тип
+previousVisits=Предыдущие визиты
+date=Дата
+description=Описание
+new=Новый
+addVisit=Добавить визит
+editPet=Редактировать питомца
+ownerInformation=Информация о владельце
+visitDate=Дата визита
+editOwner=Редактировать владельца
+addNewPet=Добавить нового питомца
+petsAndVisits=Питомцы и визиты
+
+
+
+================================================
+FILE: src/main/resources/messages/messages_tr.properties
+================================================
+welcome=hoş geldiniz
+required=gerekli
+notFound=bulunamadı
+duplicate=zaten kullanılıyor
+nonNumeric=sadece sayısal olmalıdır
+duplicateFormSubmission=Formun tekrar gönderilmesine izin verilmez
+typeMismatch.date=geçersiz tarih
+typeMismatch.birthDate=geçersiz tarih
+owner=Sahip
+firstName=Ad
+lastName=Soyad
+address=Adres
+city=Şehir
+telephone=Telefon
+owners=Sahipler
+addOwner=Sahip Ekle
+findOwner=Sahip Bul
+findOwners=Sahipleri Bul
+updateOwner=Sahip Güncelle
+vets=Veterinerler
+name=İsim
+specialties=Uzmanlıklar
+none=yok
+pages=sayfalar
+first=İlk
+next=Sonraki
+previous=Önceki
+last=Son
+somethingHappened=Bir şey oldu...
+pets=Evcil Hayvanlar
+home=Ana Sayfa
+error=Hata
+telephone.invalid=Telefon numarası 10 basamaklı olmalıdır
+layoutTitle=PetClinic :: bir Spring Framework demosu
+pet=Evcil Hayvan
+birthDate=Doğum Tarihi
+type=Tür
+previousVisits=Önceki Ziyaretler
+date=Tarih
+description=Açıklama
+new=Yeni
+addVisit=Ziyaret Ekle
+editPet=Evcil Hayvanı Düzenle
+ownerInformation=Sahip Bilgileri
+visitDate=Ziyaret Tarihi
+editOwner=Sahibi Düzenle
+addNewPet=Yeni Evcil Hayvan Ekle
+petsAndVisits=Evcil Hayvanlar ve Ziyaretler
+
+
+
+================================================
+FILE: src/main/resources/static/resources/fonts/montserrat-webfont.eot
+================================================
+[Binary file]
+
+
+================================================
+FILE: src/main/resources/static/resources/fonts/montserrat-webfont.ttf
+================================================
+[Binary file]
+
+
+================================================
+FILE: src/main/resources/static/resources/fonts/montserrat-webfont.woff
+================================================
+[Binary file]
+
+
+================================================
+FILE: src/main/resources/static/resources/fonts/varela_round-webfont.eot
+================================================
+[Binary file]
+
+
+================================================
+FILE: src/main/resources/static/resources/fonts/varela_round-webfont.woff
+================================================
+[Binary file]
+
+
+================================================
+FILE: src/main/resources/templates/error.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'error')}">
+
+<body>
+  <img src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
+  <h2 th:text="#{somethingHappened}">Something happened...</h2>
+  <p th:text="${message}">Exception message</p>
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/welcome.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'home')}">
+
+<body>
+
+  <h2 th:text="#{welcome}">Welcome</h2>
+  <div class="row">
+    <div class="col-md-12">
+      <img class="img-responsive" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
+    </div>
+  </div>
+
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/fragments/inputField.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org">
+
+<body>
+  <form>
+    <th:block th:fragment="input (label, name, type)">
+      <div th:with="valid=${!#fields.hasErrors(name)}" th:class="${'form-group' + (valid ? '' : ' has-error')}"
+        class="form-group">
+        <label th:for="${name}" class="col-sm-2 control-label" th:text="${label}">Label</label>
+        <div class="col-sm-10">
+          <div th:switch="${type}">
+            <input th:case="'text'" class="form-control" type="text" th:field="*{__${name}__}" />
+            <input th:case="'date'" class="form-control" type="date" th:field="*{__${name}__}" />
+          </div>
+          <span th:if="${valid}" class="fa fa-ok form-control-feedback" aria-hidden="true"></span>
+          <th:block th:if="${!valid}">
+            <span class="fa fa-remove form-control-feedback" aria-hidden="true"></span>
+            <span class="help-inline" th:errors="*{__${name}__}" th:text="#{error}">Error</span>
+          </th:block>
+        </div>
+      </div>
+    </th:block>
+  </form>
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/fragments/layout.html
+================================================
+<!DOCTYPE html>
+
+<html th:fragment="layout (template, menu)" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/resources/images/favicon.png}">
+  <title th:text="#{layoutTitle}">PetClinic :: a Spring Framework demonstration</title>
+  <link th:href="@{/webjars/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/resources/css/petclinic.css}" />
+
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark" role="navigation">
+    <div class="container-fluid">
+      <a class="navbar-brand" th:href="@{/}"><span></span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="main-navbar" style>
+
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" th:remove="all">
+
+          <li th:fragment="menuItem (link,active,title,glyph,text)" th:class="nav-item">
+            <a th:class="${active==menu ? 'nav-link active' : 'nav-link'}" th:href="@{__${link}__}" th:title="${title}">
+              <span th:class="'fa fa-'+${glyph}" class="fa fa-home"></span>
+              <span th:text="${text}">Template</span>
+            </a>
+          </li>
+
+        </ul>
+
+        <ul class="nav navbar-nav me-auto">
+
+          <li th:replace="~{::menuItem ('/','home','home page','home',#{home})}">
+            <span class="fa fa-home" aria-hidden="true"></span>
+            <span th:text="#{home}">Home</span>
+          </li>
+
+          <li th:replace="~{::menuItem ('/owners/find','owners','find owners','search',#{findOwners})}">
+            <span class="fa fa-search" aria-hidden="true"></span>
+            <span th:text="#{findOwners}">Find owners</span>
+          </li>
+
+          <li th:replace="~{::menuItem ('/vets.html','vets','veterinarians','th-list',#{vets})}">
+            <span class="fa fa-th-list" aria-hidden="true"></span>
+            <span th:text="#{vets}">Veterinarians</span>
+          </li>
+
+          <li
+            th:replace="~{::menuItem ('/oups','error','trigger a RuntimeException to see how it is handled','exclamation-triangle',#{error})}">
+            <span class="fa exclamation-triangle" aria-hidden="true"></span>
+            <span th:text="#{error}">Error</span>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <div class="container xd-container">
+
+      <th:block th:insert="${template}" />
+
+      <br />
+      <br />
+      <div class="container">
+        <div class="row">
+          <div class="col-12 text-center">
+            <img src="../static/images/spring-logo.svg" th:src="@{/resources/images/spring-logo.svg}"
+              alt="VMware Tanzu Logo" class="logo">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script th:src="@{/webjars/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/fragments/selectField.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org">
+
+<body>
+  <form>
+    <th:block th:fragment="select (label, name, items)">
+      <div th:with="valid=${!#fields.hasErrors(name)}" th:class="${'form-group' + (valid ? '' : ' has-error')}"
+        class="form-group">
+        <label th:for="${name}" class="col-sm-2 control-label" th:text="${label}">Label</label>
+
+        <div class="col-sm-10">
+          <select th:field="*{__${name}__}">
+            <option th:each="item : ${items}" th:value="${item}" th:text="${item}">dog</option>
+          </select>
+          <span th:if="${valid}" class="fa fa-ok form-control-feedback" aria-hidden="true"></span>
+          <th:block th:if="${!valid}">
+            <span class="fa fa-remove form-control-feedback" aria-hidden="true"></span>
+            <span class="help-inline" th:errors="*{__${name}__}" th:text="#{error}">Error</span>
+          </th:block>
+        </div>
+      </div>
+    </th:block>
+  </form>
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/owners/createOrUpdateOwnerForm.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+  <h2 th:text="#{owner}">Owner</h2>
+  <form th:object="${owner}" class="form-horizontal" id="add-owner-form" method="post">
+    <div class="form-group has-feedback">
+      <input th:replace="~{fragments/inputField :: input (#{firstName}, 'firstName', 'text')}" />
+      <input th:replace="~{fragments/inputField :: input (#{lastName}, 'lastName', 'text')}" />
+      <input th:replace="~{fragments/inputField :: input (#{address}, 'address', 'text')}" />
+      <input th:replace="~{fragments/inputField :: input (#{city}, 'city', 'text')}" />
+      <input th:replace="~{fragments/inputField :: input (#{telephone}, 'telephone', 'text')}" />
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button th:with="text=${owner['new']} ? #{addOwner} : #{updateOwner}" class="btn btn-primary" type="submit"
+          th:text="${text}">Add Owner</button>
+      </div>
+    </div>
+  </form>
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/owners/findOwners.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+  <h2 th:text="#{findOwners}">Find Owners</h2>
+
+  <form th:object="${owner}" th:action="@{/owners}" method="get" class="form-horizontal" id="search-owner-form">
+    <div class="form-group">
+      <div class="control-group" id="lastNameGroup">
+        <label class="col-sm-2 control-label" th:text="#{lastName}">Last name </label>
+        <div class="col-sm-10">
+          <input class="form-control" th:field="*{lastName}" size="30" maxlength="80" />
+          <span class="help-inline">
+            <div th:if="${#fields.hasAnyErrors()}">
+              <p th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</p>
+            </div>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn btn-primary" th:text="#{findOwner}">Find Owner</button>
+      </div>
+    </div>
+
+    <a class="btn btn-primary" th:href="@{/owners/new}" th:text="#{addOwner}">Add Owner</a>
+
+  </form>
+
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/owners/ownerDetails.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+  <h2 th:text="#{ownerInformation}">Owner Information</h2>
+
+  <div th:if="${message}" class="alert alert-success" id="success-message">
+    <span th:text="${message}"></span>
+  </div>
+
+  <div th:if="${error}" class="alert alert-danger" id="error-message">
+    <span th:text="${error}"></span>
+  </div>
+
+  <table class="table table-striped" th:object="${owner}">
+    <tr>
+      <th th:text="#{name}">Name</th>
+      <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
+    </tr>
+    <tr>
+      <th th:text="#{address}">Address</th>
+      <td th:text="*{address}"></td>
+    </tr>
+    <tr>
+      <th th:text="#{city}">City</th>
+      <td th:text="*{city}"></td>
+    </tr>
+    <tr>
+      <th th:text="#{telephone}">Telephone</th>
+      <td th:text="*{telephone}"></td>
+    </tr>
+  </table>
+
+  <a th:href="@{__${owner.id}__/edit}" class="btn btn-primary" th:text="#{editOwner}">Edit
+    Owner</a>
+  <a th:href="@{__${owner.id}__/pets/new}" class="btn btn-primary" th:text="#{addNewPet}">Add
+    New Pet</a>
+
+  <br />
+  <br />
+  <br />
+  <h2 th:text="#{petsAndVisits}">Pets and Visits</h2>
+
+  <table class="table table-striped">
+
+    <tr th:each="pet : ${owner.pets}">
+      <td valign="top">
+        <dl class="dl-horizontal">
+          <dt th:text="#{name}">Name</dt>
+          <dd th:text="${pet.name}"></dd>
+          <dt th:text="#{birthDate}">Birth Date</dt>
+          <dd th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}"></dd>
+          <dt th:text="#{type}">Type</dt>
+          <dd th:text="${pet.type}"></dd>
+        </dl>
+      </td>
+      <td valign="top">
+        <table class="table-condensed">
+          <thead>
+            <tr>
+              <th th:text="#{visitDate}">Visit Date</th>
+              <th th:text="#{description}">Description</th>
+            </tr>
+          </thead>
+          <tr th:each="visit : ${pet.visits}">
+            <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
+            <td th:text="${visit?.description}"></td>
+          </tr>
+          <tr>
+            <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/edit}" th:text="#{editPet}">Edit Pet</a></td>
+            <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}" th:text="#{addVisit}">Add Visit</a></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+  </table>
+  <script>
+    // Function to hide the success and error messages after 3 seconds
+    function hideMessages() {
+      setTimeout(function () {
+        document.getElementById("success-message").style.display = "none";
+        document.getElementById("error-message").style.display = "none";
+      }, 3000); // 3000 milliseconds (3 seconds)
+    }
+
+    // Call the function to hide messages
+    hideMessages();
+  </script>
+
+</body>
+
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/owners/ownersList.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+  <h2 th:text="#{owners}">Owners</h2>
+
+  <table id="owners" class="table table-striped">
+    <thead>
+      <tr>
+        <th th:text="#{name}" style="width: 150px;">Name</th>
+        <th th:text="#{address}" style="width: 200px;">Address</th>
+        <th th:text="#{city}">City</th>
+        <th th:text="#{telephone}" style="width: 120px">Telephone</th>
+        <th th:text="#{pets}">Pets</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="owner : ${listOwners}">
+        <td>
+          <a th:href="@{/owners/__${owner.id}__}" th:text="${owner.firstName + ' ' + owner.lastName}" /></a>
+        </td>
+        <td th:text="${owner.address}" />
+        <td th:text="${owner.city}" />
+        <td th:text="${owner.telephone}" />
+        <td><span th:text="${#strings.listJoin(owner.pets, ', ')}" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <div th:if="${totalPages > 1}">
+    <span th:text="#{pages}">Pages:</span>
+    <span>[</span>
+    <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+      <a th:if="${currentPage != i}" th:href="@{'/owners?page=' + ${i}}">[[${i}]]</a>
+      <span th:unless="${currentPage != i}">[[${i}]]</span>
+    </span>
+    <span>]&nbsp;</span>
+    <span>
+      <a th:if="${currentPage > 1}" th:href="@{'/owners?page=1'}" th:title="#{first}" class="fa fa-fast-backward"></a>
+      <span th:unless="${currentPage > 1}" th:title="#{first}" class="fa fa-fast-backward"></span>
+    </span>
+    <span>
+      <a th:if="${currentPage > 1}" th:href="@{'/owners?page=__${currentPage - 1}__'}" th:title="#{previous}"
+        class="fa fa-step-backward"></a>
+      <span th:unless="${currentPage > 1}" th:title="#{previous}" class="fa fa-step-backward"></span>
+    </span>
+    <span>
+      <a th:if="${currentPage < totalPages}" th:href="@{'/owners?page=__${currentPage + 1}__'}" th:title="#{next}"
+        class="fa fa-step-forward"></a>
+      <span th:unless="${currentPage < totalPages}" th:title="#{next}" class="fa fa-step-forward"></span>
+    </span>
+    <span>
+      <a th:if="${currentPage < totalPages}" th:href="@{'/owners?page=__${totalPages}__'}" th:title="#{last}"
+        class="fa fa-fast-forward"></a>
+      <span th:unless="${currentPage < totalPages}" th:title="#{last}" class="fa fa-fast-forward"></span>
+    </span>
+  </div>
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/pets/createOrUpdatePetForm.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+  <h2>
+    <th:block th:if="${pet['new']}" th:text="#{new}">New </th:block>
+    <span th:text="#{pet}">Pet</span>
+  </h2>
+  <form th:object="${pet}" class="form-horizontal" method="post">
+    <input type="hidden" name="id" th:value="*{id}" />
+    <div class="form-group has-feedback">
+      <div class="form-group">
+        <label class="col-sm-2 control-label" th:text="#{owner}">Owner</label>
+        <div class="col-sm-10">
+          <span th:text="${owner?.firstName + ' ' + owner?.lastName}" />
+        </div>
+      </div>
+      <input th:replace="~{fragments/inputField :: input ('Name', 'name', 'text')}" />
+      <input th:replace="~{fragments/inputField :: input ('Birth Date', 'birthDate', 'date')}" />
+      <input th:replace="~{fragments/selectField :: select ('Type', 'type', ${types})}" />
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button th:with="text=${pet['new']} ? 'Add Pet' : 'Update Pet'" class="btn btn-primary" type="submit"
+          th:text="${text}">Add Pet</button>
+      </div>
+    </div>
+  </form>
+
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/pets/createOrUpdateVisitForm.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+  <h2>
+    <th:block th:if="${visit['new']}" th:text="#{new}">New </th:block>
+    Visit
+  </h2>
+
+  <b th:text="#{pet}">Pet</b>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th th:text="#{name}">Name</th>
+        <th th:text="#{birthDate}">Birth Date</th>
+        <th th:text="#{type}">Type</th>
+        <th th:text="#{owner}">Owner</th>
+      </tr>
+    </thead>
+    <tr>
+      <td th:text="${pet.name}"></td>
+      <td th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}"></td>
+      <td th:text="${pet.type}"></td>
+      <td th:text="${owner?.firstName + ' ' + owner?.lastName}"></td>
+    </tr>
+  </table>
+
+  <form th:object="${visit}" class="form-horizontal" method="post">
+    <div class="form-group has-feedback">
+      <input th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}" />
+      <input th:replace="~{fragments/inputField :: input ('Description', 'description', 'text')}" />
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <input type="hidden" name="petId" th:value="${pet.id}" />
+        <button class="btn btn-primary" type="submit" th:text="#{addVisit}">Add Visit</button>
+      </div>
+    </div>
+  </form>
+
+  <br />
+  <b th:text="#{previousVisits}">Previous Visits</b>
+  <table class="table table-striped">
+    <tr>
+      <th th:text="#{date}">Date</th>
+      <th th:text="#{description}">Description</th>
+    </tr>
+    <tr th:if="${!visit['new']}" th:each="visit : ${pet.visits}">
+      <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
+      <td th:text=" ${visit.description}"></td>
+    </tr>
+  </table>
+
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/resources/templates/vets/vetList.html
+================================================
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'vets')}">
+
+<body>
+
+  <h2 th:text="#{vets}">Veterinarians</h2>
+
+  <table id="vets" class="table table-striped">
+    <thead>
+      <tr>
+        <th th:text="#{name}">Name</th>
+        <th th:text="#{specialties}">Specialties</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="vet : ${listVets}">
+        <td th:text="${vet.firstName + ' ' + vet.lastName}"></td>
+        <td>
+          <span th:each="specialty : ${vet.specialties}" th:text="${specialty.name + ' '}" /> <span
+            th:if="${vet.nrOfSpecialties == 0}" th:text="#{none}">none</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div th:if="${totalPages > 1}">
+    <span th:text="#{pages}">Pages:</span>
+    <span>[</span>
+    <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+      <a th:if="${currentPage != i}" th:href="@{'/vets.html?page=__${i}__'}">[[${i}]]</a>
+      <span th:unless="${currentPage != i}">[[${i}]]</span>
+    </span>
+    <span>]&nbsp;</span>
+    <span>
+      <a th:if="${currentPage > 1}" th:href="@{'/vets.html?page=1'}" th:title="#{first}"
+        class="fa fa-fast-backward"></a>
+      <span th:unless="${currentPage > 1}" th:title="#{first}" class="fa fa-fast-backward"></span>
+    </span>
+    <span>
+      <a th:if="${currentPage > 1}" th:href="@{'/vets.html?page=__${currentPage - 1}__'}" th:title="#{previous}"
+        class="fa fa-step-backward"></a>
+      <span th:unless="${currentPage > 1}" th:title="#{previous}" class="fa fa-step-backward"></span>
+    </span>
+    <span>
+      <a th:if="${currentPage < totalPages}" th:href="@{'/vets.html?page=__${currentPage + 1}__'}" th:title="#{next}"
+        class="fa fa-step-forward"></a>
+      <span th:unless="${currentPage < totalPages}" th:title="#{next}" class="fa fa-step-forward"></span>
+    </span>
+    <span>
+      <a th:if="${currentPage < totalPages}" th:href="@{'/vets.html?page=__${totalPages}__'}" th:title="#{last}"
+        class="fa fa-fast-forward"></a>
+      <span th:unless="${currentPage < totalPages}" th:title="#{last}" class="fa fa-fast-forward"></span>
+    </span>
+  </div>
+</body>
+
+</html>
+
+
+================================================
+FILE: src/main/scss/header.scss
+================================================
+.navbar {
+  border-top: 4px solid #6db33f;
+  background-color: #34302d;
+  margin-bottom: 0px;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+}
+
+.navbar a.navbar-brand {
+  background: url("../images/spring-logo-dataflow.png") -1px -1px no-repeat;
+  margin: 12px 0 6px;
+  width: 229px;
+  height: 46px;
+  display: inline-block;
+  text-decoration: none;
+  padding: 0;
+}
+
+.navbar a.navbar-brand span {
+  display: block;
+  width: 229px;
+  height: 46px;
+  background: url("../images/spring-logo-dataflow.png") -1px -48px no-repeat;
+  opacity: 0;
+  -moz-transition: opacity 0.12s ease-in-out;
+  -webkit-transition: opacity 0.12s ease-in-out;
+  -o-transition: opacity 0.12s ease-in-out;
+}
+
+.navbar a:hover.navbar-brand span {
+  opacity: 1;
+}
+
+.navbar li > a, .navbar-text {
+  font-family: "montserratregular", sans-serif;
+  text-shadow: none;
+  font-size: 14px;
+
+/* line-height: 14px; */
+  padding: 28px 20px;
+  transition: all 0.15s;
+  -webkit-transition: all 0.15s;
+  -moz-transition: all 0.15s;
+  -o-transition: all 0.15s;
+  -ms-transition: all 0.15s;
+}
+
+.navbar li > a {
+  text-transform: uppercase;
+}
+
+.navbar .navbar-text {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.navbar li:hover > a {
+  color: #eeeeee;
+  background-color: #6db33f;
+}
+
+.navbar-toggle {
+  border-width: 0;
+
+  .icon-bar + .icon-bar {
+    margin-top: 3px;
+  }
+  .icon-bar {
+    width: 19px;
+    height: 3px;
+  }
+
+}
+
+
+
+================================================
+FILE: src/main/scss/petclinic.scss
+================================================
+/*
+ * Copyright 2016 the original author or authors.
+ *
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ @import "bootstrap";
+
+$icon-font-path:    "../../webjars/bootstrap/fonts/";
+
+$spring-green:      #6db33f;
+$spring-dark-green: #5fa134;
+$spring-brown:      #34302D;
+$spring-grey:       #838789;
+$spring-light-grey: #f1f1f1;
+
+$body-bg:                           $spring-light-grey;
+$text-color:                        $spring-brown;
+$link-color:                        $spring-dark-green;
+$link-hover-color:                  $spring-dark-green;
+
+$navbar-default-link-color:         $spring-light-grey;
+$navbar-default-link-active-color:  $spring-light-grey;
+$navbar-default-link-hover-color:   $spring-light-grey;
+$navbar-default-link-hover-bg:      $spring-green;
+$navbar-default-toggle-icon-bar-bg: $spring-light-grey;
+$navbar-default-toggle-hover-bg:    transparent;
+$navbar-default-link-active-bg:     $spring-green;
+
+$border-radius-base:             0;
+$border-radius-large:            0;
+$border-radius-small:            0;
+
+$nav-tabs-active-link-hover-color:        $spring-light-grey;
+$nav-tabs-active-link-hover-bg:           $spring-brown;
+$nav-tabs-active-link-hover-border-color: $spring-brown;
+$nav-tabs-border-color:                   $spring-brown;
+
+$pagination-active-bg:                    $spring-brown;
+$pagination-active-border:                $spring-green;
+$table-border-color:                      $spring-brown;
+
+.table > thead > tr > th {
+  background-color: lighten($spring-brown, 3%);
+  color: $spring-light-grey;
+}
+
+.table-filter {
+  background-color: $spring-brown;
+  padding: 9px 12px;
+}
+
+.nav > li > a {
+  color: $spring-grey;
+}
+
+.btn-primary {
+  margin-top: 12px;
+  border-width: 2px;
+  transition: border 0.15s;
+  color: $spring-light-grey;
+  background: $spring-brown;
+  border-color: $spring-green;
+  -webkit-transition: border 0.15s;
+  -moz-transition: border 0.15s;
+  -o-transition: border 0.15s;
+  -ms-transition: border 0.15s;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active,
+  .open .dropdown-toggle {
+    background-color: $spring-brown;
+    border-color: $spring-brown;
+  }
+}
+
+
+.container .text-muted {
+  margin: 20px 0;
+}
+
+code {
+  font-size: 80%;
+}
+
+.xd-container {
+  margin-top: 40px;
+  margin-bottom: 100px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+h1 {
+  margin-bottom: 15px
+}
+
+.index-page--subtitle {
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0 0 30px;
+}
+
+.form-horizontal button.btn-inverse {
+  margin-left: 32px;
+}
+
+#job-params-modal .modal-dialog {
+  width: 90%;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+[ng-cloak].splash {
+  display: block !important;
+}
+[ng-cloak] {
+  display: none;
+}
+
+.splash {
+  background: $spring-green;
+  color: $spring-brown;
+  display: none;
+}
+
+.error-page {
+  margin-top: 100px;
+  text-align: center;
+}
+
+.error-page .error-title {
+  font-size: 24px;
+  line-height: 24px;
+  margin: 30px 0 0;
+}
+
+table td {
+  vertical-align: middle;
+}
+
+table td .progress {
+  margin-bottom: 0;
+}
+
+table td.action-column {
+  width: 1px;
+}
+
+.help-block {
+  color: lighten($text-color, 50%); // lighten the text some for contrast
+}
+
+.xd-containers {
+  font-size: 15px;
+}
+
+.cluster-view > table td {
+  vertical-align: top;
+}
+
+.cluster-view .label, .cluster-view .column-block {
+  display: block;
+}
+
+.cluster-view .input-group-addon {
+  width: 0%;
+}
+
+.cluster-view {
+  margin-bottom: 0;
+}
+
+.container-details-table th {
+  background-color: lighten($spring-brown, 3%);
+  color: $spring-light-grey;
+}
+
+.status-help-content-table td {
+  color: $spring-brown;
+}
+
+.logo {
+  width: 200px;
+}
+
+.myspinner {
+  animation-name: spinner;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+
+  -webkit-transform-origin: 49% 50%;
+  -webkit-animation-name: spinner;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+}
+
+hr {
+  border-top: 1px dotted $spring-brown;
+}
+
+@import "typography.scss";
+@import "header.scss";
+@import "responsive.scss";
+
+
+
+================================================
+FILE: src/main/scss/responsive.scss
+================================================
+@media (max-width: 768px) {
+  .navbar-toggle {
+    position:absolute;
+    z-index: 9999;
+    left:0px;
+    top:0px;
+  }
+
+  .navbar a.navbar-brand {
+    display: block;
+    margin: 0 auto 0 auto;
+    width: 148px;
+    height: 50px;
+    float: none;
+    background: url("../images/spring-logo-dataflow-mobile.png") 0 center no-repeat;
+  }
+
+  .homepage-billboard .homepage-subtitle {
+    font-size: 21px;
+    line-height: 21px;
+  }
+
+  .navbar a.navbar-brand span {
+    display: none;
+  }
+
+  .navbar {
+    border-top-width: 0;
+  }
+
+  .xd-container {
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+
+  .index-page--subtitle {
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+
+}
+
+
+
+================================================
+FILE: src/main/scss/typography.scss
+================================================
+@font-face {
+  font-family: 'varela_roundregular';
+
+  src: url('../fonts/varela_round-webfont.eot');
+  src: url('../fonts/varela_round-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/varela_round-webfont.woff') format('woff'),
+       url('../fonts/varela_round-webfont.ttf') format('truetype'),
+       url('../fonts/varela_round-webfont.svg#varela_roundregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'montserratregular';
+  src: url('../fonts/montserrat-webfont.eot');
+  src: url('../fonts/montserrat-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/montserrat-webfont.woff') format('woff'),
+       url('../fonts/montserrat-webfont.ttf') format('truetype'),
+       url('../fonts/montserrat-webfont.svg#montserratregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body, h1, h2, h3, p, input {
+  margin: 0;
+  font-weight: 400;
+  font-family: "varela_roundregular", sans-serif;
+  color: #34302d;
+}
+
+h1 {
+  font-size: 24px;
+  line-height: 30px;
+  font-family: "montserratregular", sans-serif;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  margin-bottom: 10px;
+  font-family: "montserratregular", sans-serif;
+}
+
+h3 {
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+p {
+  //font-size: 15px;
+  //line-height: 24px;
+}
+
+strong {
+  font-weight: 700;
+  font-family: "montserratregular", sans-serif;
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/MySqlIntegrationTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.web.client.RestTemplate;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("mysql")
+@Testcontainers(disabledWithoutDocker = true)
+@DisabledInNativeImage
+@DisabledInAotMode
+class MySqlIntegrationTests {
+
+	@ServiceConnection
+	@Container
+	static MySQLContainer<?> container = new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
+
+	@LocalServerPort
+	int port;
+
+	@Autowired
+	private VetRepository vets;
+
+	@Autowired
+	private RestTemplateBuilder builder;
+
+	@Test
+	void testFindAll() {
+		vets.findAll();
+		vets.findAll(); // served from cache
+	}
+
+	@Test
+	void testOwnerDetails() {
+		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/MysqlTestApplication.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.utility.DockerImageName;
+
+/**
+ * PetClinic Spring Boot Application.
+ *
+ * @author Dave Syer
+ */
+@Configuration
+public class MysqlTestApplication {
+
+	@ServiceConnection
+	@Profile("mysql")
+	@Bean
+	static MySQLContainer<?> container() {
+		return new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(PetClinicApplication.class, "--spring.profiles.active=mysql",
+				"--spring.docker.compose.enabled=false");
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/PetClinicIntegrationTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.web.client.RestTemplate;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class PetClinicIntegrationTests {
+
+	@LocalServerPort
+	int port;
+
+	@Autowired
+	private VetRepository vets;
+
+	@Autowired
+	private RestTemplateBuilder builder;
+
+	@Test
+	void testFindAll() {
+		vets.findAll();
+		vets.findAll(); // served from cache
+	}
+
+	@Test
+	void testOwnerDetails() {
+		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(PetClinicApplication.class, args);
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/PostgresIntegrationTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationPreparedEvent;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.ApplicationListener;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestTemplate;
+import org.testcontainers.DockerClientFactory;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "spring.docker.compose.skip.in-tests=false", //
+		"spring.docker.compose.start.arguments=--force-recreate,--renew-anon-volumes,postgres" })
+@ActiveProfiles("postgres")
+@DisabledInNativeImage
+public class PostgresIntegrationTests {
+
+	@LocalServerPort
+	int port;
+
+	@Autowired
+	private VetRepository vets;
+
+	@Autowired
+	private RestTemplateBuilder builder;
+
+	@BeforeAll
+	static void available() {
+		assumeTrue(DockerClientFactory.instance().isDockerAvailable(), "Docker not available");
+	}
+
+	public static void main(String[] args) {
+		new SpringApplicationBuilder(PetClinicApplication.class) //
+			.profiles("postgres") //
+			.properties( //
+					"spring.docker.compose.start.arguments=postgres" //
+			) //
+			.listeners(new PropertiesLogger()) //
+			.run(args);
+	}
+
+	@Test
+	void testFindAll() throws Exception {
+		vets.findAll();
+		vets.findAll(); // served from cache
+	}
+
+	@Test
+	void testOwnerDetails() {
+		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	static class PropertiesLogger implements ApplicationListener<ApplicationPreparedEvent> {
+
+		private static final Log log = LogFactory.getLog(PropertiesLogger.class);
+
+		private ConfigurableEnvironment environment;
+
+		private boolean isFirstRun = true;
+
+		@Override
+		public void onApplicationEvent(ApplicationPreparedEvent event) {
+			if (isFirstRun) {
+				environment = event.getApplicationContext().getEnvironment();
+				printProperties();
+			}
+			isFirstRun = false;
+		}
+
+		public void printProperties() {
+			for (EnumerablePropertySource<?> source : findPropertiesPropertySources()) {
+				log.info("PropertySource: " + source.getName());
+				String[] names = source.getPropertyNames();
+				Arrays.sort(names);
+				for (String name : names) {
+					String resolved = environment.getProperty(name);
+
+					assertNotNull(resolved, "resolved environment property: " + name + " is null.");
+
+					Object sourceProperty = source.getProperty(name);
+
+					assertNotNull(sourceProperty, "source property was expecting an object but is null.");
+
+					assertNotNull(sourceProperty.toString(), "source property toString() returned null.");
+
+					String value = sourceProperty.toString();
+					if (resolved.equals(value)) {
+						log.info(name + "=" + resolved);
+					}
+					else {
+						log.info(name + "=" + value + " OVERRIDDEN to " + resolved);
+					}
+				}
+			}
+		}
+
+		private List<EnumerablePropertySource<?>> findPropertiesPropertySources() {
+			List<EnumerablePropertySource<?>> sources = new LinkedList<>();
+			for (PropertySource<?> source : environment.getPropertySources()) {
+				if (source instanceof EnumerablePropertySource enumerable) {
+					sources.add(enumerable);
+				}
+			}
+			return sources;
+		}
+
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/model/ValidatorTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.model;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Locale;
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
+/**
+ * @author Michael Isvy Simple test to make sure that Bean Validation is working (useful
+ * when upgrading to a new version of Hibernate Validator/ Bean Validation)
+ */
+class ValidatorTests {
+
+	private Validator createValidator() {
+		LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+		localValidatorFactoryBean.afterPropertiesSet();
+		return localValidatorFactoryBean;
+	}
+
+	@Test
+	void shouldNotValidateWhenFirstNameEmpty() {
+
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+		Person person = new Person();
+		person.setFirstName("");
+		person.setLastName("smith");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
+
+		assertThat(constraintViolations).hasSize(1);
+		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
+		assertThat(violation.getPropertyPath()).hasToString("firstName");
+		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/**
+ * Test class for {@link OwnerController}
+ *
+ * @author Colin But
+ * @author Wick Dynex
+ */
+@WebMvcTest(OwnerController.class)
+@DisabledInNativeImage
+@DisabledInAotMode
+class OwnerControllerTests {
+
+	private static final int TEST_OWNER_ID = 1;
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private OwnerRepository owners;
+
+	private Owner george() {
+		Owner george = new Owner();
+		george.setId(TEST_OWNER_ID);
+		george.setFirstName("George");
+		george.setLastName("Franklin");
+		george.setAddress("110 W. Liberty St.");
+		george.setCity("Madison");
+		george.setTelephone("6085551023");
+		Pet max = new Pet();
+		PetType dog = new PetType();
+		dog.setName("dog");
+		max.setType(dog);
+		max.setName("Max");
+		max.setBirthDate(LocalDate.now());
+		george.addPet(max);
+		max.setId(1);
+		return george;
+	}
+
+	@BeforeEach
+	void setup() {
+
+		Owner george = george();
+		given(this.owners.findByLastNameStartingWith(eq("Franklin"), any(Pageable.class)))
+			.willReturn(new PageImpl<>(List.of(george)));
+
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(george));
+		Visit visit = new Visit();
+		visit.setDate(LocalDate.now());
+		george.getPet("Max").getVisits().add(visit);
+
+	}
+
+	@Test
+	void testInitCreationForm() throws Exception {
+		mockMvc.perform(get("/owners/new"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("owner"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testProcessCreationFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1316761638"))
+			.andExpect(status().is3xxRedirection());
+	}
+
+	@Test
+	void testProcessCreationFormHasErrors() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "address"))
+			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testInitFindForm() throws Exception {
+		mockMvc.perform(get("/owners/find"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("owner"))
+			.andExpect(view().name("owners/findOwners"));
+	}
+
+	@Test
+	void testProcessFindFormSuccess() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of(george(), new Owner()));
+		when(this.owners.findByLastNameStartingWith(anyString(), any(Pageable.class))).thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1")).andExpect(status().isOk()).andExpect(view().name("owners/ownersList"));
+	}
+
+	@Test
+	void testProcessFindFormByLastName() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of(george()));
+		when(this.owners.findByLastNameStartingWith(eq("Franklin"), any(Pageable.class))).thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1").param("lastName", "Franklin"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
+	}
+
+	@Test
+	void testProcessFindFormNoOwnersFound() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of());
+		when(this.owners.findByLastNameStartingWith(eq("Unknown Surname"), any(Pageable.class))).thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1").param("lastName", "Unknown Surname"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasFieldErrors("owner", "lastName"))
+			.andExpect(model().attributeHasFieldErrorCode("owner", "lastName", "notFound"))
+			.andExpect(view().name("owners/findOwners"));
+
+	}
+
+	@Test
+	void testInitUpdateOwnerForm() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("owner"))
+			.andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
+			.andExpect(model().attribute("owner", hasProperty("firstName", is("George"))))
+			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
+			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
+			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testProcessUpdateOwnerFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1616291589"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Test
+	void testProcessUpdateOwnerFormUnchangedSuccess() throws Exception {
+		mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Test
+	void testProcessUpdateOwnerFormHasErrors() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("address", "")
+				.param("telephone", ""))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "address"))
+			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testShowOwner() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
+			.andExpect(model().attribute("owner", hasProperty("firstName", is("George"))))
+			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
+			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
+			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(model().attribute("owner", hasProperty("pets", not(empty()))))
+			.andExpect(model().attribute("owner",
+					hasProperty("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0)))))))
+			.andExpect(view().name("owners/ownerDetails"));
+	}
+
+	@Test
+	public void testProcessUpdateOwnerFormWithIdMismatch() throws Exception {
+		int pathOwnerId = 1;
+
+		Owner owner = new Owner();
+		owner.setId(2);
+		owner.setFirstName("John");
+		owner.setLastName("Doe");
+		owner.setAddress("Center Street");
+		owner.setCity("New York");
+		owner.setTelephone("0123456789");
+
+		when(owners.findById(pathOwnerId)).thenReturn(Optional.of(owner));
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/owners/{ownerId}/edit", pathOwnerId).flashAttr("owner", owner))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/owners/" + pathOwnerId + "/edit"))
+			.andExpect(flash().attributeExists("error"));
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/PetControllerTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.samples.petclinic.owner.PetTypeRepository;
+import org.springframework.samples.petclinic.owner.OwnerRepository;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+/**
+ * Test class for the {@link PetController}
+ *
+ * @author Colin But
+ * @author Wick Dynex
+ */
+@WebMvcTest(value = PetController.class,
+		includeFilters = @ComponentScan.Filter(value = PetTypeFormatter.class, type = FilterType.ASSIGNABLE_TYPE))
+@DisabledInNativeImage
+@DisabledInAotMode
+class PetControllerTests {
+
+	private static final int TEST_OWNER_ID = 1;
+
+	private static final int TEST_PET_ID = 1;
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private OwnerRepository owners;
+
+	@MockitoBean
+	private PetTypeRepository types;
+
+	@BeforeEach
+	void setup() {
+		PetType cat = new PetType();
+		cat.setId(3);
+		cat.setName("hamster");
+		given(this.types.findPetTypes()).willReturn(List.of(cat));
+
+		Owner owner = new Owner();
+		Pet pet = new Pet();
+		Pet dog = new Pet();
+		owner.addPet(pet);
+		owner.addPet(dog);
+		pet.setId(TEST_PET_ID);
+		dog.setId(TEST_PET_ID + 1);
+		pet.setName("petty");
+		dog.setName("doggy");
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+	}
+
+	@Test
+	void testInitCreationForm() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(view().name("pets/createOrUpdatePetForm"))
+			.andExpect(model().attributeExists("pet"));
+	}
+
+	@Test
+	void testProcessCreationFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+				.param("type", "hamster")
+				.param("birthDate", "2015-02-12"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Nested
+	class ProcessCreationFormHasErrors {
+
+		@Test
+		void testProcessCreationFormWithBlankName() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "\t \n")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "name"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "required"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessCreationFormWithDuplicateName() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "petty")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "name"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "duplicate"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessCreationFormWithMissingPetType() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "type"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "type", "required"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessCreationFormWithInvalidBirthDate() throws Exception {
+			LocalDate currentDate = LocalDate.now();
+			String futureBirthDate = currentDate.plusMonths(1).toString();
+
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+					.param("birthDate", futureBirthDate))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "birthDate"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "birthDate", "typeMismatch.birthDate"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testInitUpdateForm() throws Exception {
+			mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeExists("pet"))
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+	}
+
+	@Test
+	void testProcessUpdateFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "Betty")
+				.param("type", "hamster")
+				.param("birthDate", "2015-02-12"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Nested
+	class ProcessUpdateFormHasErrors {
+
+		@Test
+		void testProcessUpdateFormWithInvalidBirthDate() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", " ")
+					.param("birthDate", "2015/02/12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "birthDate"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "birthDate", "typeMismatch"))
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessUpdateFormWithBlankName() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "  ")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "name"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "required"))
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/PetTypeFormatterTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+/**
+ * Test class for {@link PetTypeFormatter}
+ *
+ * @author Colin But
+ */
+@ExtendWith(MockitoExtension.class)
+@DisabledInNativeImage
+class PetTypeFormatterTests {
+
+	@Mock
+	private PetTypeRepository types;
+
+	private PetTypeFormatter petTypeFormatter;
+
+	@BeforeEach
+	void setup() {
+		this.petTypeFormatter = new PetTypeFormatter(types);
+	}
+
+	@Test
+	void testPrint() {
+		PetType petType = new PetType();
+		petType.setName("Hamster");
+		String petTypeName = this.petTypeFormatter.print(petType, Locale.ENGLISH);
+		assertThat(petTypeName).isEqualTo("Hamster");
+	}
+
+	@Test
+	void shouldParse() throws ParseException {
+		given(types.findPetTypes()).willReturn(makePetTypes());
+		PetType petType = petTypeFormatter.parse("Bird", Locale.ENGLISH);
+		assertThat(petType.getName()).isEqualTo("Bird");
+	}
+
+	@Test
+	void shouldThrowParseException() {
+		given(types.findPetTypes()).willReturn(makePetTypes());
+		Assertions.assertThrows(ParseException.class, () -> {
+			petTypeFormatter.parse("Fish", Locale.ENGLISH);
+		});
+	}
+
+	/**
+	 * Helper method to produce some sample pet types just for test purpose
+	 * @return {@link Collection} of {@link PetType}
+	 */
+	private List<PetType> makePetTypes() {
+		List<PetType> petTypes = new ArrayList<>();
+		petTypes.add(new PetType() {
+			{
+				setName("Dog");
+			}
+		});
+		petTypes.add(new PetType() {
+			{
+				setName("Bird");
+			}
+		});
+		return petTypes;
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/PetValidatorTests.java
+================================================
+/*
+ * Copyright 2012-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.validation.Errors;
+import org.springframework.validation.MapBindingResult;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Test class for {@link PetValidator}
+ *
+ * @author Wick Dynex
+ */
+@ExtendWith(MockitoExtension.class)
+@DisabledInNativeImage
+public class PetValidatorTests {
+
+	private PetValidator petValidator;
+
+	private Pet pet;
+
+	private PetType petType;
+
+	private Errors errors;
+
+	private static final String petName = "Buddy";
+
+	private static final String petTypeName = "Dog";
+
+	private static final LocalDate petBirthDate = LocalDate.of(1990, 1, 1);
+
+	@BeforeEach
+	void setUp() {
+		petValidator = new PetValidator();
+		pet = new Pet();
+		petType = new PetType();
+		errors = new MapBindingResult(new HashMap<>(), "pet");
+	}
+
+	@Test
+	void testValidate() {
+		petType.setName(petTypeName);
+		pet.setName(petName);
+		pet.setType(petType);
+		pet.setBirthDate(petBirthDate);
+
+		petValidator.validate(pet, errors);
+
+		assertFalse(errors.hasErrors());
+	}
+
+	@Nested
+	class ValidateHasErrors {
+
+		@Test
+		void testValidateWithInvalidPetName() {
+			petType.setName(petTypeName);
+			pet.setName("");
+			pet.setType(petType);
+			pet.setBirthDate(petBirthDate);
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("name"));
+		}
+
+		@Test
+		void testValidateWithInvalidPetType() {
+			pet.setName(petName);
+			pet.setType(null);
+			pet.setBirthDate(petBirthDate);
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("type"));
+		}
+
+		@Test
+		void testValidateWithInvalidBirthDate() {
+			petType.setName(petTypeName);
+			pet.setName(petName);
+			pet.setType(petType);
+			pet.setBirthDate(null);
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("birthDate"));
+		}
+
+	}
+
+}

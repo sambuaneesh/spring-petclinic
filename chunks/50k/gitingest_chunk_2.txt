@@ -1,0 +1,3059 @@
+
+
+
+
+================================================
+FILE: src/main/scss/petclinic.scss
+================================================
+/*
+ * Copyright 2016 the original author or authors.
+ *
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ @import "bootstrap";
+
+$icon-font-path:    "../../webjars/bootstrap/fonts/";
+
+$spring-green:      #6db33f;
+$spring-dark-green: #5fa134;
+$spring-brown:      #34302D;
+$spring-grey:       #838789;
+$spring-light-grey: #f1f1f1;
+
+$body-bg:                           $spring-light-grey;
+$text-color:                        $spring-brown;
+$link-color:                        $spring-dark-green;
+$link-hover-color:                  $spring-dark-green;
+
+$navbar-default-link-color:         $spring-light-grey;
+$navbar-default-link-active-color:  $spring-light-grey;
+$navbar-default-link-hover-color:   $spring-light-grey;
+$navbar-default-link-hover-bg:      $spring-green;
+$navbar-default-toggle-icon-bar-bg: $spring-light-grey;
+$navbar-default-toggle-hover-bg:    transparent;
+$navbar-default-link-active-bg:     $spring-green;
+
+$border-radius-base:             0;
+$border-radius-large:            0;
+$border-radius-small:            0;
+
+$nav-tabs-active-link-hover-color:        $spring-light-grey;
+$nav-tabs-active-link-hover-bg:           $spring-brown;
+$nav-tabs-active-link-hover-border-color: $spring-brown;
+$nav-tabs-border-color:                   $spring-brown;
+
+$pagination-active-bg:                    $spring-brown;
+$pagination-active-border:                $spring-green;
+$table-border-color:                      $spring-brown;
+
+.table > thead > tr > th {
+  background-color: lighten($spring-brown, 3%);
+  color: $spring-light-grey;
+}
+
+.table-filter {
+  background-color: $spring-brown;
+  padding: 9px 12px;
+}
+
+.nav > li > a {
+  color: $spring-grey;
+}
+
+.btn-primary {
+  margin-top: 12px;
+  border-width: 2px;
+  transition: border 0.15s;
+  color: $spring-light-grey;
+  background: $spring-brown;
+  border-color: $spring-green;
+  -webkit-transition: border 0.15s;
+  -moz-transition: border 0.15s;
+  -o-transition: border 0.15s;
+  -ms-transition: border 0.15s;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active,
+  .open .dropdown-toggle {
+    background-color: $spring-brown;
+    border-color: $spring-brown;
+  }
+}
+
+
+.container .text-muted {
+  margin: 20px 0;
+}
+
+code {
+  font-size: 80%;
+}
+
+.xd-container {
+  margin-top: 40px;
+  margin-bottom: 100px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+h1 {
+  margin-bottom: 15px
+}
+
+.index-page--subtitle {
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0 0 30px;
+}
+
+.form-horizontal button.btn-inverse {
+  margin-left: 32px;
+}
+
+#job-params-modal .modal-dialog {
+  width: 90%;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+[ng-cloak].splash {
+  display: block !important;
+}
+[ng-cloak] {
+  display: none;
+}
+
+.splash {
+  background: $spring-green;
+  color: $spring-brown;
+  display: none;
+}
+
+.error-page {
+  margin-top: 100px;
+  text-align: center;
+}
+
+.error-page .error-title {
+  font-size: 24px;
+  line-height: 24px;
+  margin: 30px 0 0;
+}
+
+table td {
+  vertical-align: middle;
+}
+
+table td .progress {
+  margin-bottom: 0;
+}
+
+table td.action-column {
+  width: 1px;
+}
+
+.help-block {
+  color: lighten($text-color, 50%); // lighten the text some for contrast
+}
+
+.xd-containers {
+  font-size: 15px;
+}
+
+.cluster-view > table td {
+  vertical-align: top;
+}
+
+.cluster-view .label, .cluster-view .column-block {
+  display: block;
+}
+
+.cluster-view .input-group-addon {
+  width: 0%;
+}
+
+.cluster-view {
+  margin-bottom: 0;
+}
+
+.container-details-table th {
+  background-color: lighten($spring-brown, 3%);
+  color: $spring-light-grey;
+}
+
+.status-help-content-table td {
+  color: $spring-brown;
+}
+
+.logo {
+  width: 200px;
+}
+
+.myspinner {
+  animation-name: spinner;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+
+  -webkit-transform-origin: 49% 50%;
+  -webkit-animation-name: spinner;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+}
+
+hr {
+  border-top: 1px dotted $spring-brown;
+}
+
+@import "typography.scss";
+@import "header.scss";
+@import "responsive.scss";
+
+
+
+================================================
+FILE: src/main/scss/responsive.scss
+================================================
+@media (max-width: 768px) {
+  .navbar-toggle {
+    position:absolute;
+    z-index: 9999;
+    left:0px;
+    top:0px;
+  }
+
+  .navbar a.navbar-brand {
+    display: block;
+    margin: 0 auto 0 auto;
+    width: 148px;
+    height: 50px;
+    float: none;
+    background: url("../images/spring-logo-dataflow-mobile.png") 0 center no-repeat;
+  }
+
+  .homepage-billboard .homepage-subtitle {
+    font-size: 21px;
+    line-height: 21px;
+  }
+
+  .navbar a.navbar-brand span {
+    display: none;
+  }
+
+  .navbar {
+    border-top-width: 0;
+  }
+
+  .xd-container {
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+
+  .index-page--subtitle {
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+
+}
+
+
+
+================================================
+FILE: src/main/scss/typography.scss
+================================================
+@font-face {
+  font-family: 'varela_roundregular';
+
+  src: url('../fonts/varela_round-webfont.eot');
+  src: url('../fonts/varela_round-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/varela_round-webfont.woff') format('woff'),
+       url('../fonts/varela_round-webfont.ttf') format('truetype'),
+       url('../fonts/varela_round-webfont.svg#varela_roundregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'montserratregular';
+  src: url('../fonts/montserrat-webfont.eot');
+  src: url('../fonts/montserrat-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/montserrat-webfont.woff') format('woff'),
+       url('../fonts/montserrat-webfont.ttf') format('truetype'),
+       url('../fonts/montserrat-webfont.svg#montserratregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body, h1, h2, h3, p, input {
+  margin: 0;
+  font-weight: 400;
+  font-family: "varela_roundregular", sans-serif;
+  color: #34302d;
+}
+
+h1 {
+  font-size: 24px;
+  line-height: 30px;
+  font-family: "montserratregular", sans-serif;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  margin-bottom: 10px;
+  font-family: "montserratregular", sans-serif;
+}
+
+h3 {
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+p {
+  //font-size: 15px;
+  //line-height: 24px;
+}
+
+strong {
+  font-weight: 700;
+  font-family: "montserratregular", sans-serif;
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/MySqlIntegrationTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.web.client.RestTemplate;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("mysql")
+@Testcontainers(disabledWithoutDocker = true)
+@DisabledInNativeImage
+@DisabledInAotMode
+class MySqlIntegrationTests {
+
+	@ServiceConnection
+	@Container
+	static MySQLContainer<?> container = new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
+
+	@LocalServerPort
+	int port;
+
+	@Autowired
+	private VetRepository vets;
+
+	@Autowired
+	private RestTemplateBuilder builder;
+
+	@Test
+	void testFindAll() {
+		vets.findAll();
+		vets.findAll(); // served from cache
+	}
+
+	@Test
+	void testOwnerDetails() {
+		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/MysqlTestApplication.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.utility.DockerImageName;
+
+/**
+ * PetClinic Spring Boot Application.
+ *
+ * @author Dave Syer
+ */
+@Configuration
+public class MysqlTestApplication {
+
+	@ServiceConnection
+	@Profile("mysql")
+	@Bean
+	static MySQLContainer<?> container() {
+		return new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(PetClinicApplication.class, "--spring.profiles.active=mysql",
+				"--spring.docker.compose.enabled=false");
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/PetClinicIntegrationTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.web.client.RestTemplate;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class PetClinicIntegrationTests {
+
+	@LocalServerPort
+	int port;
+
+	@Autowired
+	private VetRepository vets;
+
+	@Autowired
+	private RestTemplateBuilder builder;
+
+	@Test
+	void testFindAll() {
+		vets.findAll();
+		vets.findAll(); // served from cache
+	}
+
+	@Test
+	void testOwnerDetails() {
+		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(PetClinicApplication.class, args);
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/PostgresIntegrationTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationPreparedEvent;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.ApplicationListener;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestTemplate;
+import org.testcontainers.DockerClientFactory;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "spring.docker.compose.skip.in-tests=false", //
+		"spring.docker.compose.start.arguments=--force-recreate,--renew-anon-volumes,postgres" })
+@ActiveProfiles("postgres")
+@DisabledInNativeImage
+public class PostgresIntegrationTests {
+
+	@LocalServerPort
+	int port;
+
+	@Autowired
+	private VetRepository vets;
+
+	@Autowired
+	private RestTemplateBuilder builder;
+
+	@BeforeAll
+	static void available() {
+		assumeTrue(DockerClientFactory.instance().isDockerAvailable(), "Docker not available");
+	}
+
+	public static void main(String[] args) {
+		new SpringApplicationBuilder(PetClinicApplication.class) //
+			.profiles("postgres") //
+			.properties( //
+					"spring.docker.compose.start.arguments=postgres" //
+			) //
+			.listeners(new PropertiesLogger()) //
+			.run(args);
+	}
+
+	@Test
+	void testFindAll() throws Exception {
+		vets.findAll();
+		vets.findAll(); // served from cache
+	}
+
+	@Test
+	void testOwnerDetails() {
+		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	static class PropertiesLogger implements ApplicationListener<ApplicationPreparedEvent> {
+
+		private static final Log log = LogFactory.getLog(PropertiesLogger.class);
+
+		private ConfigurableEnvironment environment;
+
+		private boolean isFirstRun = true;
+
+		@Override
+		public void onApplicationEvent(ApplicationPreparedEvent event) {
+			if (isFirstRun) {
+				environment = event.getApplicationContext().getEnvironment();
+				printProperties();
+			}
+			isFirstRun = false;
+		}
+
+		public void printProperties() {
+			for (EnumerablePropertySource<?> source : findPropertiesPropertySources()) {
+				log.info("PropertySource: " + source.getName());
+				String[] names = source.getPropertyNames();
+				Arrays.sort(names);
+				for (String name : names) {
+					String resolved = environment.getProperty(name);
+
+					assertNotNull(resolved, "resolved environment property: " + name + " is null.");
+
+					Object sourceProperty = source.getProperty(name);
+
+					assertNotNull(sourceProperty, "source property was expecting an object but is null.");
+
+					assertNotNull(sourceProperty.toString(), "source property toString() returned null.");
+
+					String value = sourceProperty.toString();
+					if (resolved.equals(value)) {
+						log.info(name + "=" + resolved);
+					}
+					else {
+						log.info(name + "=" + value + " OVERRIDDEN to " + resolved);
+					}
+				}
+			}
+		}
+
+		private List<EnumerablePropertySource<?>> findPropertiesPropertySources() {
+			List<EnumerablePropertySource<?>> sources = new LinkedList<>();
+			for (PropertySource<?> source : environment.getPropertySources()) {
+				if (source instanceof EnumerablePropertySource enumerable) {
+					sources.add(enumerable);
+				}
+			}
+			return sources;
+		}
+
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/model/ValidatorTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.model;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Locale;
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
+/**
+ * @author Michael Isvy Simple test to make sure that Bean Validation is working (useful
+ * when upgrading to a new version of Hibernate Validator/ Bean Validation)
+ */
+class ValidatorTests {
+
+	private Validator createValidator() {
+		LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+		localValidatorFactoryBean.afterPropertiesSet();
+		return localValidatorFactoryBean;
+	}
+
+	@Test
+	void shouldNotValidateWhenFirstNameEmpty() {
+
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+		Person person = new Person();
+		person.setFirstName("");
+		person.setLastName("smith");
+
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
+
+		assertThat(constraintViolations).hasSize(1);
+		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
+		assertThat(violation.getPropertyPath()).hasToString("firstName");
+		assertThat(violation.getMessage()).isEqualTo("must not be blank");
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/**
+ * Test class for {@link OwnerController}
+ *
+ * @author Colin But
+ * @author Wick Dynex
+ */
+@WebMvcTest(OwnerController.class)
+@DisabledInNativeImage
+@DisabledInAotMode
+class OwnerControllerTests {
+
+	private static final int TEST_OWNER_ID = 1;
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private OwnerRepository owners;
+
+	private Owner george() {
+		Owner george = new Owner();
+		george.setId(TEST_OWNER_ID);
+		george.setFirstName("George");
+		george.setLastName("Franklin");
+		george.setAddress("110 W. Liberty St.");
+		george.setCity("Madison");
+		george.setTelephone("6085551023");
+		Pet max = new Pet();
+		PetType dog = new PetType();
+		dog.setName("dog");
+		max.setType(dog);
+		max.setName("Max");
+		max.setBirthDate(LocalDate.now());
+		george.addPet(max);
+		max.setId(1);
+		return george;
+	}
+
+	@BeforeEach
+	void setup() {
+
+		Owner george = george();
+		given(this.owners.findByLastNameStartingWith(eq("Franklin"), any(Pageable.class)))
+			.willReturn(new PageImpl<>(List.of(george)));
+
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(george));
+		Visit visit = new Visit();
+		visit.setDate(LocalDate.now());
+		george.getPet("Max").getVisits().add(visit);
+
+	}
+
+	@Test
+	void testInitCreationForm() throws Exception {
+		mockMvc.perform(get("/owners/new"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("owner"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testProcessCreationFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1316761638"))
+			.andExpect(status().is3xxRedirection());
+	}
+
+	@Test
+	void testProcessCreationFormHasErrors() throws Exception {
+		mockMvc
+			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "address"))
+			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testInitFindForm() throws Exception {
+		mockMvc.perform(get("/owners/find"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("owner"))
+			.andExpect(view().name("owners/findOwners"));
+	}
+
+	@Test
+	void testProcessFindFormSuccess() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of(george(), new Owner()));
+		when(this.owners.findByLastNameStartingWith(anyString(), any(Pageable.class))).thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1")).andExpect(status().isOk()).andExpect(view().name("owners/ownersList"));
+	}
+
+	@Test
+	void testProcessFindFormByLastName() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of(george()));
+		when(this.owners.findByLastNameStartingWith(eq("Franklin"), any(Pageable.class))).thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1").param("lastName", "Franklin"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
+	}
+
+	@Test
+	void testProcessFindFormNoOwnersFound() throws Exception {
+		Page<Owner> tasks = new PageImpl<>(List.of());
+		when(this.owners.findByLastNameStartingWith(eq("Unknown Surname"), any(Pageable.class))).thenReturn(tasks);
+		mockMvc.perform(get("/owners?page=1").param("lastName", "Unknown Surname"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasFieldErrors("owner", "lastName"))
+			.andExpect(model().attributeHasFieldErrorCode("owner", "lastName", "notFound"))
+			.andExpect(view().name("owners/findOwners"));
+
+	}
+
+	@Test
+	void testInitUpdateOwnerForm() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("owner"))
+			.andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
+			.andExpect(model().attribute("owner", hasProperty("firstName", is("George"))))
+			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
+			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
+			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testProcessUpdateOwnerFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("address", "123 Caramel Street")
+				.param("city", "London")
+				.param("telephone", "1616291589"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Test
+	void testProcessUpdateOwnerFormUnchangedSuccess() throws Exception {
+		mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Test
+	void testProcessUpdateOwnerFormHasErrors() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("address", "")
+				.param("telephone", ""))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasErrors("owner"))
+			.andExpect(model().attributeHasFieldErrors("owner", "address"))
+			.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
+	}
+
+	@Test
+	void testShowOwner() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
+			.andExpect(model().attribute("owner", hasProperty("firstName", is("George"))))
+			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
+			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
+			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(model().attribute("owner", hasProperty("pets", not(empty()))))
+			.andExpect(model().attribute("owner",
+					hasProperty("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0)))))))
+			.andExpect(view().name("owners/ownerDetails"));
+	}
+
+	@Test
+	public void testProcessUpdateOwnerFormWithIdMismatch() throws Exception {
+		int pathOwnerId = 1;
+
+		Owner owner = new Owner();
+		owner.setId(2);
+		owner.setFirstName("John");
+		owner.setLastName("Doe");
+		owner.setAddress("Center Street");
+		owner.setCity("New York");
+		owner.setTelephone("0123456789");
+
+		when(owners.findById(pathOwnerId)).thenReturn(Optional.of(owner));
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/owners/{ownerId}/edit", pathOwnerId).flashAttr("owner", owner))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/owners/" + pathOwnerId + "/edit"))
+			.andExpect(flash().attributeExists("error"));
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/PetControllerTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.samples.petclinic.owner.PetTypeRepository;
+import org.springframework.samples.petclinic.owner.OwnerRepository;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+/**
+ * Test class for the {@link PetController}
+ *
+ * @author Colin But
+ * @author Wick Dynex
+ */
+@WebMvcTest(value = PetController.class,
+		includeFilters = @ComponentScan.Filter(value = PetTypeFormatter.class, type = FilterType.ASSIGNABLE_TYPE))
+@DisabledInNativeImage
+@DisabledInAotMode
+class PetControllerTests {
+
+	private static final int TEST_OWNER_ID = 1;
+
+	private static final int TEST_PET_ID = 1;
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private OwnerRepository owners;
+
+	@MockitoBean
+	private PetTypeRepository types;
+
+	@BeforeEach
+	void setup() {
+		PetType cat = new PetType();
+		cat.setId(3);
+		cat.setName("hamster");
+		given(this.types.findPetTypes()).willReturn(List.of(cat));
+
+		Owner owner = new Owner();
+		Pet pet = new Pet();
+		Pet dog = new Pet();
+		owner.addPet(pet);
+		owner.addPet(dog);
+		pet.setId(TEST_PET_ID);
+		dog.setId(TEST_PET_ID + 1);
+		pet.setName("petty");
+		dog.setName("doggy");
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+	}
+
+	@Test
+	void testInitCreationForm() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(view().name("pets/createOrUpdatePetForm"))
+			.andExpect(model().attributeExists("pet"));
+	}
+
+	@Test
+	void testProcessCreationFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+				.param("type", "hamster")
+				.param("birthDate", "2015-02-12"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Nested
+	class ProcessCreationFormHasErrors {
+
+		@Test
+		void testProcessCreationFormWithBlankName() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "\t \n")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "name"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "required"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessCreationFormWithDuplicateName() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "petty")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "name"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "duplicate"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessCreationFormWithMissingPetType() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "type"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "type", "required"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessCreationFormWithInvalidBirthDate() throws Exception {
+			LocalDate currentDate = LocalDate.now();
+			String futureBirthDate = currentDate.plusMonths(1).toString();
+
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+					.param("birthDate", futureBirthDate))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "birthDate"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "birthDate", "typeMismatch.birthDate"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testInitUpdateForm() throws Exception {
+			mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeExists("pet"))
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+	}
+
+	@Test
+	void testProcessUpdateFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "Betty")
+				.param("type", "hamster")
+				.param("birthDate", "2015-02-12"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Nested
+	class ProcessUpdateFormHasErrors {
+
+		@Test
+		void testProcessUpdateFormWithInvalidBirthDate() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", " ")
+					.param("birthDate", "2015/02/12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "birthDate"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "birthDate", "typeMismatch"))
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+		@Test
+		void testProcessUpdateFormWithBlankName() throws Exception {
+			mockMvc
+				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "  ")
+					.param("birthDate", "2015-02-12"))
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(model().attributeHasFieldErrors("pet", "name"))
+				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "required"))
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+		}
+
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/PetTypeFormatterTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+/**
+ * Test class for {@link PetTypeFormatter}
+ *
+ * @author Colin But
+ */
+@ExtendWith(MockitoExtension.class)
+@DisabledInNativeImage
+class PetTypeFormatterTests {
+
+	@Mock
+	private PetTypeRepository types;
+
+	private PetTypeFormatter petTypeFormatter;
+
+	@BeforeEach
+	void setup() {
+		this.petTypeFormatter = new PetTypeFormatter(types);
+	}
+
+	@Test
+	void testPrint() {
+		PetType petType = new PetType();
+		petType.setName("Hamster");
+		String petTypeName = this.petTypeFormatter.print(petType, Locale.ENGLISH);
+		assertThat(petTypeName).isEqualTo("Hamster");
+	}
+
+	@Test
+	void shouldParse() throws ParseException {
+		given(types.findPetTypes()).willReturn(makePetTypes());
+		PetType petType = petTypeFormatter.parse("Bird", Locale.ENGLISH);
+		assertThat(petType.getName()).isEqualTo("Bird");
+	}
+
+	@Test
+	void shouldThrowParseException() {
+		given(types.findPetTypes()).willReturn(makePetTypes());
+		Assertions.assertThrows(ParseException.class, () -> {
+			petTypeFormatter.parse("Fish", Locale.ENGLISH);
+		});
+	}
+
+	/**
+	 * Helper method to produce some sample pet types just for test purpose
+	 * @return {@link Collection} of {@link PetType}
+	 */
+	private List<PetType> makePetTypes() {
+		List<PetType> petTypes = new ArrayList<>();
+		petTypes.add(new PetType() {
+			{
+				setName("Dog");
+			}
+		});
+		petTypes.add(new PetType() {
+			{
+				setName("Bird");
+			}
+		});
+		return petTypes;
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/PetValidatorTests.java
+================================================
+/*
+ * Copyright 2012-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.validation.Errors;
+import org.springframework.validation.MapBindingResult;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Test class for {@link PetValidator}
+ *
+ * @author Wick Dynex
+ */
+@ExtendWith(MockitoExtension.class)
+@DisabledInNativeImage
+public class PetValidatorTests {
+
+	private PetValidator petValidator;
+
+	private Pet pet;
+
+	private PetType petType;
+
+	private Errors errors;
+
+	private static final String petName = "Buddy";
+
+	private static final String petTypeName = "Dog";
+
+	private static final LocalDate petBirthDate = LocalDate.of(1990, 1, 1);
+
+	@BeforeEach
+	void setUp() {
+		petValidator = new PetValidator();
+		pet = new Pet();
+		petType = new PetType();
+		errors = new MapBindingResult(new HashMap<>(), "pet");
+	}
+
+	@Test
+	void testValidate() {
+		petType.setName(petTypeName);
+		pet.setName(petName);
+		pet.setType(petType);
+		pet.setBirthDate(petBirthDate);
+
+		petValidator.validate(pet, errors);
+
+		assertFalse(errors.hasErrors());
+	}
+
+	@Nested
+	class ValidateHasErrors {
+
+		@Test
+		void testValidateWithInvalidPetName() {
+			petType.setName(petTypeName);
+			pet.setName("");
+			pet.setType(petType);
+			pet.setBirthDate(petBirthDate);
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("name"));
+		}
+
+		@Test
+		void testValidateWithInvalidPetType() {
+			pet.setName(petName);
+			pet.setType(null);
+			pet.setBirthDate(petBirthDate);
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("type"));
+		}
+
+		@Test
+		void testValidateWithInvalidBirthDate() {
+			petType.setName(petTypeName);
+			pet.setName(petName);
+			pet.setType(petType);
+			pet.setBirthDate(null);
+
+			petValidator.validate(pet, errors);
+
+			assertTrue(errors.hasFieldErrors("birthDate"));
+		}
+
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/owner/VisitControllerTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.owner;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Optional;
+
+/**
+ * Test class for {@link VisitController}
+ *
+ * @author Colin But
+ * @author Wick Dynex
+ */
+@WebMvcTest(VisitController.class)
+@DisabledInNativeImage
+@DisabledInAotMode
+class VisitControllerTests {
+
+	private static final int TEST_OWNER_ID = 1;
+
+	private static final int TEST_PET_ID = 1;
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private OwnerRepository owners;
+
+	@BeforeEach
+	void init() {
+		Owner owner = new Owner();
+		Pet pet = new Pet();
+		owner.addPet(pet);
+		pet.setId(TEST_PET_ID);
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+	}
+
+	@Test
+	void testInitNewVisitForm() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID))
+			.andExpect(status().isOk())
+			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+	@Test
+	void testProcessNewVisitFormSuccess() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "George")
+				.param("description", "Visit Description"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
+
+	@Test
+	void testProcessNewVisitFormHasErrors() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID).param("name",
+					"George"))
+			.andExpect(model().attributeHasErrors("visit"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("pets/createOrUpdateVisitForm"));
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/service/ClinicServiceTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.owner.OwnerRepository;
+import org.springframework.samples.petclinic.owner.PetTypeRepository;
+import org.springframework.samples.petclinic.owner.Pet;
+import org.springframework.samples.petclinic.owner.PetType;
+import org.springframework.samples.petclinic.owner.Visit;
+import org.springframework.samples.petclinic.vet.Vet;
+import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Integration test of the Service and the Repository layer.
+ * <p>
+ * ClinicServiceSpringDataJpaTests subclasses benefit from the following services provided
+ * by the Spring TestContext Framework:
+ * </p>
+ * <ul>
+ * <li><strong>Spring IoC container caching</strong> which spares us unnecessary set up
+ * time between test execution.</li>
+ * <li><strong>Dependency Injection</strong> of test fixture instances, meaning that we
+ * don't need to perform application context lookups. See the use of
+ * {@link Autowired @Autowired} on the <code> </code> instance variable, which uses
+ * autowiring <em>by type</em>.
+ * <li><strong>Transaction management</strong>, meaning each test method is executed in
+ * its own transaction, which is automatically rolled back by default. Thus, even if tests
+ * insert or otherwise change database state, there is no need for a teardown or cleanup
+ * script.
+ * <li>An {@link org.springframework.context.ApplicationContext ApplicationContext} is
+ * also inherited and can be used for explicit bean lookup if necessary.</li>
+ * </ul>
+ *
+ * @author Ken Krebs
+ * @author Rod Johnson
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Michael Isvy
+ * @author Dave Syer
+ */
+@DataJpaTest
+// Ensure that if the mysql profile is active we connect to the real database:
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+// @TestPropertySource("/application-postgres.properties")
+class ClinicServiceTests {
+
+	@Autowired
+	protected OwnerRepository owners;
+
+	@Autowired
+	protected PetTypeRepository types;
+
+	@Autowired
+	protected VetRepository vets;
+
+	Pageable pageable;
+
+	@Test
+	void shouldFindOwnersByLastName() {
+		Page<Owner> owners = this.owners.findByLastNameStartingWith("Davis", pageable);
+		assertThat(owners).hasSize(2);
+
+		owners = this.owners.findByLastNameStartingWith("Daviss", pageable);
+		assertThat(owners).isEmpty();
+	}
+
+	@Test
+	void shouldFindSingleOwnerWithPet() {
+		Optional<Owner> optionalOwner = this.owners.findById(1);
+		assertThat(optionalOwner).isPresent();
+		Owner owner = optionalOwner.get();
+		assertThat(owner.getLastName()).startsWith("Franklin");
+		assertThat(owner.getPets()).hasSize(1);
+		assertThat(owner.getPets().get(0).getType()).isNotNull();
+		assertThat(owner.getPets().get(0).getType().getName()).isEqualTo("cat");
+	}
+
+	@Test
+	@Transactional
+	void shouldInsertOwner() {
+		Page<Owner> owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		int found = (int) owners.getTotalElements();
+
+		Owner owner = new Owner();
+		owner.setFirstName("Sam");
+		owner.setLastName("Schultz");
+		owner.setAddress("4, Evans Street");
+		owner.setCity("Wollongong");
+		owner.setTelephone("4444444444");
+		this.owners.save(owner);
+		assertThat(owner.getId()).isNotZero();
+
+		owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		assertThat(owners.getTotalElements()).isEqualTo(found + 1);
+	}
+
+	@Test
+	@Transactional
+	void shouldUpdateOwner() {
+		Optional<Owner> optionalOwner = this.owners.findById(1);
+		assertThat(optionalOwner).isPresent();
+		Owner owner = optionalOwner.get();
+		String oldLastName = owner.getLastName();
+		String newLastName = oldLastName + "X";
+
+		owner.setLastName(newLastName);
+		this.owners.save(owner);
+
+		// retrieving new name from database
+		optionalOwner = this.owners.findById(1);
+		assertThat(optionalOwner).isPresent();
+		owner = optionalOwner.get();
+		assertThat(owner.getLastName()).isEqualTo(newLastName);
+	}
+
+	@Test
+	void shouldFindAllPetTypes() {
+		Collection<PetType> petTypes = this.types.findPetTypes();
+
+		PetType petType1 = EntityUtils.getById(petTypes, PetType.class, 1);
+		assertThat(petType1.getName()).isEqualTo("cat");
+		PetType petType4 = EntityUtils.getById(petTypes, PetType.class, 4);
+		assertThat(petType4.getName()).isEqualTo("snake");
+	}
+
+	@Test
+	@Transactional
+	void shouldInsertPetIntoDatabaseAndGenerateId() {
+		Optional<Owner> optionalOwner = this.owners.findById(6);
+		assertThat(optionalOwner).isPresent();
+		Owner owner6 = optionalOwner.get();
+
+		int found = owner6.getPets().size();
+
+		Pet pet = new Pet();
+		pet.setName("bowser");
+		Collection<PetType> types = this.types.findPetTypes();
+		pet.setType(EntityUtils.getById(types, PetType.class, 2));
+		pet.setBirthDate(LocalDate.now());
+		owner6.addPet(pet);
+		assertThat(owner6.getPets()).hasSize(found + 1);
+
+		this.owners.save(owner6);
+
+		optionalOwner = this.owners.findById(6);
+		assertThat(optionalOwner).isPresent();
+		owner6 = optionalOwner.get();
+		assertThat(owner6.getPets()).hasSize(found + 1);
+		// checks that id has been generated
+		pet = owner6.getPet("bowser");
+		assertThat(pet.getId()).isNotNull();
+	}
+
+	@Test
+	@Transactional
+	void shouldUpdatePetName() {
+		Optional<Owner> optionalOwner = this.owners.findById(6);
+		assertThat(optionalOwner).isPresent();
+		Owner owner6 = optionalOwner.get();
+
+		Pet pet7 = owner6.getPet(7);
+		String oldName = pet7.getName();
+
+		String newName = oldName + "X";
+		pet7.setName(newName);
+		this.owners.save(owner6);
+
+		optionalOwner = this.owners.findById(6);
+		assertThat(optionalOwner).isPresent();
+		owner6 = optionalOwner.get();
+		pet7 = owner6.getPet(7);
+		assertThat(pet7.getName()).isEqualTo(newName);
+	}
+
+	@Test
+	void shouldFindVets() {
+		Collection<Vet> vets = this.vets.findAll();
+
+		Vet vet = EntityUtils.getById(vets, Vet.class, 3);
+		assertThat(vet.getLastName()).isEqualTo("Douglas");
+		assertThat(vet.getNrOfSpecialties()).isEqualTo(2);
+		assertThat(vet.getSpecialties().get(0).getName()).isEqualTo("dentistry");
+		assertThat(vet.getSpecialties().get(1).getName()).isEqualTo("surgery");
+	}
+
+	@Test
+	@Transactional
+	void shouldAddNewVisitForPet() {
+		Optional<Owner> optionalOwner = this.owners.findById(6);
+		assertThat(optionalOwner).isPresent();
+		Owner owner6 = optionalOwner.get();
+
+		Pet pet7 = owner6.getPet(7);
+		int found = pet7.getVisits().size();
+		Visit visit = new Visit();
+		visit.setDescription("test");
+
+		owner6.addVisit(pet7.getId(), visit);
+		this.owners.save(owner6);
+
+		assertThat(pet7.getVisits()) //
+			.hasSize(found + 1) //
+			.allMatch(value -> value.getId() != null);
+	}
+
+	@Test
+	void shouldFindVisitsByPetId() {
+		Optional<Owner> optionalOwner = this.owners.findById(6);
+		assertThat(optionalOwner).isPresent();
+		Owner owner6 = optionalOwner.get();
+
+		Pet pet7 = owner6.getPet(7);
+		Collection<Visit> visits = pet7.getVisits();
+
+		assertThat(visits) //
+			.hasSize(2) //
+			.element(0)
+			.extracting(Visit::getDate)
+			.isNotNull();
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/service/EntityUtils.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.service;
+
+import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.samples.petclinic.model.BaseEntity;
+
+import java.util.Collection;
+
+/**
+ * Utility methods for handling entities. Separate from the BaseEntity class mainly
+ * because of dependency on the ORM-associated ObjectRetrievalFailureException.
+ *
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @see org.springframework.samples.petclinic.model.BaseEntity
+ * @since 29.10.2003
+ */
+public abstract class EntityUtils {
+
+	/**
+	 * Look up the entity of the given class with the given id in the given collection.
+	 * @param entities the collection to search
+	 * @param entityClass the entity class to look up
+	 * @param entityId the entity id to look up
+	 * @return the found entity
+	 * @throws ObjectRetrievalFailureException if the entity was not found
+	 */
+	public static <T extends BaseEntity> T getById(Collection<T> entities, Class<T> entityClass, int entityId)
+			throws ObjectRetrievalFailureException {
+		for (T entity : entities) {
+			if (entity.getId() == entityId && entityClass.isInstance(entity)) {
+				return entity;
+			}
+		}
+		throw new ObjectRetrievalFailureException(entityClass, entityId);
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/system/CrashControllerIntegrationTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.system;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+
+/**
+ * Integration Test for {@link CrashController}.
+ *
+ * @author Alex Lutz
+ */
+// NOT Waiting https://github.com/spring-projects/spring-boot/issues/5574
+@SpringBootTest(webEnvironment = RANDOM_PORT,
+		properties = { "server.error.include-message=ALWAYS", "management.endpoints.enabled-by-default=false" })
+class CrashControllerIntegrationTests {
+
+	@Value(value = "${local.server.port}")
+	private int port;
+
+	@Autowired
+	private TestRestTemplate rest;
+
+	@Test
+	void testTriggerExceptionJson() {
+		ResponseEntity<Map<String, Object>> resp = rest.exchange(
+				RequestEntity.get("http://localhost:" + port + "/oups").build(),
+				new ParameterizedTypeReference<Map<String, Object>>() {
+				});
+		assertThat(resp).isNotNull();
+		assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+		assertThat(resp.getBody()).containsKey("timestamp");
+		assertThat(resp.getBody()).containsKey("status");
+		assertThat(resp.getBody()).containsKey("error");
+		assertThat(resp.getBody()).containsEntry("message",
+				"Expected: controller used to showcase what happens when an exception is thrown");
+		assertThat(resp.getBody()).containsEntry("path", "/oups");
+	}
+
+	@Test
+	void testTriggerExceptionHtml() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(List.of(MediaType.TEXT_HTML));
+		ResponseEntity<String> resp = rest.exchange("http://localhost:" + port + "/oups", HttpMethod.GET,
+				new HttpEntity<>(headers), String.class);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+		assertThat(resp.getBody()).isNotNull();
+		// html:
+		assertThat(resp.getBody()).containsSubsequence("<body>", "<h2>", "Something happened...", "</h2>", "<p>",
+				"Expected:", "controller", "used", "to", "showcase", "what", "happens", "when", "an", "exception", "is",
+				"thrown", "</p>", "</body>");
+		// Not the whitelabel error page:
+		assertThat(resp.getBody()).doesNotContain("Whitelabel Error Page",
+				"This application has no explicit mapping for");
+	}
+
+	@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
+			DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
+	static class TestConfiguration {
+
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/system/CrashControllerTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.system;
+
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+/**
+ * Test class for {@link CrashController}
+ *
+ * @author Colin But
+ * @author Alex Lutz
+ */
+// Waiting https://github.com/spring-projects/spring-boot/issues/5574 ..good
+// luck ((plain(st) UNIT test)! :)
+class CrashControllerTests {
+
+	final CrashController testee = new CrashController();
+
+	@Test
+	void testTriggerException() {
+		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> testee.triggerException())
+			.withMessageContaining("Expected: controller used to showcase what happens when an exception is thrown");
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/system/I18nPropertiesSyncTest.java
+================================================
+package org.springframework.samples.petclinic.system;
+
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
+/**
+ * This test ensures that there are no hard-coded strings without internationalization in
+ * any HTML files. Also ensures that a string is translated in every language to avoid
+ * partial translations.
+ *
+ * @author Anuj Ashok Potdar
+ */
+public class I18nPropertiesSyncTest {
+
+	private static final String I18N_DIR = "src/main/resources";
+
+	private static final String BASE_NAME = "messages";
+
+	public static final String PROPERTIES = ".properties";
+
+	private static final Pattern HTML_TEXT_LITERAL = Pattern.compile(">([^<>{}]+)<");
+
+	private static final Pattern BRACKET_ONLY = Pattern.compile("<[^>]*>\\s*[\\[\\]](?:&nbsp;)?\\s*</[^>]*>");
+
+	private static final Pattern HAS_TH_TEXT_ATTRIBUTE = Pattern.compile("th:(u)?text\\s*=\\s*\"[^\"]+\"");
+
+	@Test
+	public void checkNonInternationalizedStrings() throws IOException {
+		Path root = Paths.get("src/main");
+		List<Path> files;
+
+		try (Stream<Path> stream = Files.walk(root)) {
+			files = stream.filter(p -> p.toString().endsWith(".java") || p.toString().endsWith(".html"))
+				.filter(p -> !p.toString().contains("/test/"))
+				.filter(p -> !p.getFileName().toString().endsWith("Test.java"))
+				.toList();
+		}
+
+		StringBuilder report = new StringBuilder();
+
+		for (Path file : files) {
+			List<String> lines = Files.readAllLines(file);
+			for (int i = 0; i < lines.size(); i++) {
+				String line = lines.get(i).trim();
+
+				if (line.startsWith("//") || line.startsWith("@") || line.contains("log.")
+						|| line.contains("System.out"))
+					continue;
+
+				if (file.toString().endsWith(".html")) {
+					boolean hasLiteralText = HTML_TEXT_LITERAL.matcher(line).find();
+					boolean hasThTextAttribute = HAS_TH_TEXT_ATTRIBUTE.matcher(line).find();
+					boolean isBracketOnly = BRACKET_ONLY.matcher(line).find();
+
+					if (hasLiteralText && !line.contains("#{") && !hasThTextAttribute && !isBracketOnly) {
+						report.append("HTML: ")
+							.append(file)
+							.append(" Line ")
+							.append(i + 1)
+							.append(": ")
+							.append(line)
+							.append("\n");
+					}
+				}
+			}
+		}
+
+		if (!report.isEmpty()) {
+			fail("Hardcoded (non-internationalized) strings found:\n" + report);
+		}
+	}
+
+	@Test
+	public void checkI18nPropertyFilesAreInSync() throws IOException {
+		List<Path> propertyFiles;
+		try (Stream<Path> stream = Files.walk(Paths.get(I18N_DIR))) {
+			propertyFiles = stream.filter(p -> p.getFileName().toString().startsWith(BASE_NAME))
+				.filter(p -> p.getFileName().toString().endsWith(PROPERTIES))
+				.toList();
+		}
+
+		Map<String, Properties> localeToProps = new HashMap<>();
+
+		for (Path path : propertyFiles) {
+			Properties props = new Properties();
+			try (var reader = Files.newBufferedReader(path)) {
+				props.load(reader);
+				localeToProps.put(path.getFileName().toString(), props);
+			}
+		}
+
+		String baseFile = BASE_NAME + PROPERTIES;
+		Properties baseProps = localeToProps.get(baseFile);
+		if (baseProps == null) {
+			fail("Base properties file '" + baseFile + "' not found.");
+			return;
+		}
+
+		Set<String> baseKeys = baseProps.stringPropertyNames();
+		StringBuilder report = new StringBuilder();
+
+		for (Map.Entry<String, Properties> entry : localeToProps.entrySet()) {
+			String fileName = entry.getKey();
+			// We use fallback logic to include english strings, hence messages_en is not
+			// populated.
+			if (fileName.equals(baseFile) || fileName.equals("messages_en.properties"))
+				continue;
+
+			Properties props = entry.getValue();
+			Set<String> missingKeys = new TreeSet<>(baseKeys);
+			missingKeys.removeAll(props.stringPropertyNames());
+
+			if (!missingKeys.isEmpty()) {
+				report.append("Missing keys in ").append(fileName).append(":\n");
+				missingKeys.forEach(k -> report.append("  ").append(k).append("\n"));
+			}
+		}
+
+		if (!report.isEmpty()) {
+			fail("Translation files are not in sync:\n" + report);
+		}
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/vet/VetControllerTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.vet;
+
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/**
+ * Test class for the {@link VetController}
+ */
+
+@WebMvcTest(VetController.class)
+@DisabledInNativeImage
+@DisabledInAotMode
+class VetControllerTests {
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private VetRepository vets;
+
+	private Vet james() {
+		Vet james = new Vet();
+		james.setFirstName("James");
+		james.setLastName("Carter");
+		james.setId(1);
+		return james;
+	}
+
+	private Vet helen() {
+		Vet helen = new Vet();
+		helen.setFirstName("Helen");
+		helen.setLastName("Leary");
+		helen.setId(2);
+		Specialty radiology = new Specialty();
+		radiology.setId(1);
+		radiology.setName("radiology");
+		helen.addSpecialty(radiology);
+		return helen;
+	}
+
+	@BeforeEach
+	void setup() {
+		given(this.vets.findAll()).willReturn(Lists.newArrayList(james(), helen()));
+		given(this.vets.findAll(any(Pageable.class)))
+			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james(), helen())));
+
+	}
+
+	@Test
+	void testShowVetListHtml() throws Exception {
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=1"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("listVets"))
+			.andExpect(view().name("vets/vetList"));
+
+	}
+
+	@Test
+	void testShowResourcesVetList() throws Exception {
+		ResultActions actions = mockMvc.perform(get("/vets").accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+		actions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.vetList[0].id").value(1));
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/java/org/springframework/samples/petclinic/vet/VetTests.java
+================================================
+/*
+ * Copyright 2012-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.vet;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.util.SerializationUtils;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * @author Dave Syer
+ */
+class VetTests {
+
+	@Test
+	void testSerialization() {
+		Vet vet = new Vet();
+		vet.setFirstName("Zaphod");
+		vet.setLastName("Beeblebrox");
+		vet.setId(123);
+		@SuppressWarnings("deprecation")
+		Vet other = (Vet) SerializationUtils.deserialize(SerializationUtils.serialize(vet));
+		assertThat(other.getFirstName()).isEqualTo(vet.getFirstName());
+		assertThat(other.getLastName()).isEqualTo(vet.getLastName());
+		assertThat(other.getId()).isEqualTo(vet.getId());
+	}
+
+}
+
+
+
+================================================
+FILE: src/test/jmeter/petclinic_test_plan.jmx
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments"
+        guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+        enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="PETCLINIC_HOST" elementType="Argument">
+            <stringProp name="Argument.name">PETCLINIC_HOST</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PETCLINIC_PORT" elementType="Argument">
+            <stringProp name="Argument.name">PETCLINIC_PORT</stringProp>
+            <stringProp name="Argument.value">8080</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="CONTEXT_WEB" elementType="Argument">
+            <stringProp name="Argument.name">CONTEXT_WEB</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User threads"
+        enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController"
+          guiclass="LoopControlPanel" testclass="LoopController" testname="Contr�leur Boucle"
+          enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">10</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">500</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">10</stringProp>
+        <longProp name="ThreadGroup.start_time">1361531541000</longProp>
+        <longProp name="ThreadGroup.end_time">1361531541000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+        <stringProp name="TestPlan.comments">Original : 500 - 10 - 10</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer"
+          testname="Fixed time counter" enabled="true">
+          <stringProp name="ConstantTimer.delay">300</stringProp>
+        </ConstantTimer>
+        <hashTree />
+        <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement"
+          testname="Default HTTP parameters" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${PETCLINIC_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${PETCLINIC_PORT}</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
+          <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
+        </ConfigTestElement>
+        <hashTree />
+        <CookieManager guiclass="CookiePanel" testclass="CookieManager"
+          testname="HTTP cookie manager" enabled="true">
+          <collectionProp name="CookieManager.cookies" />
+          <boolProp name="CookieManager.clearEachIteration">true</boolProp>
+        </CookieManager>
+        <hashTree />
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="User Count"
+          enabled="true">
+          <stringProp name="CounterConfig.start">1</stringProp>
+          <stringProp name="CounterConfig.end">3</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">count</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+        </CounterConfig>
+        <hashTree />
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Pet Count"
+          enabled="true">
+          <stringProp name="CounterConfig.start">1</stringProp>
+          <stringProp name="CounterConfig.end">3</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">petCount</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+        </CounterConfig>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="Home page" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="CSS"
+          enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/resources/css/petclinic.css</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="JS"
+          enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/webjars/bootstrap/dist/js/bootstrap.bundle.min.js</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Vets"
+          enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/vets.html</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="Find owner" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/find</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="Find owner with lastname=&quot;&quot;" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners?lastName=</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Owner"
+          enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/${count}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="Edit Owner" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/${count}/edit</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="POST Edit Owner" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="firstName" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">Test</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">firstName</stringProp>
+              </elementProp>
+              <elementProp name="lastName" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${count}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">lastName</stringProp>
+              </elementProp>
+              <elementProp name="address" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">1234+Test+St.</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">address</stringProp>
+              </elementProp>
+              <elementProp name="city" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">TestCity</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">city</stringProp>
+              </elementProp>
+              <elementProp name="telephone" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">612345678</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">telephone</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/${count}/edit</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="New Pet" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/${count}/pets/new</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="POST new pet" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="name" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">Test+Fluffy+${petCount}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">name</stringProp>
+              </elementProp>
+              <elementProp name="birthDate" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">2020-12-20</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">birthDate</stringProp>
+              </elementProp>
+              <elementProp name="type" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">cat</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">type</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/${count}/pets/new</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="New visit" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments" />
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/${count}/pets/${petCount}/visits/new</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy"
+          testname="POST new visit" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments"
+            guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables pr�-d�finies"
+            enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="date" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">2013-02-22</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">date</stringProp>
+              </elementProp>
+              <elementProp name="description" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">visit</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">description</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${CONTEXT_WEB}/owners/${count}/pets/${petCount}/visits/new</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree />
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector"
+          testname="Results" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree />
+        <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector"
+          testname="Aggregated report" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree />
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
+
+
+
+================================================
+FILE: .devcontainer/devcontainer.json
+================================================
+{
+  "name": "Java",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21-oracle",
+      "jdkDistro": "oracle"
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "redhat.vscode-xml",
+        "visualstudioexptteam.vscodeintellicode",
+        "vscjava.vscode-java-pack"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
+
+
+
+================================================
+FILE: .devcontainer/Dockerfile
+================================================
+# Not actually used by the devcontainer, but it is used by gitpod
+ARG VARIANT=17-bullseye
+FROM mcr.microsoft.com/vscode/devcontainers/java:0-${VARIANT}
+ARG NODE_VERSION="none"
+RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
+ARG USER=vscode
+VOLUME /home/$USER/.m2
+VOLUME /home/$USER/.gradle
+ARG JAVA_VERSION=17.0.7-ms
+RUN sudo mkdir /home/$USER/.m2 /home/$USER/.gradle && sudo chown $USER:$USER /home/$USER/.m2 /home/$USER/.gradle
+RUN bash -lc '. /usr/local/sdkman/bin/sdkman-init.sh && sdk install java $JAVA_VERSION && sdk use java $JAVA_VERSION'
+
+
+================================================
+FILE: .github/dco.yml
+================================================
+require:
+  members: false
+
+
+================================================
+FILE: .github/workflows/deploy-and-test-cluster.yml
+================================================
+name: Deploy and Test Cluster
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'k8s/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'k8s/**'
+
+jobs:
+  deploy-and-test-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1
+
+      - name: Deploy application
+        run: |
+          kubectl apply -f k8s/
+
+      - name: Wait for Pods to be ready
+        run: |
+          kubectl wait --for=condition=ready pod -l app=demo-db --timeout=180s
+          kubectl wait --for=condition=ready pod -l app=petclinic --timeout=180s
+
+
+
+
+================================================
+FILE: .github/workflows/gradle-build.yml
+================================================
+# This workflow will build a Java project with Gradle, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '17' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{matrix.java}}
+          distribution: 'adopt'
+          cache: maven
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build with Gradle
+        run: ./gradlew build
+
+
+
+================================================
+FILE: .github/workflows/maven-build.yml
+================================================
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '17' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{matrix.java}}
+          distribution: 'adopt'
+          cache: maven
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B verify
+
+
+
+================================================
+FILE: .mvn/wrapper/maven-wrapper.properties
+================================================
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+wrapperVersion=3.3.2
+distributionType=only-script
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.10/apache-maven-3.9.10-bin.zip
+
+
