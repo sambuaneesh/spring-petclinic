@@ -1,0 +1,5 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Owner Component** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Thymeleaf | H2, HSQLDB, MySQL, PostgreSQL | HTTP (Server-side Rendered HTML), In-process method calls | Model-View-Controller (MVC), Repository, Dependency Injection |
+| **Vet Component** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Thymeleaf, JCache (Caffeine) | H2, HSQLDB, MySQL, PostgreSQL | HTTP (HTML, JSON), In-process method calls | Model-View-Controller (MVC), Repository, DTO, Caching, Dependency Injection |
+| **System Component**| Java | Spring Boot, Spring MVC, Thymeleaf, JCache | N/A | HTTP (Server-side Rendered HTML), In-process method calls | Model-View-Controller (MVC), Interceptor (for i18n), Dependency Injection |

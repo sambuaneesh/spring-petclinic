@@ -1,0 +1,6 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Owner Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Thymeleaf, Bean Validation | Relational (H2, HSQLDB, MySQL, PostgreSQL) | HTTP/S, JDBC, In-process method calls | Bounded Context, MVC, Repository, Dependency Injection, Entity, Custom Validator |
+| **Veterinarian Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, JCache API, Thymeleaf | Relational (H2, HSQLDB, MySQL, PostgreSQL) | HTTP/S (HTML & JSON/XML API), JDBC, In-process method calls | Bounded Context, MVC, Repository, Dependency Injection, Caching, Entity, DTO (XML Wrapper) |
+| **System & Web Configuration** | Java, SASS | Spring Boot, Spring MVC, JCache API, Thymeleaf, Bootstrap | N/A | HTTP/S | Configuration as Code, Interceptor, Front Controller, Internationalization (i18n) |
+| **Shared Data Model** | Java | JPA / Hibernate | N/A (Defines schema) | In-process method calls (Java inheritance) | Shared Kernel, Mapped Superclass, Entity, Inheritance |
