@@ -1,0 +1,246 @@
+Architectural Summary (Chunk 2 of 3) — Spring PetClinic
+
+Scope of this chunk
+- Web/MVC controllers for the welcome page and veterinarians (HTML + JSON).
+- Vet domain model (Vet, Specialty), repository, and wrapper DTO for API marshalling.
+- Thymeleaf templates (layout, fragments, vets, owners, pets, visits, error, welcome).
+- Database schema and seed data for H2, HSQLDB, MySQL, PostgreSQL; profile-based DB configuration.
+- Internationalization message bundles and static front-end resources (SCSS, fonts).
+- Integration and MVC tests (including Testcontainers configuration for MySQL/Postgres).
+
+Key Components and Responsibilities
+- WelcomeController (org.springframework.samples.petclinic.system.WelcomeController)
+  - Responsibility: Serves the home/welcome page.
+  - Endpoint: GET "/" → returns view name "welcome" (Thymeleaf).
+
+- VetController (org.springframework.samples.petclinic.vet.VetController)
+  - Responsibility: Lists veterinarians for HTML view with pagination and exposes JSON endpoint (for API clients).
+  - Dependencies: VetRepository (Spring Data).
+  - Endpoints:
+    - GET "/vets.html"
+      - Query param: page (int, default 1).
+      - Retrieves paginated vets (page size 5), builds model attributes: currentPage, totalPages, totalItems, listVets.
+      - View: "vets/vetList".
+    - GET "/vets"
+      - Produces application/json (via @ResponseBody returning Vets wrapper).
+      - Returns all vets (non-paginated) as Vets (list) for simplified JSON/XML mapping.
+
+- VetRepository (org.springframework.samples.petclinic.vet.VetRepository)
+  - Type: Spring Data Repository<Vet, Integer>.
+  - Responsibility: Data access for Vet.
+  - Methods:
+    - Collection<Vet> findAll() — @Transactional(readOnly = true), @Cacheable("vets")
+    - Page<Vet> findAll(Pageable pageable) — @Transactional(readOnly = true), @Cacheable("vets")
+  - Caching: Uses Spring Cache abstraction with cache name "vets" (default cache provider unless overridden).
+
+- Domain Models
+  - Vet (org.springframework.samples.petclinic.vet.Vet)
+    - Extends Person (not shown; inferred to hold id, firstName, lastName).
+    - JPA: @Entity @Table("vets").
+    - Relationships:
+      - @ManyToMany(fetch = FetchType.EAGER) Set<Specialty> via join table "vet_specialties" (vet_id, specialty_id).
+    - Methods:
+      - getSpecialties(): returns sorted List<Specialty> by name (Comparator on NamedEntity::getName).
+      - getNrOfSpecialties(): size of specialties.
+      - addSpecialty(Specialty).
+    - Notes: EAGER fetch is paired with spring.jpa.open-in-view=false to avoid lazy-init issues in views.
+
+  - Specialty (org.springframework.samples.petclinic.vet.Specialty)
+    - Extends NamedEntity (not shown; inferred to hold id, name).
+    - JPA: @Entity @Table("specialties").
+
+  - Vets (org.springframework.samples.petclinic.vet.Vets)
+    - Simple wrapper for List<Vet>, annotated with @XmlRootElement and @XmlElement for marshalling to XML/JSON.
+
+User Interface and Templates (Thymeleaf)
+- Layout and fragments (templates/fragments/layout.html, inputField.html, selectField.html):
+  - Defines common navigation (home, owners/find, vets list, error) and layout structure.
+  - Uses WebJars for bootstrap and font-awesome.
+  - Menu includes a link to "/oups" (error trigger controller likely in another chunk).
+- Pages:
+  - welcome.html: Home page content injected into layout.
+  - vets/vetList.html: Displays listVets with pagination controls; shows specialties or "none".
+  - owners/* and pets/* templates: Forms and details pages for owners, pets, visits (controllers part of other chunks).
+- Internationalization:
+  - Message bundles for multiple locales (default, de, es, fa, pt, ru, tr, en fallback).
+  - Keys used throughout templates (e.g., vets, owners, error, first/next/previous/last).
+
+API Endpoints and Interfaces (observed in this chunk)
+- Public web endpoints (served via Spring MVC + Thymeleaf):
+  - GET "/": welcome view.
+  - GET "/vets.html": vets HTML list with pagination.
+  - Owners/Pets UI endpoints referenced by templates (controllers not in this chunk):
+    - Owners: "/owners/find", "/owners", "/owners/new", "/owners/{ownerId}", "/owners/{ownerId}/edit"
+    - Pets: "/owners/{ownerId}/pets/new", "/owners/{ownerId}/pets/{petId}/edit"
+    - Visits: "/owners/{ownerId}/pets/{petId}/visits/new"
+- JSON/XML-oriented endpoint:
+  - GET "/vets": returns Vets wrapper with all vets. JSON by default; JAXB annotations also support XML marshalling.
+
+Data Persistence and Database Schemas
+- Spring Data JPA with Hibernate. No schema generation at runtime (spring.jpa.hibernate.ddl-auto=none).
+- SQL init is enabled to run provided schema and data scripts.
+
+- Common tables across DBs (H2/HSQLDB/MySQL/Postgres):
+  - vets: id (identity/auto-increment), first_name, last_name; index on last_name.
+  - specialties: id, name; index on name.
+  - vet_specialties: (vet_id, specialty_id); FKs to vets, specialties; unique constraint on (vet_id, specialty_id) in MySQL/Postgres.
+  - types: id, name; index on name.
+  - owners: id, first_name, last_name (H2/HSQL use VARCHAR_IGNORECASE), address, city, telephone; index on last_name.
+  - pets: id, name, birth_date (DATE), type_id (FK to types, not null), owner_id (FK to owners); index on name; Postgres additionally indexes owner_id.
+  - visits: id, pet_id (FK to pets), visit_date (DATE), description; index on pet_id.
+
+- Seed data (varies slightly by DB but semantically consistent):
+  - Vets: 6 sample vets.
+  - Specialties: radiology, surgery, dentistry.
+  - Vet-Specialties: sample associations.
+  - Types: cat, dog, lizard, snake, bird, hamster.
+  - Owners: 10 sample owners.
+  - Pets: 13 sample pets with various owners and types.
+  - Visits: 4 sample visits.
+
+Configuration and Deployment Details
+- application.properties:
+  - Database initialization:
+    - database=h2 (default). Scripts loaded from classpath: db/${database}/schema.sql and data.sql.
+  - JPA: spring.jpa.hibernate.ddl-auto=none; spring.jpa.open-in-view=false (important for fetch strategies).
+  - Thymeleaf: spring.thymeleaf.mode=HTML.
+  - Internationalization: spring.messages.basename=messages/messages.
+  - Actuator: management.endpoints.web.exposure.include=* (exposes all endpoints).
+  - Logging: logging.level.org.springframework=INFO.
+  - Static resources caching: spring.web.resources.cache.cachecontrol.max-age=12h.
+
+- application-mysql.properties (profile: mysql):
+  - spring.datasource.url=${MYSQL_URL:jdbc:mysql://localhost/petclinic}
+  - spring.datasource.username=${MYSQL_USER:petclinic}
+  - spring.datasource.password=${MYSQL_PASS:petclinic}
+  - spring.sql.init.mode=always.
+
+- application-postgres.properties (profile: postgres):
+  - spring.datasource.url=${POSTGRES_URL:jdbc:postgresql://localhost/petclinic}
+  - spring.datasource.username=${POSTGRES_USER:petclinic}
+  - spring.datasource.password=${POSTGRES_PASS:petclinic}
+  - spring.sql.init.mode=always.
+
+- DB setup helper docs:
+  - db/mysql/petclinic_db_setup_mysql.txt: How to run with docker-compose or standalone, activate profile mysql.
+  - db/postgres/petclinic_db_setup_postgres.txt: Run with docker-compose, activate profile postgres.
+
+- Front-end assets:
+  - SCSS: petclinic.scss + header/responsive/typography; compiled into CSS referenced by templates.
+  - Fonts/images via static/resources.
+  - WebJars for Bootstrap and Font Awesome.
+
+Service Dependencies and Communication Patterns
+- Intra-application interactions:
+  - MVC Controller layer -> Repository layer -> JPA/Hibernate -> Database.
+  - View rendering via Thymeleaf templates; forms POST to MVC endpoints (owners/pets/visits).
+  - JSON endpoint for /vets uses object marshalling (JAXB annotations present; Spring Boot typically uses Jackson for JSON by default).
+
+- Caching:
+  - Spring Cache abstraction with @Cacheable("vets") on repository methods findAll(). No explicit cache manager configured in this chunk (default is ConcurrentMapCacheManager in-memory).
+
+- External dependencies:
+  - Database per active profile (H2/HSQL in-memory/local by default, MySQL/Postgres via Testcontainers or Docker Compose).
+  - Actuator endpoints exposed (not used in code shown but available operationally).
+
+Key Business Logic and Algorithms
+- Vet.getSpecialties(): sorts specialties by name each time it’s accessed for stable deterministic display/API order.
+- VetController pagination:
+  - Page size fixed at 5 for /vets.html.
+  - Model attributes support UI pagination controls (currentPage, totalPages, totalItems, listVets).
+- Validation and formatting (not fully defined here but evidenced by tests and templates):
+  - Use of message keys like required, notFound, duplicate, typeMismatch.*.
+  - PetTypeFormatter resolves PetType from String; PetValidator checks pet fields (tested in this chunk).
+  - Owners and Pets controllers exist elsewhere; templates here reflect their form validation and i18n behavior.
+
+Interfaces and View Models (for microservice boundaries)
+- Vet service (from this chunk):
+  - Domain: Vet {id, firstName, lastName, specialties[]}, Specialty {id, name}.
+  - API:
+    - HTML: GET /vets.html?page=N (page size 5).
+    - JSON: GET /vets → { "vet": [ { id, firstName, lastName, specialties: [ { id, name } ] } ] } via Vets wrapper.
+  - Repository interface for service implementation: VetRepository.findAll(Pageable) and findAll().
+
+- Owner/Pet/Visit/Type services (implied by templates/tests; implementation likely in other chunks):
+  - Owners: CRUD, search by lastName (paginated); GET /owners/{id}, /owners/find, /owners/new, /owners/{id}/edit.
+  - Pets: Create/update pet for an owner; GET/POST /owners/{ownerId}/pets/new, /owners/{ownerId}/pets/{petId}/edit.
+  - Visits: Add visit; GET/POST /owners/{ownerId}/pets/{petId}/visits/new.
+  - Types: enumeration of pet types; formatter integration.
+  - Data linkage:
+    - owners(1..n)–pets; pets(1..n)–visits; pets(1)–type; vets(n..n)–specialties.
+  - UI view models reflect full owner->pets->visits nesting.
+
+Testing, Observability, and Runtime
+- Integration Tests:
+  - PetClinicIntegrationTests (default profile): Validates vets caching and GET /owners/1 returns 200 OK using RestTemplate against embedded server.
+  - MySqlIntegrationTests (@ActiveProfiles("mysql")):
+    - Uses @ServiceConnection + @Container MySQL Testcontainers (mysql:9.2) and RestTemplate tests.
+  - PostgresIntegrationTests (@ActiveProfiles("postgres")):
+    - Uses Docker Compose integration (spring.docker.compose.* properties) to start postgres service; verifies /owners/1; logs properties at startup.
+  - MysqlTestApplication: Defines a Testcontainers MySQL bean for "mysql" profile and a main to run PetClinic with that profile.
+
+- Observability:
+  - All Actuator endpoints exposed via management.endpoints.web.exposure.include=* (e.g., /actuator/health, /actuator/metrics, etc.).
+
+Architectural Patterns and Frameworks
+- Spring Boot application with:
+  - Spring MVC (Controllers, Thymeleaf view rendering).
+  - Spring Data JPA (Repository abstraction).
+  - Hibernate (JPA provider).
+  - Spring Cache (@Cacheable).
+  - Thymeleaf templating and fragments.
+  - Internationalization (MessageSource).
+  - WebJars for front-end dependencies.
+  - Testcontainers for DB integration tests (MySQL/Postgres).
+  - Docker Compose integration for Postgres profile testing.
+- DTO/wrapper pattern (Vets) to ease XML/JSON marshalling and keep view/API models simple.
+
+Configuration Implications for Microservices
+- DB profiles and scripts support switching per environment; schemas are compatible across H2/HSQLDB/MySQL/Postgres.
+- open-in-view=false and EAGER fetch on Vet.specialties avoid lazy loading during view rendering; in microservices, prefer explicit DTOs and service-level aggregation.
+- Caching currently in-memory; for distributed deployments, replace with a distributed cache (e.g., Redis) and configure TTL/eviction.
+- Actuator exposure should be restricted/secured in production microservices.
+- The UI is server-side rendered in this monolith; in a microservice decomposition, UI can be separated into a frontend or BFF service, and APIs surfaced as JSON.
+
+Candidate Microservice Decomposition (from this chunk and inferred dependencies)
+- Vet Service
+  - Owns tables: vets, specialties, vet_specialties.
+  - APIs: list vets (paged for UI, full list for API/consumers). Might add CRUD for vets and specialties.
+  - No direct linkage to owners/pets in schema; relatively independent.
+
+- Owner Service
+  - Owns tables: owners.
+  - APIs: search owners by last name (paginated); CRUD; fetch owner details.
+
+- Pet Service
+  - Owns tables: pets, types.
+  - APIs: CRUD pets; list available types; validation of pet names per owner (duplicate check suggested by templates/tests).
+  - Dependency: references owners via owner_id; in microservices, would require owner service call or database view/projection.
+
+- Visit Service
+  - Owns table: visits.
+  - APIs: add/list visits for pet.
+  - Dependency: references pets via pet_id; in microservices, would call pet service or use an event-driven approach.
+
+- Shared/UI Service
+  - Serves Thymeleaf templates or replaced by SPA; composes data from above services.
+  - i18n assets and static resources hosted here.
+
+Data Models Summary (fields as per schemas)
+- vets: id (int), first_name (varchar/text), last_name (varchar/text).
+- specialties: id (int), name (varchar/text).
+- vet_specialties: vet_id (int), specialty_id (int), unique(vet_id, specialty_id in MySQL/Postgres).
+- owners: id (int), first_name, last_name, address, city, telephone.
+- types: id (int), name.
+- pets: id (int), name, birth_date (date), type_id (int, not null), owner_id (int).
+- visits: id (int), pet_id (int), visit_date (date), description (varchar/text).
+
+Other Notable Details
+- Pagination:
+  - Vets HTML list: page size 5; model attributes used by vets/vetList.html.
+  - Owners list view (owners/ownersList.html) includes pagination UI (currentPage, totalPages), implying owners controller supplies these attributes.
+- Error handling:
+  - error.html template and layout include a link to "/oups" to trigger an error (controller likely elsewhere).
+- Static resource caching: 12-hour Cache-Control max-age.
+
+This summary preserves the relevant classes, endpoints, data models, configuration, and patterns needed to reason about microservice boundaries and inter-service interfaces for the PetClinic system in chunk 2.

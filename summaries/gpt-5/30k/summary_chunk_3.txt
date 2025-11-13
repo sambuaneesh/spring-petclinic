@@ -1,0 +1,235 @@
+Architectural Summary (Codebase Chunk 3)
+
+Scope of this chunk
+- Mostly test code and ancillary tooling that reveals the runtime architecture, domain model, public HTTP endpoints, repositories, persistence behavior, UI/i18n conventions, and CI/CD/deployment approach.
+- Core runtime modules inferred:
+  - owner domain (Owner, Pet, Visit, PetType)
+  - vet domain (Vet, Specialty)
+  - system module (CrashController for error testing)
+  - MVC controllers (VisitController, VetController; Owner/Pet controllers are implied by endpoints in tests and JMeter plan)
+  - Spring Data repositories (OwnerRepository, PetTypeRepository, VetRepository)
+  - UI templating with Thymeleaf (inferred by HTML tests and i18n test)
+  - Persistence via Spring Data JPA/Hibernate (inferred by @DataJpaTest and repository usage)
+
+Components and Responsibilities
+- VisitController (org.springframework.samples.petclinic.owner)
+  - Handles creating new visits for pets.
+  - Dependencies: OwnerRepository to load an Owner and navigate to Pet and Visits, and to persist changes.
+  - Responsibilities:
+    - GET form initialization for new Visit.
+    - POST form processing with validation, error handling, redirect on success.
+- VetController (org.springframework.samples.petclinic.vet)
+  - Exposes Vet list in HTML and JSON.
+  - Dependencies: VetRepository.
+  - Responsibilities:
+    - GET vets.html: returns Thymeleaf view with model attribute listVets.
+    - GET vets: returns JSON with vetList key.
+- CrashController (org.springframework.samples.petclinic.system)
+  - Purposefully throws RuntimeException at /oups to validate error handling (HTML vs JSON content negotiation).
+  - No external dependencies in tests.
+- Repositories (Spring Data)
+  - OwnerRepository
+    - findByLastNameStartingWith(String, Pageable): paginated search by last name prefix.
+    - findById(int): Optional<Owner>.
+    - save(Owner): cascades to child aggregates (Pets and Visits).
+  - PetTypeRepository
+    - findPetTypes(): Collection<PetType>.
+  - VetRepository
+    - findAll(): Collection<Vet>.
+    - findAll(Pageable): Page<Vet>.
+- Domain Entities (JPA, all extend a BaseEntity with id)
+  - Owner
+    - Fields: id, firstName, lastName, address, city, telephone, pets (List/Collection<Pet>).
+    - Methods: addPet(Pet), getPets(), getPet(int or by name), addVisit(petId, Visit).
+    - Owner serves as aggregate root for Pets and Visits (cascaded persistence).
+  - Pet
+    - Fields: id, name, birthDate (LocalDate), type (PetType), visits (Collection<Visit>).
+  - PetType
+    - Fields: id, name (e.g., cat, snake).
+  - Visit
+    - Fields: id, date (LocalDate), description.
+  - Vet
+    - Fields: id, firstName, lastName, specialties (List<Specialty>), nrOfSpecialties derived property.
+  - Specialty
+    - Fields: id, name (e.g., radiology, dentistry, surgery).
+  - BaseEntity
+    - Field: id; utility functions elsewhere reference this (EntityUtils).
+- Utility
+  - EntityUtils.getById(Collection<T>, Class<T>, int): finds entity by id from a collection, throws ObjectRetrievalFailureException if not found.
+
+API Endpoints and Interfaces
+- System
+  - GET /oups
+    - Throws RuntimeException to test error path.
+    - Error JSON response contains keys: timestamp, status, error, message, path.
+    - HTML error page rendered; not the Spring Boot default whitelabel page.
+- Vets
+  - GET /vets.html?page={pageNo}
+    - Returns HTML view: vets/vetList.
+    - Model attribute: listVets (paged).
+  - GET /vets
+    - Returns JSON object with vetList array; each vet has id, names, specialties, etc.
+    - Content negotiation via Accept: application/json.
+- Owners/Pets/Visits (inferred from tests and JMeter plan)
+  - GET /owners/find
+    - Owners search page.
+  - GET /owners?lastName={value}
+    - Search owners by lastName (with empty lastName returning list of all owners).
+  - GET /owners/{ownerId}
+    - Owner details page (includes Pets and Visits).
+  - GET /owners/{ownerId}/edit
+    - Edit owner form.
+  - POST /owners/{ownerId}/edit
+    - Form fields: firstName, lastName, address, city, telephone.
+    - Redirect to owner details on success.
+  - GET /owners/{ownerId}/pets/new
+    - New pet form.
+  - POST /owners/{ownerId}/pets/new
+    - Form fields: name, birthDate (yyyy-MM-dd), type (string e.g., cat).
+    - Redirect to owner details on success.
+  - GET /owners/{ownerId}/pets/{petId}/visits/new
+    - New visit form; View: pets/createOrUpdateVisitForm.
+  - POST /owners/{ownerId}/pets/{petId}/visits/new
+    - Form fields: date (yyyy-MM-dd), description; some tests also pass name (legacy param observed).
+    - On validation errors (e.g., missing description), stays on pets/createOrUpdateVisitForm and exposes "visit" model errors.
+    - On success, redirects to /owners/{ownerId}.
+- Static assets
+  - GET /resources/css/petclinic.css
+  - GET /webjars/bootstrap/dist/js/bootstrap.bundle.min.js
+- Root
+  - GET /
+
+Database Schemas and Data Models (inferred)
+- owners
+  - id (PK), first_name, last_name, address, city, telephone.
+- pets
+  - id (PK), name, birth_date, type_id (FK to pet_types), owner_id (FK to owners).
+- pet_types
+  - id (PK), name.
+- visits
+  - id (PK), pet_id (FK to pets), visit_date, description.
+- vets
+  - id (PK), first_name, last_name.
+- specialties
+  - id (PK), name.
+- vet_specialties
+  - vet_id (FK to vets), specialty_id (FK to specialties) — many-to-many mapping.
+- Aggregate boundaries and cascading:
+  - Owner is the aggregate root for both Pets and their Visits. Persisting Owner cascades persist operations for attached Pet and Visit instances (observed in tests: owners.save(owner) generates IDs for nested entities).
+
+Service Dependencies and Communication Patterns
+- Controllers depend on repositories directly (no separate service layer in the tests examined).
+- Dependencies:
+  - VisitController -> OwnerRepository.
+  - VetController -> VetRepository.
+- Communication:
+  - Synchronous HTTP requests handled by Spring MVC controllers; persistence via Spring Data JPA/Hibernate.
+  - No inter-service communication visible in this chunk; monolithic runtime pattern with a single application connecting to a database.
+- Content negotiation:
+  - Based on Accept header (e.g., vets JSON when Accept: application/json).
+
+Key Business Logic and Algorithms
+- Owner aggregate logic:
+  - addPet(Pet): associates a Pet with an Owner.
+  - addVisit(petId, Visit): associates a Visit with a specific Pet owned by the Owner.
+  - getPet(id or name): lookup of Pet owned by Owner; case-insensitive name match is common in PetClinic patterns (name-based retrieval inferred).
+- Validation:
+  - Visit creation requires description; missing description triggers validation error and re-renders form (binding result for model attribute "visit").
+  - General form validation likely powered by Bean Validation (JSR 380), though specific annotations are not visible in this chunk.
+- Repository operations:
+  - OwnerRepository.findByLastNameStartingWith supports paging and is used for owner search.
+  - Owner updates are transactional; changes are persisted via save.
+  - Pet insertion and update flows are validated in tests (ID generation on persist, name update round-trip).
+- Error handling:
+  - CrashController triggers exception to verify error endpoint behavior with HTML and JSON responses; Spring Boot error handling is configured to include error messages.
+
+Configuration and Deployment Details
+- Spring Boot testing:
+  - @WebMvcTest for controller-layer tests with slicing (uses MockMvc, @MockitoBean).
+  - @DataJpaTest for JPA integration tests with real DB when profile directs to MySQL (AutoConfigureTestDatabase(replace = NONE)).
+  - Tests disabled in native image and AOT mode where annotated (DisabledInNativeImage, DisabledInAotMode).
+- Error configuration in integration test:
+  - server.error.include-message=ALWAYS enables message field in error JSON.
+  - management.endpoints.enabled-by-default=false disables actuator endpoints by default in tests.
+- CI/CD (GitHub Actions):
+  - Java CI with Maven: builds on Java 17 using ./mvnw -B verify with dependency caching.
+  - Java CI with Gradle: builds on Java 17 using ./gradlew build with Gradle setup and caching.
+  - Deploy-and-Test-Cluster:
+    - Creates a local Kubernetes cluster via Kind.
+    - kubectl apply -f k8s/ (manifests not shown in this chunk).
+    - Waits for pods labeled app=demo-db (database) and app=petclinic (application) to be ready.
+- Container/dev environment:
+  - Devcontainer configuration for VS Code with Java 21 (Oracle), Azure CLI, Docker-in-Docker, GitHub CLI.
+  - Alternate Dockerfile (used by Gitpod) sets Java 17 via SDKMAN, mounts Maven and Gradle caches.
+- AOT/native:
+  - Some tests are marked DisabledInNativeImage/DisabledInAotMode, implying the main app may be compatible or being evaluated for native/AOT but tests selectively disabled.
+
+Architectural Patterns and Frameworks
+- Frameworks:
+  - Spring Boot (auto-configuration).
+  - Spring MVC (controllers, MockMvc tests).
+  - Spring Data JPA with Hibernate (repositories, @DataJpaTest).
+  - Thymeleaf templating (inferred via HTML and th:text usage enforced by i18n test).
+  - JUnit 5 (testing), Mockito (@MockitoBean).
+  - WebJars for static assets (Bootstrap).
+- Patterns:
+  - Layered monolith: Controller -> Repository -> JPA Entity (no service layer shown in this chunk).
+  - Aggregate root pattern: Owner as aggregate root for Pet and Visit.
+  - REST/HTTP endpoints for data (JSON) and web MVC for views (HTML).
+  - Content negotiation for some endpoints (e.g., vets).
+  - Validation and error-handling integrated in MVC forms.
+
+Internationalization (i18n) and UI
+- I18nPropertiesSyncTest enforces:
+  - No hard-coded literal text in HTML files unless using Thymeleaf th:text or message placeholders (#{...}).
+  - All message keys in base messages.properties must exist in each locale properties file; messages_en.properties is allowed to be empty due to fallback.
+- HTML:
+  - Thymeleaf templates expected to use th:text or message keys; static literal text is disallowed by test.
+- Message bundle base name: messages (messages*.properties in src/main/resources).
+
+Performance/Load Testing
+- JMeter test plan (src/test/jmeter/petclinic_test_plan.jmx):
+  - Threads: 500 users, loops: 10, ramp-up: 10 seconds (delayedStart true).
+  - Fixed think time: 300 ms between samples.
+  - Exercises endpoints:
+    - Home page (/)
+    - Static assets (CSS, JS)
+    - Vets page (/vets.html)
+    - Owners flows: /owners/find, search /owners?lastName=, view /owners/{id}, edit owner GET/POST, new pet GET/POST.
+    - Visits flows: new visit GET/POST /owners/{ownerId}/pets/{petId}/visits/new.
+  - Cookie manager enabled; certain result collectors configured.
+
+Inter-module Dependencies and Coupling
+- Visit creation is implemented by traversing Owner -> Pet -> Visits via OwnerRepository, indicating strong coupling of Visit to the Owner aggregate.
+- Vet domain is independent: VetController only depends on VetRepository and serves separate views/JSON. This suggests the vet domain can be isolated more easily.
+- Owner, Pet, Visit, PetType are tightly coupled in the same persistence aggregate.
+
+Implications for Microservice Decomposition
+- Candidate bounded contexts:
+  - Customers/Owners (Owners, Pets, PetTypes, Visits as a single aggregate): Current implementation persists Pets and Visits through OwnerRepository; extracting Visits as a separate microservice would require:
+    - Decoupling cascaded persistence (introduce VisitRepository, separate transaction boundaries).
+    - Introducing cross-service communication or domain events when visits change.
+    - Shared identity for Pet across services (PetId as a stable external ID).
+  - Vets (Vets and Specialties):
+    - Already self-contained read-oriented endpoints; likely can be separated as a read-mostly service with its own repository and schema.
+- System/error handling module is generic and can stay within an API gateway or in each service if desired.
+- UI/i18n:
+  - Tightly coupled Thymeleaf server-side templating suggests either:
+    - Keep UI in the monolith or a dedicated web app composing calls to microservices.
+    - If decomposed, convert to an API-first approach or keep Thymeleaf per service with shared styling and i18n strategy.
+- Database:
+  - Current monolith likely uses a single relational schema.
+  - Microservice split would imply database-per-service with replicated reference data (PetType, Specialties) or an API to query cross-service data; or establishing a shared catalog service for types/specialties.
+
+Non-functional/Configuration Notes
+- Transaction management: @Transactional used around repository operations in tests, implying default Spring transaction management.
+- Paging support: repositories support Pageable (e.g., findByLastNameStartingWith, VetRepository.findAll(Pageable)).
+- Error response behavior can be configured via server.error.* properties; Accept header drives HTML vs JSON.
+- Build tooling supports Maven and Gradle; both workflows target Java 17.
+- Kubernetes deployment expected to run a petclinic app and a demo database as pods; workflows ensure pods are ready.
+
+Gaps and Assumptions (based on this chunk)
+- Controllers for Owners and Pets are not present here but are inferred by endpoint tests; their behavior matches classic Spring PetClinic flows.
+- Exact JPA annotations and cascade types are not shown but inferred by observed behavior (ID generation by saving Owner including nested Pet/Visit).
+- Full database schema DDL is not present; inferred from model and tests.
+- k8s manifests content is not shown; labels app=demo-db and app=petclinic are relied upon in CI.
