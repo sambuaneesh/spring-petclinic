@@ -1,0 +1,347 @@
+Comprehensive Architectural Summary — Spring PetClinic (Merged from 3 Analysis Chunks)
+
+Overview
+- Type: Monolithic Spring Boot 3.5 application with server-side rendering (Thymeleaf) and JPA persistence.
+- Primary domains and packages:
+  - owner: Owners, Pets, Pet Types, Visits, and related controllers/repositories/validators.
+  - vet: Vets, Specialties, VetController, VetRepository, Vets wrapper.
+  - system: Cross-cutting infrastructure (caching configuration, i18n/web config, error/crash controller, welcome).
+  - model: Base domain classes (BaseEntity, Person, NamedEntity).
+- Persistence: Spring Data JPA with Hibernate. Database initialized via SQL scripts (H2 default; MySQL and PostgreSQL via profiles).
+- UI: Thymeleaf templates and fragments (layout, pages for owners/pets/visits/vets, error, welcome).
+- Caching: JCache API with Caffeine provider; cache name “vets”; statistics enabled.
+- Internationalization: Message bundles for multiple locales; session-based locale; switch via URL parameter (?lang=xx).
+- Native image/AOT: Spring AOT RuntimeHints for resources and serialization; GraalVM native-maven-plugin support.
+- Actuator: Included; management endpoints exposed broadly by default properties; K8s probes configured for /livez and /readyz.
+
+Domain Model and JPA Entities
+- model package (base types)
+  - BaseEntity: @MappedSuperclass; id (Integer, GenerationType.IDENTITY), Serializable; isNew().
+  - Person: @MappedSuperclass; first_name, last_name (NotBlank).
+  - NamedEntity: @MappedSuperclass; name (NotBlank).
+
+- owner domain
+  - Owner (@Entity, table owners)
+    - Extends Person; fields: address (NotBlank), city (NotBlank), telephone (NotBlank, regex \d{10}).
+    - OneToMany pets (cascade=ALL, fetch=EAGER) mapped by owner_id; ordered by pet name.
+    - Business methods:
+      - getPet(name or id, ignoreNew): case-insensitive lookup; ignore unsaved pets when requested.
+      - addPet(Pet): associate Pet with Owner.
+      - addVisit(petId, Visit): associate Visit to a specific Pet (asserts existence).
+  - Pet (@Entity, table pets)
+    - Extends NamedEntity; fields: birth_date (LocalDate).
+    - ManyToOne type (PetType) via type_id.
+    - OneToMany visits (cascade=ALL, fetch=EAGER) via pet_id; @OrderBy date asc.
+    - addVisit(Visit).
+  - PetType (@Entity, table types)
+    - Extends NamedEntity; typically unique name (not enforced in code).
+  - Visit (@Entity, table visits)
+    - Fields: visit_date (LocalDate, defaults to now), description (NotBlank).
+
+- vet domain
+  - Vet (@Entity, table vets)
+    - Extends Person.
+    - ManyToMany specialties (fetch=EAGER) via join table vet_specialties (vet_id, specialty_id).
+    - Methods: getSpecialties() returns sorted List<Specialty> by name; getNrOfSpecialties(); addSpecialty().
+  - Specialty (@Entity, table specialties)
+    - Extends NamedEntity (id, name).
+  - Vets (DTO/wrapper)
+    - Wrapper for List<Vet>; JAXB annotations (@XmlRootElement, @XmlElement) for XML; JSON via Jackson by default.
+
+Database Schema and Initialization
+- Strategy: spring.jpa.hibernate.ddl-auto=none; schema and seed data loaded from classpath: db/${database}/{schema.sql,data.sql}.
+- Default DB: H2; profiles available for mysql and postgres with scripts for H2, HSQLDB, MySQL, PostgreSQL.
+- Tables (common semantics across DBs; column names align to entities)
+  - owners: id, first_name, last_name, address, city, telephone; index on last_name.
+  - pets: id, name, birth_date, type_id (FK types.id, not null), owner_id (FK owners.id); index on name; Postgres also indexes owner_id.
+  - types: id, name; index on name. Note: some documentation refers to pet_types; in code it’s “types”.
+  - visits: id, pet_id (FK pets.id), visit_date, description; index on pet_id.
+  - vets: id, first_name, last_name; index on last_name.
+  - specialties: id, name; index on name.
+  - vet_specialties: vet_id (FK vets.id), specialty_id (FK specialties.id); unique(vet_id, specialty_id) in MySQL/Postgres.
+- Seed data
+  - Vets: 6; Specialties: radiology, surgery, dentistry; Vet-Specialties associations.
+  - Types: cat, dog, lizard, snake, bird, hamster.
+  - Owners: 10; Pets: 13; Visits: 4.
+
+Repositories (Spring Data JPA)
+- OwnerRepository
+  - JpaRepository<Owner, Integer>.
+  - Page<Owner> findByLastNameStartingWith(String, Pageable).
+  - Optional<Owner> findById(Integer).
+  - Persistence cascades: saving Owner persists new Pets and Visits (aggregate root).
+- PetTypeRepository
+  - JpaRepository<PetType, Integer>.
+  - List<PetType> findPetTypes(): JPQL with order by name.
+- VetRepository
+  - Repository<Vet, Integer>.
+  - @Transactional(readOnly = true); @Cacheable("vets") on:
+    - Collection<Vet> findAll().
+    - Page<Vet> findAll(Pageable pageable).
+
+Controllers and Web/API Endpoints
+- system
+  - WelcomeController
+    - GET / → welcome view (templates/welcome.html).
+  - CrashController
+    - GET /oups → throws RuntimeException; used to demonstrate error handling. JSON error includes timestamp, status, error, message, path. HTML error page is customized (not the default whitelabel).
+
+- owner (HTML MVC)
+  - OwnerController
+    - GET /owners/new → owners/createOrUpdateOwnerForm.
+    - POST /owners/new → validate/save; redirect /owners/{id}.
+    - GET /owners/find → owners/findOwners.
+    - GET /owners?lastName=&page= → paginated search (Page size 5). If exactly one match → redirect to details; if none → add “notFound” error; else → owners/ownersList with pagination model.
+    - GET /owners/{ownerId}/edit → owners/createOrUpdateOwnerForm.
+    - POST /owners/{ownerId}/edit → validate/update; redirect /owners/{ownerId}.
+    - GET /owners/{ownerId} → owners/ownerDetails.
+    - Security: Disallows binding to id on Owner via WebDataBinder.
+  - PetController (scoped under /owners/{ownerId})
+    - GET /owners/{ownerId}/pets/new → pets/createOrUpdatePetForm.
+    - POST /owners/{ownerId}/pets/new → validations (see Validation section); adds pet to owner; redirect /owners/{ownerId}.
+    - GET /owners/{ownerId}/pets/{petId}/edit → pets/createOrUpdatePetForm.
+    - POST /owners/{ownerId}/pets/{petId}/edit → validations incl. duplicate-name excluding same id; update; redirect /owners/{ownerId}.
+    - Security: Disallows binding to owner.id.
+  - VisitController (under owners/{ownerId}/pets/{petId})
+    - GET /owners/{ownerId}/pets/{petId}/visits/new → pets/createOrUpdateVisitForm.
+    - POST /owners/{ownerId}/pets/{petId}/visits/new → validates; adds visit to Pet via Owner aggregate; redirect /owners/{ownerId}.
+    - Preloads Owner and Pet via @ModelAttribute; new Visit attached to Pet before form display and submit.
+
+- vet (HTML + JSON)
+  - VetController
+    - GET /vets.html?page={pageNo default 1} → vets/vetList view; model includes listVets and pagination (page size 5).
+    - GET /vets (Accept: application/json) → returns Vets wrapper containing all vets (non-paginated); content negotiation handled by Spring; JAXB annotations also allow XML marshalling.
+
+Validation, Formatting, and Binding Rules
+- Bean Validation annotations:
+  - Owner.telephone: regex \d{10}.
+  - Person.first_name, Person.last_name, NamedEntity.name, Visit.description: NotBlank.
+- Custom Validator: PetValidator
+  - Validates Pet: name required; type required when new; birthDate required.
+- PetController additional rules:
+  - Rejects future birth dates.
+  - Duplicate pet name per owner rejected on create; on update, duplicate check excludes the same pet id.
+- Binding security:
+  - Disallow id field binding on Owner and owner.id in PetController to prevent overposting/mass assignment.
+- MVC Formatter: PetTypeFormatter
+  - parse(String) → PetType by name via PetTypeRepository; print(PetType) → name.
+
+Caching
+- Configuration: @EnableCaching with JCache (javax.cache) backed by Caffeine; cache “vets” registered with statistics enabled.
+- Usage: VetRepository methods findAll() and findAll(Pageable) are @Cacheable("vets") to cache read-mostly vet lists.
+
+Internationalization (i18n)
+- Message bundles under classpath: messages/messages*.properties for locales: default, de, es, fa, ko, pt, ru, tr (messages_en.properties may be empty due to fallback).
+- WebConfiguration:
+  - SessionLocaleResolver default Locale.ENGLISH.
+  - LocaleChangeInterceptor with param “lang”; registered via addInterceptors.
+- Tests enforce:
+  - No hard-coded literal text in HTML not backed by message keys.
+  - Keys in base messages.properties must exist in each locale bundle.
+
+User Interface and Templates
+- Layout and fragments (fragments/layout.html, inputField.html, selectField.html).
+  - Navigation: home, owners/find, vets list, error (/oups).
+  - WebJars for Bootstrap and Font Awesome.
+- Pages:
+  - welcome.html.
+  - vets/vetList.html (includes pagination, displays specialties or “none”).
+  - owners: findOwners, ownersList, createOrUpdateOwnerForm, ownerDetails.
+  - pets: createOrUpdatePetForm.
+  - visits: createOrUpdateVisitForm.
+  - error.html customized error page.
+- Static assets:
+  - SCSS compiled to CSS (petclinic.scss).
+  - Fonts/images under static resources.
+  - WebJars JS (bootstrap.bundle).
+
+Configuration and Runtime Properties
+- application.properties (defaults)
+  - Database selection: database=h2; scripts loaded from db/${database}/schema.sql and data.sql.
+  - JPA: spring.jpa.hibernate.ddl-auto=none; spring.jpa.open-in-view=false (important with EAGER fetch to avoid lazy-init issues in views).
+  - Thymeleaf: spring.thymeleaf.mode=HTML.
+  - i18n: spring.messages.basename=messages/messages.
+  - Actuator: management.endpoints.web.exposure.include=* (exposes all endpoints).
+  - Static resource caching: spring.web.resources.cache.cachecontrol.max-age=12h.
+- application-mysql.properties (profile mysql)
+  - spring.datasource.url=${MYSQL_URL:jdbc:mysql://localhost/petclinic}
+  - spring.datasource.username=${MYSQL_USER:petclinic}
+  - spring.datasource.password=${MYSQL_PASS:petclinic}
+  - spring.sql.init.mode=always.
+- application-postgres.properties (profile postgres)
+  - spring.datasource.url=${POSTGRES_URL:jdbc:postgresql://localhost/petclinic}
+  - spring.datasource.username=${POSTGRES_USER:petclinic}
+  - spring.datasource.password=${POSTGRES_PASS:petclinic}
+  - spring.sql.init.mode=always.
+
+Native Image and AOT
+- PetClinicRuntimeHints:
+  - Registers resources: db/*, messages/*, mysql-default-conf.
+  - Serialization hints: BaseEntity, Person, Vet.
+- GraalVM native-maven-plugin configured; tests selectively disabled for native/AOT modes where applicable.
+
+Build, Dependencies, and Tooling
+- Maven parent: spring-boot-starter-parent 3.5.0.
+- Dependencies:
+  - Spring Boot starters: web, thymeleaf, data-jpa, validation, actuator, cache.
+  - Databases: h2 (runtime default), mysql-connector-j (runtime), postgresql (runtime).
+  - Caching: javax.cache:cache-api, caffeine.
+  - Front-end: webjars-locator-lite, bootstrap, font-awesome.
+  - Dev/Test: spring-boot-devtools (test), testcontainers (junit-jupiter, mysql), spring-boot-docker-compose (test).
+  - QA: checkstyle, nohttp, jacoco, CycloneDX SBOM generator.
+- SCSS build: Maven profile “css” compiles SCSS via libsass-maven-plugin and unpacks webjars.
+- Build container image: ./mvnw spring-boot:build-image (Cloud Native Buildpacks).
+- Both Maven and Gradle CI workflows exist (Java 17).
+- Devcontainer (VS Code) prepared with Java, Docker-in-Docker, CLI tooling.
+
+Deployment and Ops (Docker, Kubernetes)
+- Docker Compose
+  - mysql service: image mysql:9.2, port 3306; env: MYSQL_USER=petclinic, MYSQL_PASSWORD=petclinic, MYSQL_ALLOW_EMPTY_PASSWORD=true, MYSQL_DATABASE=petclinic; mounts ./conf.d to /etc/mysql/conf.d:ro.
+  - postgres service: image postgres:17.5, port 5432; env: POSTGRES_USER=petclinic, POSTGRES_PASSWORD=petclinic, POSTGRES_DB=petclinic.
+- Kubernetes (k8s/*.yml)
+  - db.yml:
+    - Secret demo-db (type servicebinding.io/postgresql) providing host, port, database, username, password.
+    - Service demo-db on 5432.
+    - Deployment demo-db (image postgres:17.5) with env from secret; liveness/readiness/startup TCP probes on port 5432.
+  - petclinic.yml:
+    - Service petclinic (NodePort 80 → 8080).
+    - Deployment petclinic:
+      - image: dsyer/petclinic.
+      - env:
+        - SPRING_PROFILES_ACTIVE=postgres.
+        - SERVICE_BINDING_ROOT=/bindings.
+        - SPRING_APPLICATION_JSON: { "management.endpoint.health.probes.add-additional-paths": true } to expose /livez, /readyz.
+      - Container port 8080 (name: http).
+      - Probes: liveness GET /livez; readiness GET /readyz.
+      - Volume mount /bindings/secret from secret demo-db (service binding).
+- Ports and special endpoints
+  - App listens on 8080 (exposed as 80 in K8s service).
+  - H2 console (dev default): /h2-console (printed URL at startup).
+  - Actuator probes: /livez and /readyz enabled in K8s deployment via environment.
+
+Testing, Observability, and Performance
+- Integration tests
+  - Default profile: validates vets caching and GET /owners/1 using embedded server and RestTemplate.
+  - MySqlIntegrationTests (@ActiveProfiles("mysql")): Testcontainers MySQL (mysql:9.2) with @ServiceConnection; verifies endpoints.
+  - PostgresIntegrationTests (@ActiveProfiles("postgres")): Uses Docker Compose (spring.docker.compose.*) to start postgres; verifies endpoints; logs properties.
+  - MysqlTestApplication: defines Testcontainers MySQL bean for mysql profile; can run app with that profile.
+- MVC tests (@WebMvcTest)
+  - VetController: JSON and HTML endpoints; pagination model attributes.
+  - VisitController: form behavior and validation errors for missing description.
+  - CrashController: error JSON structure and HTML rendering; server.error.include-message=ALWAYS in tests.
+- JPA tests (@DataJpaTest)
+  - OwnerRepository, PetTypeRepository, VetRepository behavior; cascade persistence confirmed (Owner persists nested Pet/Visit).
+- Observability
+  - All actuator endpoints exposed by default config; tests often disable management endpoints (management.endpoints.enabled-by-default=false).
+- Performance testing (JMeter)
+  - Load plan: 500 users, 10 loops, 10s ramp-up, 300ms think time.
+  - Exercises: /, static assets, /vets.html, owners search/find/details/edit (GET/POST), pets new (GET/POST), visits new (GET/POST).
+
+Error Handling and Content Negotiation
+- CrashController intentionally throws; error handling configured to return meaningful JSON (timestamp, status, error, message, path) and a custom HTML error page.
+- Content negotiation: /vets supports JSON via Accept header; otherwise HTML.
+
+Key Business Logic and Behaviors
+- Aggregates and cascading
+  - Owner is aggregate root for Pets and Visits; saving Owner cascades to new Pets and their Visits.
+- Fetch strategies
+  - Owner.pets: EAGER; Pet.visits: EAGER; Vet.specialties: EAGER.
+  - Spring JPA open-in-view=false; EAGER mitigates lazy loading issues in views but increases coupling and load.
+- Owner search and pagination
+  - findByLastNameStartingWith with PageRequest(size=5). One match → redirect to details; zero → error on lastName; multiple → list.
+- Pet creation/update validations
+  - Required: name, birthDate, type (type required when new). No future birth dates. Duplicate pet names per owner rejected (create/update).
+- Visit creation
+  - Description required; date defaults to now in Visit constructor; Owner.addVisit used to attach to correct Pet.
+- Binding security
+  - Disallows binding entity id fields (Owner.id, owner.id within pet scope).
+
+External Dependencies and Communication Patterns
+- Internal: Controllers → Repositories → JPA/Hibernate → Database; Thymeleaf renders views; no service layer abstraction for domain operations in most flows.
+- External: Relational database (profile-specific); caching via JCache/Caffeine; Resource bundles; WebJars.
+- No inter-service HTTP or messaging; monolithic deployment with in-process calls only.
+
+Microservice Decomposition Guidance
+- Current bounded contexts
+  - Vet Service:
+    - Owns: vets, specialties, vet_specialties.
+    - APIs: GET /vets.html (paged, page size 5), GET /vets (JSON of all vets via Vets wrapper).
+    - Independent from owner/pet schema; read-mostly with caching; relatively easy to extract.
+  - Owner Service (with Pets, PetTypes, Visits as implemented):
+    - Owns: owners, pets, types, visits (current monolith treats Visits within Owner aggregate).
+    - APIs (HTML): owners CRUD/find; pets create/update within owner; visits create for a pet.
+    - Strong coupling: EAGER Owner→Pets→Visits and cascade persist; extraction implies redesign of boundaries.
+- Recommended decompositions and impacts
+  - Split Vet domain first: independent schema; replace cache with distributed cache (e.g., Redis) if deployed separately; expose JSON APIs (extend for CRUD).
+  - Owners vs Pets vs Visits:
+    - Option A: Keep Pets and Visits within Owner (single service). Pros: keeps current transactional model; minimal change. Cons: coarse-grained aggregate; heavy fetch.
+    - Option B: Separate Visit Service:
+      - Introduce VisitRepository and VisitController (JSON) with its own DB.
+      - Establish shared PetId identity across services; remove cascade Owner→Visit; Owner/Pet service emits domain events when visits are added; Visit service validates pet existence via synchronous call or event-sourced materialized view.
+      - UI/BFF composes Owner detail with visits via API composition.
+    - Option C: Separate Pet Service (and Types) from Owner:
+      - Pet references owner_id; in microservices requires cross-service owner existence validation; duplicate-name-per-owner check moves to Pet service requiring check across owner context.
+      - Consider moving PetType as reference data owned by Pet service (or separate catalog).
+  - UI/BFF layer:
+    - Current UI is server-side Thymeleaf, tightly coupled to controllers and domain. For microservices:
+      - Introduce a BFF or gateway that renders pages by composing backend JSON APIs; or
+      - Keep Thymeleaf within each service for its pages; however, current templates cross-cut data across services (owner details include pets and visits), which favors a BFF.
+  - Data access and fetch tuning:
+    - Replace EAGER with LAZY and move to explicit DTOs and API composition for inter-service calls.
+  - Transactions:
+    - Today: single DB transaction for Owner aggregate. After split: use eventual consistency for actions spanning services (saga pattern or outbox events).
+  - Caching:
+    - “vets” cache via JCache/Caffeine; in distributed microservices, configure a distributed cache and define TTL/eviction.
+
+Non-functional and Operational Considerations
+- Health/readiness: /livez and /readyz configured in K8s via management.endpoint.health.probes.add-additional-paths=true.
+- Security: No authentication/authorization implemented; controllers protect against id overposting.
+- Observability: Actuator enabled with all endpoints exposed by default property; in production microservices, restrict and secure actuator endpoints.
+- Static resources: Client-side caching configured (12-hour max-age).
+- Data seeding: SQL init for each DB provider; H2 pre-populated by default.
+- Performance: JMeter plan simulates 500 users; EAGER relationships and large owner graphs may impact performance; consider DTOs and pagination for nested data in microservice design.
+
+Utilities and Supporting Code
+- EntityUtils.getById(Collection<T>, Class<T>, int): fetch entity by id from a collection; throws ObjectRetrievalFailureException if missing.
+- Service binding for DB in Kubernetes:
+  - SERVICE_BINDING_ROOT=/bindings; secret type servicebinding.io/postgresql used to auto-configure Spring DataSource.
+- H2 console: /h2-console when H2 in-memory active; URL logged at startup.
+
+Complete Endpoint Inventory (for reference)
+- Root/UI:
+  - GET / → welcome view.
+- Error:
+  - GET /oups → throws RuntimeException; JSON/HTML error handling.
+- Vets:
+  - GET /vets.html?page=N → HTML, vets/vetList.
+  - GET /vets → JSON (Vets wrapper).
+- Owners:
+  - GET /owners/find → search page.
+  - GET /owners?lastName=&page= → paginated list; redirect when single match.
+  - GET /owners/new → create form.
+  - POST /owners/new → create; redirect to /owners/{id}.
+  - GET /owners/{ownerId} → owner details (includes Pets and Visits).
+  - GET /owners/{ownerId}/edit → edit form.
+  - POST /owners/{ownerId}/edit → update; redirect to owner details.
+- Pets (scoped under owner):
+  - GET /owners/{ownerId}/pets/new → create form.
+  - POST /owners/{ownerId}/pets/new → create; redirect to owner details.
+  - GET /owners/{ownerId}/pets/{petId}/edit → edit form.
+  - POST /owners/{ownerId}/pets/{petId}/edit → update; redirect to owner details.
+- Visits (scoped under owner/pet):
+  - GET /owners/{ownerId}/pets/{petId}/visits/new → create form.
+  - POST /owners/{ownerId}/pets/{petId}/visits/new → create; redirect to owner details.
+- Static resources:
+  - GET /resources/css/petclinic.css; WebJars (e.g., /webjars/bootstrap/dist/js/bootstrap.bundle.min.js).
+- H2:
+  - GET /h2-console (when active).
+- Actuator (enabled broadly by default):
+  - GET /actuator/* (plus /livez, /readyz via K8s setting).
+
+Key Risks and Coupling Hotspots for Microservices
+- Owner-Pet-Visit aggregate stored/loaded as a graph with EAGER fetch and cascade operations increases payload size and coupling; difficult to split without revising transactional model.
+- UI templates assume nested access to entire graph; decomposition requires API-first DTOs and composition or a BFF.
+- Duplicate pet name per owner validation currently local to aggregate; externalizing Pets or Visits demands cross-service queries or consistency strategies.
+- Caching strategy is local (Caffeine via JCache); microservices should adopt distributed caches and define cache keys/TTL to suit data change frequency (vets are read-mostly).
+
+This consolidated summary preserves all component names, APIs, dependencies, configurations, data models, and operational details from the codebase analysis, and provides the necessary depth to plan and reason about a microservice decomposition of the Spring PetClinic system.

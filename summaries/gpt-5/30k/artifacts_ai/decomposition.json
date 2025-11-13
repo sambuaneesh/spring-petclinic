@@ -1,0 +1,91 @@
+{
+  "tool": {
+    "decomposition": {
+      "Customer Management Service": [
+        {
+          "id": "Owner"
+        },
+        {
+          "id": "OwnerController"
+        },
+        {
+          "id": "OwnerRepository"
+        },
+        {
+          "id": "Pet"
+        },
+        {
+          "id": "PetController"
+        },
+        {
+          "id": "PetType"
+        },
+        {
+          "id": "PetTypeRepository"
+        },
+        {
+          "id": "PetTypeFormatter"
+        },
+        {
+          "id": "PetValidator"
+        },
+        {
+          "id": "Visit"
+        },
+        {
+          "id": "VisitController"
+        }
+      ],
+      "Veterinary Directory Service": [
+        {
+          "id": "Vet"
+        },
+        {
+          "id": "Specialty"
+        },
+        {
+          "id": "VetRepository"
+        },
+        {
+          "id": "VetController"
+        },
+        {
+          "id": "Vets"
+        },
+        {
+          "id": "CacheConfiguration"
+        }
+      ],
+      "Web Experience & i18n Service": [
+        {
+          "id": "WelcomeController"
+        },
+        {
+          "id": "CrashController"
+        },
+        {
+          "id": "WebConfiguration"
+        }
+      ],
+      "Shared Domain Base Service": [
+        {
+          "id": "BaseEntity"
+        },
+        {
+          "id": "Person"
+        },
+        {
+          "id": "NamedEntity"
+        }
+      ],
+      "Platform Bootstrap & Native Image Service": [
+        {
+          "id": "PetClinicApplication"
+        },
+        {
+          "id": "PetClinicRuntimeHints"
+        }
+      ]
+    }
+  }
+}
