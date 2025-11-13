@@ -1,0 +1,13 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+|---|---|---|---|---|---|
+| Bootstrapping & AOT/Native | Java 17 | Spring Boot 3.5.x, GraalVM Native Build Tools | N/A | N/A | Bootstrapping, AOT runtime hints, Build info |
+| Web UI (Controllers + Views) | Java 17, HTML | Spring MVC, Thymeleaf, Hibernate Validator | None (uses repositories indirectly) | HTTP(S) HTML forms; content negotiation for errors | MVC, View-Controller, Form binding, Flash messaging |
+| Owner Domain (Owners/Pets/Visits/Types) | Java 17 | Spring Data JPA, Hibernate ORM, Spring MVC, Bean Validation | H2 (default), MySQL, PostgreSQL via JDBC/HikariCP | HTTP /owners/**; JDBC via JPA | Domain Model, Repository, Aggregate (Owner→Pet/Visit), Validator, Formatter, Pagination |
+| Vet Domain (Vets/Specialties) | Java 17 | Spring Data (Repository), Spring MVC, Jackson, JCache (Caffeine) | H2/MySQL/PostgreSQL | HTTP HTML (/vets.html), JSON (/vets) | Repository, DTO wrapper (Vets), Cache-aside (@Cacheable), Pagination |
+| System & Web Config (i18n, cache config, welcome/error) | Java 17 | Spring Cache (JCache), Caffeine, Spring WebMvcConfigurer, LocaleResolver/LocaleChangeInterceptor | None | HTTP “/”, “/oups” | Cross-cutting configuration, i18n, Error handling |
+| Persistence & DB Init | Java 17, SQL | Spring Data JPA, Hibernate, HikariCP | H2, MySQL, PostgreSQL (schema.sql/data.sql per profile) | JDBC | Repository, Scripted schema management, Profile-based datasource, No OSIV |
+| Caching Layer | Java 17 | JCache (javax.cache), Caffeine, Spring Cache | None | In-process cache | Cache-aside, Annotations (@EnableCaching, @Cacheable), Local cache |
+| Observability & Actuator | Java 17, YAML | Spring Boot Actuator | None | HTTP /actuator/*, /livez, /readyz | Health checks, Metrics/Info endpoints, Probes |
+| Static Assets & Theming | SCSS/CSS | libsass-maven-plugin, WebJars (Bootstrap, FontAwesome) | None | HTTP static resource serving | Asset pipeline, Responsive theming |
+| Testing & Performance | Java 17, JMX (JMeter XML), YAML | JUnit 5, Mockito, Spring Test (MockMvc), Testcontainers (MySQL), Spring Boot Docker Compose (Postgres), JMeter | H2, MySQL (Testcontainers), PostgreSQL (Compose) | MockMvc/HTTP, Container orchestration | Integration testing, Performance testing, ServiceConnection |
+| Deployment & DevOps | YAML | Spring Boot Buildpacks (Maven Plugin), Docker Compose, Kubernetes, Service Binding | PostgreSQL (k8s demo-db), MySQL/Postgres containers | HTTP Service/NodePort; Service Binding via mounted Secret/env | Containerized deployment, 12-Factor config, Health probes, Buildpacks |

@@ -1,0 +1,12 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+|---|---|---|---|---|---|
+| Bootstrapping & System Configuration | Java 17+ | Spring Boot 3.5, RuntimeHintsRegistrar, Spring Configuration | N/A | N/A | Inversion of Control, Auto-configuration, AOT runtime hints |
+| Web MVC & View Layer | Java 17+ | Spring MVC, Thymeleaf, Jackson, Webjars | N/A | HTTP/HTML (SSR), HTTP/JSON (/vets), in-process calls to repositories | MVC, Controller, PRG, ModelAttribute, Formatter/Converter, Interceptor, Pagination |
+| Domain: Owners, Pets, Visits | Java 17+ | JPA (Hibernate), Spring Data JPA, Bean Validation | H2/MySQL/PostgreSQL (single schema; SQL init) | In-process (controllers → repositories) | Domain Model, Aggregate Root (Owner→Pet→Visit), Repository, Cascade (ALL), EAGER fetch |
+| Domain: Vets & Specialties | Java 17+ | JPA (Hibernate), Spring Data (Repository), Bean Validation | Same relational DB | In-process; exposes HTTP/JSON via VetController | Repository, Many-to-Many, Cache-aside/read-through (@Cacheable), Pagination |
+| Persistence & Data Access | Java 17+ | Spring Data JPA, Hibernate, JDBC | H2 (dev), MySQL/PostgreSQL (profiles); schema/data via spring.sql.init | JDBC to RDBMS | Repository, DAO, SQL-based initialization |
+| Caching | Java 17+ | JCache API, Caffeine, Spring Cache | N/A | In-process cache interception | Cache-aside (@Cacheable), Read-through semantics, Named cache ("vets") |
+| Internationalization (i18n) | Java 17+ | Spring MVC i18n (SessionLocaleResolver, LocaleChangeInterceptor) | N/A | In-process; query param ?lang=xx | Locale resolution (session), Message bundles |
+| Validation | Java 17+ | Bean Validation (JSR 380), Spring Validation, Custom PetValidator | N/A | In-process (binding/validation) | Constraint annotations, Custom validator, Domain validation (duplicate pet name, date rules) |
+| Observability & Operations | Java 17+ | Spring Boot Actuator | N/A | HTTP (/actuator/*, /livez, /readyz) | Health checks, Metrics/Info endpoints |
+| Packaging & Deployment | Java 17+ | Spring Boot Maven Plugin (build-image), GraalVM native-maven-plugin, Docker Compose, Kubernetes, Service Binding | External Postgres/MySQL via profiles/service binding | HTTP via k8s Service (NodePort), Service Binding via projected volume/files | 12-factor config, Service Binding spec, Containerized deployment, Liveness/Readiness probes |
