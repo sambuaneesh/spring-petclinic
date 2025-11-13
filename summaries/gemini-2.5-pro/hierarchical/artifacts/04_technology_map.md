@@ -1,0 +1,8 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Core Application & Integration** | Java | Spring Boot, Testcontainers | MySQL (for testing) | RESTful API (HTTP/JSON) | Integration Testing, Ahead-Of-Time (AOT) Compilation, Testcontainers for DB Isolation, Spring Profiles |
+| **Owner & Pet Management** | Java | Spring MVC, Spring Data JPA | Relational (via JPA) | HTTP (Web UI) | Model-View-Controller (MVC), Repository, Domain-Driven Design (DDD), Server-Side Validation, Spring Formatter |
+| **Veterinarian Management** | Java | Spring MVC, Spring Data JPA, JAXB | Relational (via JPA) | HTTP (Web UI), RESTful API (XML/JSON) | Layered Architecture, MVC, Repository, Data Transfer Object (DTO), Caching Strategy |
+| **Domain Model** | Java | Spring Data JPA (Annotations), Bean Validation (JSR-303) | Relational (ORM Mapping) | N/A (Internal Data Model) | Object-Oriented Design (OOD) with Inheritance, Domain-Driven Design (DDD), MappedSuperclass, Early Data Integrity Enforcement |
+| **System & Cross-Cutting Concerns** | Java | Spring Boot (@Configuration), Spring MVC (@Controller), JCache | N/A | HTTP (Web UI) | Separation of Concerns, Declarative Caching, Internationalization (i18n), Global Exception Handling |
+| **Business Service & Persistence Validation** | Java | Spring Data JPA, Spring Test Framework | Relational (via JPA) | N/A (Internal Service Layer) | Service Layer, Integration Testing, Repository (validated), Utility Class |

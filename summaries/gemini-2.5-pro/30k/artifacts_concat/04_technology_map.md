@@ -1,0 +1,5 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Owner Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Thymeleaf | H2, MySQL, PostgreSQL | Intra-process method calls, HTTP (Request-Response) | MVC, Repository, Aggregate (DDD), Layered Monolith |
+| **Veterinarian Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Spring Cache, Hibernate, JAXB | H2, MySQL, PostgreSQL | Intra-process method calls, HTTP (Request-Response) | MVC, Repository, Caching, Wrapper, Layered Monolith |
+| **System & Cross-Cutting Concerns** | Java | Spring Boot, Spring MVC, Spring Cache, Spring Boot Actuator, GraalVM AOT | N/A (Configures DB access for other components) | HTTP (Request-Response) | Global Exception Handling, Internationalization (i18n), Configuration Management (Profiles) |

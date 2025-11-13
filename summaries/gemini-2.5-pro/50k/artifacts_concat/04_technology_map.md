@@ -1,0 +1,6 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Owner Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Thymeleaf, Bean Validation | Relational (H2, MySQL, PostgreSQL) | HTTP/S (Web UI), In-process calls | MVC, Repository, Dependency Injection, Custom Validator, Formatter, Pagination |
+| **Veterinarian Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Thymeleaf, JCache | Relational (H2, MySQL, PostgreSQL) | HTTP/S (Web UI), REST API (JSON/XML) | MVC, Repository, Dependency Injection, Caching, Content Negotiation, Pagination |
+| **System & UI Shell** | Java, SASS | Spring Boot, Spring MVC, Thymeleaf, Bootstrap | N/A | HTTP/S (Web UI) | MVC, Internationalization (i18n), Centralized Exception Handling |
+| **Build & Deployment** | YAML, XML, Groovy | Maven, Gradle, Docker, Kubernetes, GitHub Actions, Testcontainers, JMeter | N/A | Git, Shell Scripts, API calls (CI/CD) | Infrastructure as Code (IaC), Continuous Integration/Continuous Deployment (CI/CD) |

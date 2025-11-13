@@ -1,0 +1,5 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Owner Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Thymeleaf | Relational (H2, MySQL, PostgreSQL) | Synchronous intra-process method calls, HTTP (Web UI) | Model-View-Controller (MVC), Repository, Aggregate (Domain-Driven Design) |
+| **Veterinarian Management** | Java | Spring Boot, Spring MVC, Spring Data JPA, Hibernate, Spring Cache, JAXB, Thymeleaf | Relational (H2, MySQL, PostgreSQL) | Synchronous intra-process method calls, HTTP (Web UI and JSON/XML API) | Model-View-Controller (MVC), Repository, Caching, Data Transfer Object (DTO), Pagination |
+| **System & Cross-Cutting Concerns** | Java | Spring Boot, Spring MVC, Spring Cache, JCache, GraalVM | N/A (Handles configuration, not direct data access) | Synchronous intra-process method calls, HTTP (Web UI) | Global Exception Handling, Interceptor (for i18n), Configuration as Code, Ahead-of-Time (AOT) Compilation Hints |

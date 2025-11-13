@@ -1,0 +1,131 @@
+{
+  "tool": {
+    "decomposition": {
+      "Patient Management Service": [
+        {
+          "id": "OwnerController"
+        },
+        {
+          "id": "PetValidator"
+        },
+        {
+          "id": "Visit"
+        },
+        {
+          "id": "PetController"
+        },
+        {
+          "id": "PetTypeFormatter"
+        },
+        {
+          "id": "Pet"
+        },
+        {
+          "id": "OwnerRepository"
+        },
+        {
+          "id": "Owner"
+        },
+        {
+          "id": "VisitController"
+        },
+        {
+          "id": "PetTypeRepository"
+        },
+        {
+          "id": "OwnerControllerTests"
+        },
+        {
+          "id": "PetValidatorTests"
+        },
+        {
+          "id": "PetControllerTests"
+        },
+        {
+          "id": "VisitControllerTests"
+        },
+        {
+          "id": "PetTypeFormatterTests"
+        },
+        {
+          "id": "ClinicServiceTests"
+        }
+      ],
+      "Veterinarian Staff Service": [
+        {
+          "id": "Vet"
+        },
+        {
+          "id": "Vets"
+        },
+        {
+          "id": "VetRepository"
+        },
+        {
+          "id": "VetController"
+        },
+        {
+          "id": "VetControllerTests"
+        },
+        {
+          "id": "VetTests"
+        }
+      ],
+      "Application Gateway & System Service": [
+        {
+          "id": "PetClinicRuntimeHints"
+        },
+        {
+          "id": "PetClinicApplication"
+        },
+        {
+          "id": "MySqlIntegrationTests"
+        },
+        {
+          "id": "PetClinicIntegrationTests"
+        },
+        {
+          "id": "MysqlTestApplication"
+        },
+        {
+          "id": "CacheConfiguration"
+        },
+        {
+          "id": "WebConfiguration"
+        },
+        {
+          "id": "CrashController"
+        },
+        {
+          "id": "WelcomeController"
+        },
+        {
+          "id": "CrashControllerTests"
+        },
+        {
+          "id": "I18nPropertiesSyncTest"
+        },
+        {
+          "id": "CrashControllerIntegrationTests"
+        }
+      ],
+      "Shared Domain & Core Service": [
+        {
+          "id": "NamedEntity"
+        },
+        {
+          "id": "BaseEntity"
+        },
+        {
+          "id": "Person"
+        },
+        {
+          "id": "ValidatorTests"
+        },
+        {
+          "id": "EntityUtils"
+        }
+      ]
+    }
+  }
+}

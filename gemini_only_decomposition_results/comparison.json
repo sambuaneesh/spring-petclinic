@@ -1,0 +1,126 @@
+{
+  "your_framework": {
+    "cmod": 97.4866569626395,
+    "cid": 100.0,
+    "di": 97.4866569626395
+  },
+  "microagent_published": {
+    "cmod": 79.8,
+    "cid": 100,
+    "di": 89.8
+  },
+  "comparison": {
+    "cmod": {
+      "your_value": 97.4866569626395,
+      "microagent_value": 79.8,
+      "difference": 17.686656962639503,
+      "percent_improvement": 22.163730529623436,
+      "winner": "Your Framework"
+    },
+    "cid": {
+      "your_value": 100.0,
+      "microagent_value": 100,
+      "difference": 0.0,
+      "percent_improvement": 0.0,
+      "winner": "Tie"
+    },
+    "di": {
+      "your_value": 97.4866569626395,
+      "microagent_value": 89.8,
+      "difference": 7.686656962639503,
+      "percent_improvement": 8.559751628774503,
+      "winner": "Your Framework"
+    }
+  },
+  "ranking": {
+    "cmod": {
+      "your_rank": 2,
+      "total_approaches": 6,
+      "approaches_beaten": 4,
+      "leaderboard": [
+        [
+          "MOSAIC",
+          100
+        ],
+        [
+          "MicroAgent",
+          79.8
+        ],
+        [
+          "Mono2Micro",
+          77.8
+        ],
+        [
+          "Base LLM",
+          66.7
+        ],
+        [
+          "Data-Centric",
+          64.2
+        ]
+      ]
+    },
+    "cid": {
+      "your_rank": 1,
+      "total_approaches": 6,
+      "approaches_beaten": 5,
+      "leaderboard": [
+        [
+          "MicroAgent",
+          100
+        ],
+        [
+          "Base LLM",
+          100
+        ],
+        [
+          "MOSAIC",
+          100
+        ],
+        [
+          "Mono2Micro",
+          66.7
+        ],
+        [
+          "Data-Centric",
+          66.7
+        ]
+      ]
+    },
+    "di": {
+      "your_rank": 2,
+      "total_approaches": 6,
+      "approaches_beaten": 4,
+      "leaderboard": [
+        [
+          "Base LLM",
+          100
+        ],
+        [
+          "MOSAIC",
+          100
+        ],
+        [
+          "MicroAgent",
+          89.8
+        ],
+        [
+          "Data-Centric",
+          30.9
+        ],
+        [
+          "Mono2Micro",
+          28.5
+        ]
+      ]
+    }
+  },
+  "summary": {
+    "wins": 2,
+    "ties": 1,
+    "losses": 0,
+    "overall_winner": "Your Framework",
+    "avg_improvement_percent": 10.241160719465979,
+    "significant_improvement": true
+  }
+}
