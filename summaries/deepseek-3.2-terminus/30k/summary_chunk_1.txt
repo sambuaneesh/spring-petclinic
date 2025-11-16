@@ -1,0 +1,278 @@
+# Spring PetClinic - Architectural Summary (Part 1/3)
+
+## Application Overview
+**Spring PetClinic** is a sample veterinary clinic management application built as a monolithic Spring Boot application. It demonstrates core Spring Framework features and follows traditional web application patterns.
+
+## 1. Core Components and Responsibilities
+
+### Main Application Classes
+- **PetClinicApplication**: Main Spring Boot entry point
+- **PetClinicRuntimeHints**: GraalVM native image configuration for runtime hints
+
+### Domain Model Components
+**Base Entity Hierarchy:**
+- **BaseEntity**: Abstract base class with ID generation (JPA Identity strategy)
+- **Person**: Extends BaseEntity, adds firstName/lastName with validation
+- **NamedEntity**: Extends BaseEntity, adds name field with validation
+
+**Owner Management Domain:**
+- **Owner**: Extends Person, manages pet owners with address, city, telephone
+- **OwnerController**: Handles owner CRUD operations and search
+- **OwnerRepository**: Data access layer for Owner entities
+
+**Pet Management Domain:**
+- **Pet**: Extends NamedEntity, represents pets with birthDate, type, visits
+- **PetController**: Handles pet CRUD operations
+- **PetType**: Categorizes pets (dog, cat, etc.)
+- **PetTypeRepository**: Data access for pet types
+- **PetValidator**: Custom validation for pet entities
+- **PetTypeFormatter**: Formatter for pet type display/parsing
+
+**Visit Management Domain:**
+- **Visit**: Extends BaseEntity, tracks veterinary visits with date/description
+- **VisitController**: Manages visit scheduling and creation
+
+**Veterinarian Management:**
+- **Vet**: Extends Person, represents veterinarians with specialties
+- **VetController**: Displays veterinarian lists
+- **VetRepository**: Data access for vets
+- **Specialty**: Vet specialization categories
+- **Vets**: Wrapper class for vet collections
+
+**System Components:**
+- **CacheConfiguration**: JCache configuration with Caffeine
+- **WebConfiguration**: Internationalization (i18n) setup
+- **WelcomeController**: Handles welcome page
+- **CrashController**: Error simulation for testing
+
+## 2. API Endpoints and Interfaces
+
+### RESTful Web Interfaces
+
+**Owner Endpoints:**
+```
+GET  /owners/new                    - Show owner creation form
+POST /owners/new                    - Create new owner
+GET  /owners/find                   - Show owner search form  
+GET  /owners?page={page}            - Search owners by last name (paginated)
+GET  /owners/{ownerId}/edit         - Show owner edit form
+POST /owners/{ownerId}/edit         - Update owner
+GET  /owners/{ownerId}              - Show owner details
+```
+
+**Pet Endpoints:**
+```
+GET  /owners/{ownerId}/pets/new     - Show pet creation form
+POST /owners/{ownerId}/pets/new     - Create new pet
+GET  /owners/{ownerId}/pets/{petId}/edit - Show pet edit form
+POST /owners/{ownerId}/pets/{petId}/edit - Update pet
+```
+
+**Visit Endpoints:**
+```
+GET  /owners/{ownerId}/pets/{petId}/visits/new - Show visit creation form
+POST /owners/{ownerId}/pets/{petId}/visits/new - Create new visit
+```
+
+**Veterinarian Endpoints:**
+```
+GET  /vets                          - Display veterinarian list
+```
+
+**System Endpoints:**
+```
+GET  /                              - Welcome page
+GET  /oups                         - Error simulation endpoint
+```
+
+## 3. Database Schemas and Data Models
+
+### Entity Relationships
+```
+Owner (1) -----> (N) Pet (1) -----> (N) Visit
+                         |
+                         v
+                    PetType (lookup)
+                    
+Vet (N) -----> (N) Specialty (lookup)
+```
+
+### JPA Entity Details
+
+**Owner:**
+```java
+@Entity @Table(name = "owners")
+- id: Integer (inherited)
+- firstName: String (@NotBlank)
+- lastName: String (@NotBlank) 
+- address: String (@NotBlank)
+- city: String (@NotBlank)
+- telephone: String (@NotBlank, @Pattern("\\d{10}"))
+- pets: List<Pet> (OneToMany, EAGER fetch)
+```
+
+**Pet:**
+```java
+@Entity @Table(name = "pets")  
+- id: Integer (inherited)
+- name: String (@NotBlank)
+- birthDate: LocalDate (@DateTimeFormat)
+- type: PetType (ManyToOne)
+- visits: Set<Visit> (OneToMany, EAGER fetch, ordered by date)
+```
+
+**Visit:**
+```java
+@Entity @Table(name = "visits")
+- id: Integer (inherited)
+- date: LocalDate (@DateTimeFormat, defaults to current date)
+- description: String (@NotBlank)
+```
+
+**PetType:**
+```java
+@Entity @Table(name = "types")
+- id: Integer (inherited)
+- name: String (@NotBlank)
+```
+
+**Vet:**
+```java
+- id: Integer (inherited)
+- firstName: String (@NotBlank)
+- lastName: String (@NotBlank)
+- specialties: Set<Specialty>
+```
+
+### Supported Databases
+- **H2** (default, in-memory)
+- **MySQL** (profile: `mysql`)
+- **PostgreSQL** (profile: `postgres`)
+
+## 4. Service Dependencies and Communication Patterns
+
+### External Dependencies
+- **Spring Boot Starter Web** - Web MVC framework
+- **Spring Boot Starter Data JPA** - Database access
+- **Spring Boot Starter Validation** - Bean validation
+- **Spring Boot Starter Thymeleaf** - Template engine
+- **Spring Boot Starter Cache** - Caching support
+- **Spring Boot Starter Actuator** - Monitoring
+
+### Database Drivers
+- H2 Database (runtime)
+- MySQL Connector/J (runtime)  
+- PostgreSQL Driver (runtime)
+
+### Caching Dependencies
+- JCache API
+- Caffeine Cache implementation
+
+### Communication Patterns
+- **Synchronous Request-Response** (traditional web MVC)
+- **Repository Pattern** for data access
+- **Direct Database Access** via Spring Data JPA
+- **Server-Side Rendering** with Thymeleaf templates
+
+## 5. Key Business Logic and Algorithms
+
+### Validation Logic
+- **Owner Validation**: Telephone must be 10 digits, required fields validation
+- **Pet Validation**: Name required, birth date cannot be future, type required
+- **Custom PetValidator**: Validates pet creation/update business rules
+
+### Search and Pagination
+- **Owner Search**: Case-insensitive last name search with pagination (5 results per page)
+- **Pagination Algorithm**: Spring Data Pageable with PageRequest
+
+### Business Rules
+- **Pet Uniqueness**: No duplicate pet names per owner
+- **Visit Ordering**: Visits displayed in chronological order
+- **Date Validation**: Birth dates cannot be in the future
+
+### Caching Strategy
+- **Vet List Caching**: JCache with statistics enabled for veterinarian data
+
+## 6. Configuration and Deployment Details
+
+### Build Configuration
+- **Java Version**: 17
+- **Build Tools**: Maven (primary), Gradle (alternative)
+- **Packaging**: Executable JAR with embedded Tomcat
+
+### Application Properties
+- Multiple profile configurations: `application.properties`, `application-mysql.properties`, `application-postgres.properties`
+- Database configuration via Spring profiles
+- Internationalization support with multiple language files
+
+### Containerization
+**Docker Support:**
+- `docker-compose.yml` for MySQL and PostgreSQL services
+- Spring Boot build-image plugin for application containerization
+- Kubernetes deployment manifests in `k8s/` directory
+
+### Deployment Options
+1. **Local JAR**: `java -jar target/*.jar`
+2. **Docker Container**: `./mvnw spring-boot:build-image`
+3. **Kubernetes**: Using provided k8s manifests
+4. **Development**: `./mvnw spring-boot:run` with hot reload
+
+### Database Configuration
+- **Default**: H2 in-memory with console at `/h2-console`
+- **MySQL**: Activate with `spring.profiles.active=mysql`
+- **PostgreSQL**: Activate with `spring.profiles.active=postgres`
+
+## 7. Architectural Patterns and Frameworks
+
+### Core Patterns
+- **MVC Pattern**: Clear separation of controllers, models, and views
+- **Repository Pattern**: Spring Data JPA repositories for data access
+- **Layered Architecture**: Presentation → Business → Data layers
+- **Domain-Driven Design**: Rich domain model with entity relationships
+
+### Framework Stack
+- **Spring Boot 3.5.0** - Application framework
+- **Spring MVC** - Web framework
+- **Spring Data JPA** - Data access abstraction
+- **Thymeleaf** - Server-side templating
+- **Hibernate/JPA** - ORM implementation
+- **Bean Validation** - Input validation
+- **Spring Cache** - Caching abstraction
+
+### Internationalization
+- Session-based locale resolution
+- URL parameter language switching (`?lang=de`)
+- Multiple language support: EN, DE, ES, FA, KO, PT, RU, TR
+
+### Frontend Architecture
+- **Bootstrap 5.3.6** - CSS framework (via WebJars)
+- **SCSS** - CSS preprocessor (compiled via Maven profile)
+- **Font Awesome** - Icons
+- **Responsive Design** - Mobile-friendly templates
+
+### Testing Strategy
+- **Spring Boot Test** - Integration testing
+- **Testcontainers** - Database testing
+- **JUnit 5** - Test framework
+- **JMeter** - Performance testing plans
+
+## Microservice Decomposition Analysis Notes
+
+### Potential Service Boundaries
+1. **Owner Service**: Owner management, search, and profile operations
+2. **Pet Service**: Pet registration, medical records, type management  
+3. **Visit Service**: Appointment scheduling and visit tracking
+4. **Veterinarian Service**: Vet management and specialty catalog
+5. **Reference Data Service**: Pet types, specialties lookup data
+
+### Data Ownership Considerations
+- Strong coupling between Owner and Pet entities
+- Visit entity spans both Pet and business process domains
+- Reference data (PetType, Specialty) could be separate service
+
+### Integration Points
+- Current monolithic database would need decomposition
+- Shared validation logic would require service contracts
+- Pagination and search would need cross-service coordination
+
+This summary provides the foundation for analyzing microservice decomposition opportunities, highlighting the current monolithic structure and identifying natural service boundaries based on domain cohesion and data relationships.

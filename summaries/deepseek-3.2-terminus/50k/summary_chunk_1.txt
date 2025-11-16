@@ -1,0 +1,222 @@
+# Spring PetClinic - Architectural Summary for Microservice Decomposition
+
+## 1. Application Overview
+**Spring PetClinic** is a monolithic Spring Boot web application for managing a veterinary clinic, built with Java 17 and supporting multiple database backends.
+
+## 2. Core Components and Responsibilities
+
+### Domain Components
+
+#### **Owner Management**
+- **OwnerController**: Handles CRUD operations for pet owners
+  - Endpoints: `/owners/new`, `/owners/find`, `/owners/{id}`, `/owners/{id}/edit`
+  - Responsibilities: Owner creation, search, update, and display
+- **OwnerRepository**: Data access layer for Owner entities
+- **Owner Entity**: Represents clinic clients with personal info and pet relationships
+
+#### **Pet Management**
+- **PetController**: Manages pet lifecycle operations
+  - Endpoints: `/owners/{ownerId}/pets/new`, `/owners/{ownerId}/pets/{petId}/edit`
+  - Responsibilities: Pet registration, updates, validation
+- **Pet Entity**: Represents individual pets with type, birth date, and visit history
+- **PetValidator**: Custom validation for pet data
+
+#### **Veterinarian Management**
+- **VetController**: Manages veterinarian information
+  - Endpoints: `/vets.html` (HTML), `/vets` (JSON/XML API)
+  - Responsibilities: Vet listing with pagination
+- **VetRepository**: Data access with caching enabled
+- **Vet Entity**: Represents veterinarians with specialties
+
+#### **Visit Management**
+- **VisitController**: Handles pet visit records
+  - Endpoints: `/owners/{ownerId}/pets/{petId}/visits/new`
+  - Responsibilities: Visit scheduling and recording
+- **Visit Entity**: Tracks pet medical visits
+
+### System Components
+
+#### **Configuration & Infrastructure**
+- **CacheConfiguration**: JCache configuration with Caffeine provider
+- **WebConfiguration**: Internationalization (i18n) setup with locale resolution
+- **PetClinicRuntimeHints**: GraalVM native image configuration
+
+#### **Presentation Layer**
+- **WelcomeController**: Home page handling
+- **CrashController**: Error simulation for testing
+- **Thymeleaf Templates**: Server-side rendering with Bootstrap CSS
+
+## 3. Database Schema and Data Models
+
+### Entity Hierarchy
+```
+BaseEntity (id: Integer)
+  ├── NamedEntity (name: String)
+  │     ├── PetType
+  │     ├── Specialty
+  │     └── Pet
+  └── Person (firstName, lastName: String)
+        ├── Owner (address, city, telephone: String)
+        └── Vet
+```
+
+### Core Tables
+- **owners**: Client information with contact details
+- **pets**: Animal records with owner relationships
+- **visits**: Medical visit history
+- **vets**: Veterinarian staff
+- **specialties**: Medical specialties
+- **vet_specialties**: Many-to-many vet-specialty relationships
+- **types**: Pet categories (cat, dog, etc.)
+
+### Database Support
+- **H2**: In-memory development database
+- **MySQL**: Production-ready with specific schema
+- **PostgreSQL**: Production-ready with specific schema
+- **HSQLDB**: Alternative in-memory option
+
+## 4. API Endpoints and Interfaces
+
+### RESTful Endpoints
+```
+GET  /                    - Welcome page
+GET  /owners/find         - Owner search form
+GET  /owners              - Owner search results
+GET  /owners/{id}         - Owner details
+GET  /owners/new          - Owner creation form
+POST /owners/new          - Create owner
+GET  /owners/{id}/edit    - Owner edit form  
+POST /owners/{id}/edit    - Update owner
+
+GET  /owners/{id}/pets/new              - Pet creation form
+POST /owners/{id}/pets/new              - Create pet
+GET  /owners/{id}/pets/{petId}/edit     - Pet edit form
+POST /owners/{id}/pets/{petId}/edit     - Update pet
+
+GET  /owners/{id}/pets/{petId}/visits/new  - Visit creation form
+POST /owners/{id}/pets/{petId}/visits/new  - Create visit
+
+GET  /vets.html           - Veterinarian list (HTML)
+GET  /vets                - Veterinarian list (JSON/XML)
+GET  /oups                - Error simulation
+```
+
+### Data Formats
+- **HTML**: Primary presentation format via Thymeleaf
+- **JSON**: API responses for `/vets` endpoint
+- **XML**: Alternative API format with JAXB annotations
+
+## 5. Service Dependencies and Communication Patterns
+
+### External Dependencies
+- **Spring Boot 3.5.0**: Core framework
+- **Spring Data JPA**: Database abstraction
+- **Spring MVC**: Web layer
+- **Spring Boot Actuator**: Monitoring endpoints
+- **Thymeleaf**: Templating engine
+- **Bootstrap 5.3.6**: Frontend framework
+- **Caffeine**: Caching implementation
+
+### Database Communication
+- **JPA/Hibernate**: ORM with entity relationships
+- **Spring Data Repository Pattern**: Standardized data access
+- **Connection Pooling**: Managed by Spring Boot
+
+### Caching Strategy
+- **JCache API**: Standard caching interface
+- **Caffeine Provider**: High-performance cache
+- **Cache Name**: "vets" for veterinarian data
+- **Configuration**: Statistics enabled for JMX monitoring
+
+## 6. Key Business Logic and Algorithms
+
+### Validation Logic
+- **Owner Validation**: Telephone format (10 digits), required fields
+- **Pet Validation**: Name uniqueness per owner, birth date not in future
+- **Custom Validators**: PetValidator for complex validation rules
+
+### Search and Pagination
+- **Owner Search**: Last name prefix matching with pagination (5 records per page)
+- **Vet Listing**: Paginated display with 5 records per page
+- **Pet Visit Ordering**: Chronological sorting of medical visits
+
+### Business Rules
+- **Pet Ownership**: One owner per pet, bidirectional relationship
+- **Visit Management**: Automatic date setting to current date
+- **Data Integrity**: Referential integrity through JPA relationships
+
+## 7. Configuration and Deployment Details
+
+### Build Configuration
+- **Java Version**: 17
+- **Build Tools**: Maven (primary), Gradle (alternative)
+- **Packaging**: Executable JAR or container image
+
+### Database Configuration
+```properties
+# Default: H2 in-memory
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.sql.init.mode=always
+
+# MySQL Profile
+spring.profiles.active=mysql
+spring.datasource.url=jdbc:mysql://localhost/petclinic
+
+# PostgreSQL Profile  
+spring.profiles.active=postgres
+spring.datasource.url=jdbc:postgresql://localhost/petclinic
+```
+
+### Containerization
+- **Docker Compose**: MySQL and PostgreSQL services
+- **Kubernetes**: k8s manifests for deployment
+- **Spring Boot Build Image**: Container image creation via Maven plugin
+
+### Deployment Options
+- **Local JAR**: `java -jar target/*.jar`
+- **Docker**: `docker-compose up` with database services
+- **Kubernetes**: k8s deployment with service binding
+- **Cloud Native**: GraalVM native image support
+
+## 8. Architectural Patterns and Frameworks
+
+### Core Patterns
+- **MVC Pattern**: Clear separation between controllers, models, and views
+- **Repository Pattern**: Abstract data access layer
+- **Dependency Injection**: Spring-managed component lifecycle
+- **RESTful Design**: Resource-oriented URL structure
+
+### Framework Usage
+- **Spring Boot**: Auto-configuration and starter dependencies
+- **Spring Data JPA**: Repository abstraction with query methods
+- **Spring Validation**: Bean validation with custom validators
+- **Spring Caching**: Declarative caching with annotations
+- **Spring Internationalization**: Multi-language support
+
+### Frontend Architecture
+- **Server-Side Rendering**: Thymeleaf templates with fragments
+- **Responsive Design**: Bootstrap CSS framework
+- **Progressive Enhancement**: Basic HTML with CSS/JS enhancements
+- **Internationalization**: Message bundles for multiple languages
+
+## 9. Microservice Decomposition Opportunities
+
+### Potential Service Boundaries
+1. **Owner Service**: Customer management and pet ownership
+2. **Veterinarian Service**: Staff management and scheduling  
+3. **Medical Records Service**: Visit tracking and pet health history
+4. **Reference Data Service**: Pet types and medical specialties
+
+### Shared Dependencies
+- **Common Data Models**: BaseEntity, Person hierarchies
+- **Database Schema**: Shared relationships would need decoupling
+- **Internationalization**: Centralized message management
+- **Caching Strategy**: Distributed cache coordination
+
+### Migration Considerations
+- **Database Per Service**: Separate data ownership
+- **API Gateway**: Unified entry point for client applications
+- **Event-Driven Communication**: For cross-service data consistency
+- **Service Discovery**: Dynamic service location in distributed environment
+
+This architectural summary provides comprehensive coverage of the Spring PetClinic application's structure, suitable for planning microservice decomposition while preserving all critical business functionality and data relationships.

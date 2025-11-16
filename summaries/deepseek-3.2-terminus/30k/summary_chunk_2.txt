@@ -1,0 +1,182 @@
+# Architectural Summary - PetClinic Application (Part 2/3)
+
+## 1. Component Overview
+
+### Core Components and Responsibilities
+
+**WelcomeController**
+- Handles root URL ("/") requests
+- Returns welcome page view
+- Simple routing component for application entry point
+
+**Vet Management Components**
+- `Vet`: Domain entity representing veterinarians with specialties
+- `Specialty`: Domain entity for vet specialties (radiology, surgery, dentistry)
+- `VetController`: Handles vet listing with pagination and JSON/XML responses
+- `VetRepository`: Data access layer for vet entities with caching
+- `Vets`: Wrapper class for vet collections supporting XML marshalling
+
+## 2. API Endpoints and Interfaces
+
+### Web Controllers
+
+**WelcomeController**
+- `GET /` → Returns welcome page
+
+**VetController**
+- `GET /vets.html` → HTML vet list with pagination (5 items per page)
+- `GET /vets` → JSON/XML vet list (all vets)
+- Query parameter: `page` (default: 1) for pagination
+
+## 3. Database Architecture
+
+### Schema Design
+
+**Core Tables:**
+- `vets`: id, first_name, last_name
+- `specialties`: id, name  
+- `vet_specialties`: vet_id, specialty_id (many-to-many join table)
+- `owners`: id, first_name, last_name, address, city, telephone
+- `pets`: id, name, birth_date, type_id, owner_id
+- `types`: id, name (pet types: cat, dog, lizard, snake, bird, hamster)
+- `visits`: id, pet_id, visit_date, description
+
+### Data Models
+
+**Vet Entity:**
+```java
+@Entity
+@Table(name = "vets")
+public class Vet extends Person {
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "vet_specialties")
+    private Set<Specialty> specialties;
+    // Methods: getSpecialties(), getNrOfSpecialties(), addSpecialty()
+}
+```
+
+**Specialty Entity:**
+```java
+@Entity
+@Table(name = "specialties")
+public class Specialty extends NamedEntity {}
+```
+
+### Database Support
+- **H2** (default): In-memory development database
+- **MySQL**: Production-ready with specific schema
+- **PostgreSQL**: Production-ready with specific schema
+
+## 4. Service Dependencies & Communication
+
+### Internal Dependencies
+- `VetController` → `VetRepository` (constructor injection)
+- Repository layer uses Spring Data JPA
+- Caching enabled for vet queries (`@Cacheable("vets")`)
+
+### External Dependencies
+- **Database**: H2/MySQL/PostgreSQL
+- **Web Resources**: Bootstrap, Font Awesome via WebJars
+- **Testing**: Testcontainers for database integration tests
+
+## 5. Key Business Logic
+
+### Vet Management
+- Paginated vet listings with 5 items per page
+- Specialty management with sorted display
+- Eager fetching of vet specialties
+- Caching of vet queries for performance
+
+### Data Access Patterns
+- Repository pattern with Spring Data
+- Transactional read operations
+- Pagination support via Spring Data Pageable
+- Database-agnostic schema initialization
+
+## 6. Configuration & Deployment
+
+### Application Properties
+**Multi-database Support:**
+```properties
+# Default H2 configuration
+database=h2
+spring.sql.init.schema-locations=classpath*:db/${database}/schema.sql
+spring.sql.init.data-locations=classpath*:db/${database}/data.sql
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.open-in-view=false
+
+# Web Configuration  
+spring.thymeleaf.mode=HTML
+spring.web.resources.cache.cachecontrol.max-age=12h
+```
+
+**Database Profiles:**
+- `mysql`: MySQL database with specific connection settings
+- `postgres`: PostgreSQL database configuration
+- Default: H2 in-memory database
+
+### Deployment Features
+- Docker support via docker-compose
+- Environment variable configuration for database credentials
+- Health monitoring via Spring Boot Actuator
+- Internationalization support (8 languages)
+
+## 7. Architectural Patterns & Frameworks
+
+### Core Patterns
+- **MVC Pattern**: Clear separation between controllers, models, and views
+- **Repository Pattern**: Data access abstraction
+- **Dependency Injection**: Spring-managed components
+- **Caching Pattern**: Application-level caching for performance
+
+### Frameworks & Technologies
+- **Spring Boot**: Application framework
+- **Spring MVC**: Web layer
+- **Spring Data JPA**: Data access
+- **Hibernate**: JPA implementation
+- **Thymeleaf**: Server-side templating
+- **Bootstrap**: Front-end framework
+- **Testcontainers**: Integration testing
+
+### Frontend Architecture
+- Responsive design with Bootstrap
+- SCSS-based styling with custom theming
+- Internationalization with message bundles
+- Template fragments for reusable components
+- Static resource caching (12 hours)
+
+## 8. Testing Strategy
+
+### Test Coverage
+- **Integration Tests**: Full application testing with different databases
+- **Web MVC Tests**: Controller layer testing with mocked dependencies
+- **Validation Tests**: Bean validation testing
+- **Database Tests**: MySQL and PostgreSQL integration tests
+
+### Test Technologies
+- JUnit 5
+- Mockito for mocking
+- Spring Test framework
+- Testcontainers for database testing
+- AOT/native image testing support
+
+## 9. Microservice Decomposition Analysis
+
+### Potential Service Boundaries
+1. **Vet Service**: Manage veterinarians and specialties
+2. **Welcome Service**: Simple routing and static content
+3. **Owner Service**: (From other chunks) Owner and pet management
+4. **Visit Service**: (From other chunks) Appointment management
+
+### Data Model Considerations
+- Vet-Specialty many-to-many relationship suggests co-location
+- Shared Person base class indicates potential shared service
+- Database schema supports independent service data ownership
+
+### Integration Points
+- RESTful endpoints for vet data
+- Caching strategies for performance
+- Database migration strategies for service separation
+- Internationalization as shared concern
