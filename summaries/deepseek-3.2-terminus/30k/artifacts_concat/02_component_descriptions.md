@@ -1,0 +1,13 @@
+| Component Name | Responsibility | Interfaces (key endpoints/methods) | Depends On | Technologies |
+|---------------|----------------|-----------------------------------|------------|--------------|
+| Owner Management | Manage pet owner profiles, search, and CRUD operations | `GET/POST /owners/new`, `GET /owners/find`, `GET /owners?page={page}`, `GET/POST /owners/{ownerId}/edit`, `GET /owners/{ownerId}` | PetRepository, VisitRepository | Spring MVC, Spring Data JPA, Bean Validation, Thymeleaf |
+| Pet Management | Handle pet registration, medical records, and type classification | `GET/POST /owners/{ownerId}/pets/new`, `GET/POST /owners/{ownerId}/pets/{petId}/edit` | OwnerRepository, PetTypeRepository, VisitRepository | Spring MVC, Spring Data JPA, Custom Validators, Formatters |
+| Visit Management | Schedule and track veterinary appointments and visits | `GET/POST /owners/{ownerId}/pets/{petId}/visits/new` | OwnerRepository, PetRepository | Spring MVC, Spring Data JPA, Bean Validation |
+| Veterinarian Management | Manage veterinarian profiles, specialties, and listings | `GET /vets.html`, `GET /vets` | VetRepository, Specialty entities | Spring MVC, Spring Data JPA, JCache/Caffeine |
+| Reference Data Service | Manage lookup data for pet types and vet specialties | Entity persistence and retrieval | None (base data) | Spring Data JPA, JPA/Hibernate |
+| Clinic Service Layer | Coordinate complex business operations across domains | Business method orchestration | OwnerRepository, PetTypeRepository, VetRepository | Spring Service pattern, Transaction management |
+| Welcome & Routing | Handle application entry point and basic routing | `GET /` | None | Spring MVC, Thymeleaf |
+| Error Handling | Demonstrate error scenarios and system behavior | `GET /oups` | None | Spring MVC, Exception handling |
+| Configuration & Infrastructure | Application configuration, caching, i18n, database setup | Configuration classes and properties | Spring Framework, Database drivers | Spring Boot, JCache, Caffeine, H2/MySQL/PostgreSQL |
+| Data Access Layer | Abstract database operations and entity management | Repository interfaces and implementations | JPA Entities, Database | Spring Data JPA, Hibernate, Multiple DB support |
+| Frontend Components | Server-side rendering and user interface presentation | Thymeleaf templates, static resources | Controllers, Message bundles | Thymeleaf, Bootstrap, SCSS, WebJars |

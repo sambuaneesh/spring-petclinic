@@ -1,0 +1,9 @@
+| Component Name | Language | Frameworks | Database | Communication | Patterns |
+|----------------|----------|------------|----------|---------------|----------|
+| Owner Management | Java 17 | Spring Boot 3.5.0, Spring MVC, Spring Data JPA, Bean Validation | H2 (dev), MySQL/PostgreSQL (prod) | REST/HTTP, JPA/Hibernate | MVC, Repository, Dependency Injection |
+| Pet Management | Java 17 | Spring Boot 3.5.0, Spring MVC, Spring Data JPA, Custom Validators | H2 (dev), MySQL/PostgreSQL (prod) | REST/HTTP, JPA/Hibernate | MVC, Repository, Validator, Formatter |
+| Veterinarian Management | Java 17 | Spring Boot 3.5.0, Spring MVC, Spring Data JPA, JCache/Caffeine | H2 (dev), MySQL/PostgreSQL (prod) | REST/HTTP, JSON/XML, JPA/Hibernate | MVC, Repository, Caching, Pagination |
+| Visit Management | Java 17 | Spring Boot 3.5.0, Spring MVC, Spring Data JPA, Bean Validation | H2 (dev), MySQL/PostgreSQL (prod) | REST/HTTP, JPA/Hibernate | MVC, Repository, Transaction Management |
+| Configuration & Infrastructure | Java 17 | Spring Boot 3.5.0, Spring Cache, Spring Internationalization | H2 (dev), MySQL/PostgreSQL (prod) | JPA/Hibernate, JMX Monitoring | Configuration, Cache, I18n, Runtime Hints |
+| Presentation Layer | Java 17, HTML, CSS, SCSS | Thymeleaf, Bootstrap 5.3.6, Spring MVC | None (static resources) | HTTP, Server-side rendering | MVC, Template Fragments, Responsive Design |
+| Testing Framework | Java 17 | JUnit 5, Spring Boot Test, Testcontainers, MockMvc | H2, MySQL (Testcontainers), PostgreSQL (Docker) | Mock HTTP, Database connections | Integration Testing, Mocking, Container Testing |

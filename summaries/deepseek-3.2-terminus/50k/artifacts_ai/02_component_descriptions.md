@@ -1,0 +1,12 @@
+| Component Name | Responsibility | Interfaces | Depends On | Technologies |
+|----------------|-----------------|------------|------------|--------------|
+| Owner Management | Customer management and pet ownership | `GET/POST /owners/new`, `GET /owners/find`, `GET /owners/{id}`, `GET/POST /owners/{id}/edit`, `GET /owners?page=1&lastName=...` | Pet Management, Database | Spring MVC, Thymeleaf, JPA/Hibernate, Bean Validation |
+| Pet Management | Pet lifecycle and registration | `GET/POST /owners/{ownerId}/pets/new`, `GET/POST /owners/{ownerId}/pets/{petId}/edit` | Owner Management, Visit Management, PetType Repository | Spring MVC, Thymeleaf, JPA/Hibernate, Custom Validators (PetValidator) |
+| Veterinarian Management | Staff management and information | `GET /vets.html`, `GET /vets` (JSON/XML) | Specialty entities, Database | Spring MVC, Thymeleaf, JPA/Hibernate, JCache/Caffeine, JAXB |
+| Visit Management | Medical visit tracking and records | `GET/POST /owners/{ownerId}/pets/{petId}/visits/new` | Pet Management, Database | Spring MVC, Thymeleaf, JPA/Hibernate, Bean Validation |
+| Reference Data Management | Pet types and medical specialties | Entity retrieval methods | Database | JPA/Hibernate, Spring Data Repository |
+| Presentation Layer | UI rendering and user interaction | `GET /` (welcome), `GET /oups` (error simulation) | All domain controllers | Thymeleaf, Bootstrap 5.3.6, SCSS, Spring MVC |
+| Configuration & Infrastructure | Application configuration and setup | Configuration classes, Bean definitions | Spring Framework, Database | Spring Boot 3.5.0, JCache API, Caffeine, Internationalization |
+| Data Access Layer | Database operations and persistence | Repository interfaces (OwnerRepository, PetRepository, VetRepository, etc.) | Database, JPA entities | Spring Data JPA, Hibernate, H2/MySQL/PostgreSQL |
+| Validation & Business Logic | Data validation and business rules | Custom validators (PetValidator), utility classes | Domain entities, Spring Validation | Bean Validation, Custom Validators, Spring Utilities |
+| Testing Framework | Application testing and validation | Test classes (Integration, Web, Service, Validation tests) | Application components | JUnit 5, Spring Boot Test, Testcontainers, MockMvc, Mockito |

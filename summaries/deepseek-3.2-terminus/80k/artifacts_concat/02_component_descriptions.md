@@ -1,0 +1,10 @@
+| Component Name | Responsibility | Interfaces | Depends On | Technologies |
+|----------------|-----------------|------------|------------|--------------|
+| Owner Management | Owner registration, profile management, search functionality | `GET/POST /owners/new`, `GET /owners/find`, `GET /owners?page=1&lastName=name`, `GET/POST /owners/{ownerId}/edit`, `GET /owners/{ownerId}` | Database, Validation API | Spring MVC, Spring Data JPA, Hibernate, Bean Validation, Thymeleaf |
+| Pet Management | Pet registration, type management, birth date validation | `GET/POST /owners/{ownerId}/pets/new`, `GET/POST /owners/{ownerId}/pets/{petId}/edit` | Owner Management, Database, Validation API | Spring MVC, Spring Data JPA, Hibernate, Bean Validation, Thymeleaf |
+| Veterinarian Management | Vet directory, specialty management, cached data access | `GET /vets.html?page=1`, `GET /vets` | Database, Cache | Spring MVC, Spring Data JPA, Hibernate, JCache, Caffeine, Thymeleaf |
+| Visit Management | Visit scheduling, medical history tracking | `GET/POST /owners/{ownerId}/pets/{petId}/visits/new` | Owner Management, Pet Management, Database | Spring MVC, Spring Data JPA, Hibernate, Thymeleaf |
+| System Configuration | Internationalization support, caching configuration, error handling | `GET /`, `GET /oups`, Locale resolution, Cache configuration | Spring Framework | Spring Boot, Spring MVC, JCache, Caffeine, Thymeleaf |
+| Infrastructure | Application bootstrap, native image configuration | Main application class, Runtime hints | Spring Boot | Spring Boot, GraalVM Native Image |
+| Data Access Layer | Database operations and entity management | OwnerRepository, PetRepository, VetRepository, PetTypeRepository | Database | Spring Data JPA, Hibernate, H2/MySQL/PostgreSQL |
+| Domain Model | Core business entities and relationships | Owner, Pet, Vet, Visit, Specialty entities | Validation API | JPA/Hibernate, Bean Validation |

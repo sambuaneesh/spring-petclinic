@@ -1,0 +1,20 @@
+| Component Name | Responsibility | Interfaces (key endpoints or methods) | Depends On | Technologies |
+|----------------|----------------|--------------------------------------|------------|--------------|
+| PetClinicApplication | Main Spring Boot entry point and application bootstrap | `main()` method, Spring Boot auto-configuration | Spring Boot starters, Database drivers | Spring Boot 3.5.0, Java 17, Maven/Gradle |
+| WelcomeController | Handles root URL requests and welcome page display | `GET /` - Welcome page | None (minimal dependencies) | Spring MVC, Thymeleaf |
+| OwnerController | Manages owner CRUD operations and search functionality | `GET /owners/new`, `POST /owners/new`, `GET /owners/find`, `GET /owners?page={page}`, `GET /owners/{ownerId}/edit`, `POST /owners/{ownerId}/edit`, `GET /owners/{ownerId}` | OwnerRepository, PetRepository | Spring MVC, Thymeleaf, Bean Validation |
+| PetController | Handles pet registration and management operations | `GET /owners/{ownerId}/pets/new`, `POST /owners/{ownerId}/pets/new`, `GET /owners/{ownerId}/pets/{petId}/edit`, `POST /owners/{ownerId}/pets/{petId}/edit` | OwnerRepository, PetRepository, PetTypeRepository | Spring MVC, Thymeleaf, Custom Validators |
+| VisitController | Manages veterinary visit scheduling and tracking | `GET /owners/{ownerId}/pets/{petId}/visits/new`, `POST /owners/{ownerId}/pets/{petId}/visits/new` | OwnerRepository, PetRepository | Spring MVC, Thymeleaf, Bean Validation |
+| VetController | Displays veterinarian lists in multiple formats | `GET /vets.html?page={page}`, `GET /vets` (JSON/XML) | VetRepository | Spring MVC, Thymeleaf, Jackson XML/JSON |
+| CrashController | Error simulation endpoint for testing purposes | `GET /oups` - Error simulation | None | Spring MVC |
+| OwnerRepository | Data access layer for Owner entities | Spring Data JPA methods: `findByLastNameContainingIgnoreCase()`, `findAll()`, `findById()`, `save()` | Database, JPA | Spring Data JPA, Hibernate, MySQL/PostgreSQL/H2 |
+| PetRepository | Data access layer for Pet entities | Spring Data JPA methods: `findById()`, `save()` | Database, JPA | Spring Data JPA, Hibernate, MySQL/PostgreSQL/H2 |
+| VetRepository | Data access layer for Vet entities with caching | Spring Data JPA methods: `findAll()`, `findById()` | Database, JPA, Cache | Spring Data JPA, Hibernate, JCache, Caffeine |
+| PetTypeRepository | Data access layer for PetType reference data | Spring Data JPA methods: `findAll()`, `findById()` | Database, JPA | Spring Data JPA, Hibernate, MySQL/PostgreSQL/H2 |
+| ClinicService | Core business logic integration layer | Business methods coordinating multiple repositories | OwnerRepository, PetTypeRepository, VetRepository | Spring Service pattern, Transaction management |
+| Domain Entities (Owner, Pet, Vet, Visit, etc.) | Core business domain modeling and data representation | JPA entity fields, relationships, validation annotations | JPA, Database | JPA/Hibernate, Bean Validation, Lombok |
+| PetValidator | Custom validation for pet business rules | `validate()` method, business rule enforcement | Pet entity, PetType | Spring Validation, Custom business logic |
+| PetTypeFormatter | Formatter for pet type display and parsing | `print()`, `parse()` methods | PetTypeRepository | Spring Formatter, Type conversion |
+| CacheConfiguration | JCache configuration with Caffeine implementation | Cache manager setup, cache configuration | JCache API, Caffeine | JCache, Caffeine, Spring Cache abstraction |
+| WebConfiguration | Internationalization and web configuration | Locale resolution, message source configuration | Spring Web, Thymeleaf | Spring Web MVC, i18n, Resource handling |
+| EntityUtils | Utility for entity retrieval operations | Helper methods for entity operations | Domain entities | Java utility class pattern |
