@@ -1,0 +1,137 @@
+
+## Spring PetClinic Architectural Summary (Part 1/3)
+
+### **Application Overview**
+- **Framework**: Spring Boot 3.5.0 application with Java 17
+- **Architecture Pattern**: Traditional monolithic with layered design
+- **Primary Technology Stack**: Spring MVC, JPA/Hibernate, Thymeleaf
+- **Build Tools**: Maven (primary) and Gradle support
+- **Deployment**: Executable JAR, Docker, Kubernetes, Docker Compose
+
+### **Core Domain Models**
+```java
+BaseEntity (Abstract)
+├── NamedEntity (Abstract)
+│   └── PetType
+├── Person (Abstract)
+│   └── Owner
+└── Visit
+```
+
+**Entity Details:**
+- **BaseEntity**: Auto-generated ID (IDENTITY strategy), serializable
+- **NamedEntity**: Extends BaseEntity with required name field
+- **Person**: Extends BaseEntity with firstName/lastName validation
+- **Owner**: Extends Person with address, city, telephone (10-digit validation), one-to-many pets
+- **Pet**: NamedEntity with birthDate, PetType, one-to-many visits
+- **Visit**: BaseEntity with LocalDate and description
+- **PetType**: Simple named entity for categorization
+
+### **Database Layer**
+**Supported Databases:**
+- H2 (default, in-memory)
+- MySQL (via `spring.profiles.active=mysql`)
+- PostgreSQL (via `spring.profiles.active=postgres`)
+
+**Schema & Data:**
+- Separate schema files in `/src/main/resources/db/{database}/`
+- Initial data population via `data.sql`
+- JPA entities mapped to tables: owners, pets, types, visits
+
+**Repository Pattern:**
+```java
+OwnerRepository extends JpaRepository<Owner, Integer>
+├── findByLastNameStartingWith(String, Pageable)
+└── findById(Integer)
+
+PetTypeRepository extends JpaRepository<PetType, Integer>
+└── findPetTypes() (ORDER BY name)
+```
+
+### **Web Layer - API Endpoints**
+**Owner Management:**
+- `GET /owners/find` - Search form
+- `GET /owners` - Find owners with pagination
+- `GET /owners/{ownerId}` - Owner details
+- `GET /owners/new` - Create form
+- `POST /owners/new` - Create owner
+- `GET /owners/{ownerId}/edit` - Update form
+- `POST /owners/{ownerId}/edit` - Update owner
+
+**Pet Management:**
+- `GET /owners/{ownerId}/pets/new` - Create pet form
+- `POST /owners/{ownerId}/pets/new` - Create pet
+- `GET /owners/{ownerId}/pets/{petId}/edit` - Update pet form
+- `POST /owners/{ownerId}/pets/{petId}/edit` - Update pet
+
+**Visit Management:**
+- `GET /owners/{ownerId}/pets/{petId}/visits/new` - Create visit form
+- `POST /owners/{ownerId}/pets/{petId}/visits/new` - Create visit
+
+### **Business Logic & Validation**
+**Key Rules:**
+- Pet name uniqueness within owner scope
+- Telephone must be exactly 10 digits
+- Birth dates cannot be future dates
+- Required field validation on name, type, birth date (custom PetValidator)
+- Visit date defaults to current date
+
+**Custom Components:**
+- `PetValidator`: Validates pet-specific constraints
+- `PetTypeFormatter`: String ↔ PetType conversion for forms
+
+### **System Configuration**
+**Caching:**
+- JCache API with Caffeine implementation
+- Statistics enabled for "vets" cache
+- CacheConfiguration customizer bean
+
+**Internationalization:**
+- Session-based locale resolution
+- URL parameter language switching (?lang=de)
+- Message bundles for 8 languages
+- WebConfiguration with LocaleChangeInterceptor
+
+**Native Image Support:**
+- GraalVM runtime hints for model classes
+- Resource patterns for db/ and messages/
+
+### **Build & Deployment Configuration**
+**Maven Dependencies:**
+```xml
+Core: spring-boot-starter-web, data-jpa, validation, thymeleaf
+Database: h2 (runtime), mysql-connector-j, postgresql
+Caching: spring-boot-starter-cache, caffeine
+Frontend: webjars-locator-lite, bootstrap, font-awesome
+Testing: spring-boot-starter-test, testcontainers
+```
+
+**Deployment Artifacts:**
+- Docker images via Spring Boot buildpacks
+- Kubernetes configs in `/k8s/`
+- Docker Compose for databases
+- JMX health probes (`/livez`, `/readyz`)
+
+### **Key Technical Patterns**
+1. **Repository Pattern**: Spring Data JPA repositories
+2. **DTO Avoidance**: Direct entity usage in views
+3. **Pagination**: Pageable for owner listings (5 per page)
+4. **Transaction Management**: Spring's @Transactional (implicit via repositories)
+5. **Form Validation**: Bean Validation + custom validators
+6. **Error Handling**: Global exception handling via Spring Boot defaults
+
+### **Monitoring & Operations**
+- Spring Boot Actuator endpoints
+- Health probes for Kubernetes
+- JCache statistics via JMX
+- Build info exposure via git-commit-id plugin
+- SBOM generation via CycloneDX plugin
+
+### **Development Features**
+- Hot reload via spring-boot-devtools
+- Checkstyle code quality enforcement
+- JaCoCo coverage reporting
+- SCSS compilation pipeline for frontend
+- Multi-database test suites (H2, MySQL, PostgreSQL)
+
+This architecture forms a cohesive monolithic application with clear separation of concerns, making it suitable for microservice decomposition along domain boundaries (Owners, Pets, Visits, Vets). The extensive use of Spring abstractions provides clear extension points for service extraction.

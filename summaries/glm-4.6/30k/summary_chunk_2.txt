@@ -1,0 +1,124 @@
+
+## Comprehensive Architectural Summary - Part 2: Veterinary Management System
+
+### 1. **Core Components & Responsibilities**
+- **VetController**
+  - Handles HTTP requests for veterinary operations
+  - Supports both HTML (`/vets.html`) and JSON (`/vets`) endpoints
+  - Implements pagination (5 vets per page)
+  - Dependencies: VetRepository
+
+- **VetRepository**
+  - Data access layer for Vet entities
+  - Implements caching (`@Cacheable("vets")`)
+  - Provides paginated and non-paginated queries
+  - Read-only transactions
+
+- **Domain Models**
+  - `Vet`: Extends Person, represents veterinarians with specialties
+  - `Specialty`: Extends NamedEntity, models veterinary specialties
+  - `Vets`: Wrapper for vet collections (XML/JSON serialization)
+
+- **WelcomeController**
+  - Simple root path ("/") handler
+  - Returns welcome view
+
+### 2. **API Endpoints**
+| Method | Path | Response Type | Responsibility |
+|--------|------|---------------|----------------|
+| GET | `/` | View (welcome) | Home page |
+| GET | `/vets.html` | View (HTML) | Paginated vet listing |
+| GET | `/vets` | JSON | Full vet list (API) |
+
+### 3. **Database Schema**
+**Core Tables:**
+- `vets` (id, first_name, last_name)
+- `specialties` (id, name)
+- `vet_specialties` (vet_id, specialty_id) - M-M join table
+- `owners` (id, first_name, last_name, address, city, telephone)
+- `pets` (id, name, birth_date, type_id, owner_id)
+- `visits` (id, pet_id, visit_date, description)
+
+**Indexing:**
+- Performance indexes on frequently queried fields (last_name, name, pet_id)
+
+### 4. **Data Management**
+- **Multi-database Support:** H2 (default), MySQL, PostgreSQL
+- **Initialization:**
+  - Schema: `src/main/resources/db/{DB}/schema.sql`
+  - Data: `src/main/resources/db/{DB}/data.sql`
+- **Configuration Profiles:**
+  - `h2` (default), `mysql`, `postgres`
+
+### 5. **Web Layer (Thymeleaf)**
+**Templates:**
+- `vets/vetList.html`: Vet listing with pagination controls
+- `fragments/layout.html`: Common layout with navigation
+- `welcome.html`: Home page
+- `error.html`: Error handling
+
+**Key Features:**
+- Responsive design with Bootstrap
+- Internationalization support (8 languages)
+- Reusable fragments (input/select fields)
+
+### 6. **Configuration**
+**Application Properties:**
+- Database switching via profiles
+- Caching configuration
+- Thymeleaf settings
+- Actuator exposure
+- Internationalization setup
+
+### 7. **Service Dependencies & Communication**
+- **Internal:**
+  - VetController → VetRepository
+- **External:**
+  - Direct DB access (no inter-service communication)
+  - Static resources (CSS, fonts)
+
+### 8. **Key Business Logic**
+- **Vet Listing:** 
+  - Paginated retrieval (5/page)
+  - Specialty sorting by name
+- **Caching:** Vet list cached for performance
+
+### 9. **Testing Strategy**
+- **Integration Tests:** 
+  - Database-specific (MySQL, PostgreSQL)
+  - Full-stack endpoint testing
+- **Unit Tests:**
+  - Controller logic (`OwnerControllerTests`, `PetControllerTests`)
+  - Validation (`PetValidatorTests`, `ValidatorTests`)
+  - Formatters (`PetTypeFormatterTests`)
+
+### 10. **Architectural Patterns**
+- **MVC Pattern:** Clear separation of concerns
+- **Repository Pattern:** Data access abstraction
+- **Caching:** Performance optimization
+- **Multi-tenancy:** Database profile switching
+- **Template Method:** Fragment reuse in views
+
+### 11. **Deployment Notes**
+- Docker support via `docker-compose.yml`
+- Profile-based configuration:
+  ```bash
+  mvn spring-boot:run -Dspring-boot.run.profiles=mysql
+  ```
+- WebJars dependency management (Bootstrap)
+
+---
+
+### Microservice Decomposition Insights:
+1. **High Coherence:** Vet functionality forms a natural domain boundary
+2. **Dependencies:**
+   - Shared DB schema (tightly coupled with owners/pets)
+   - Common layout fragments
+   - Shared configuration
+3. **Decomposition Considerations:**
+   - Vets service should own `vets`, `specialties`, `vet_specialties`
+   - API-first design for `/vets` endpoint
+   - Potential data duplication for owner/pet references
+   - Would need to resolve shared UI fragments or adopt SPA architecture
+
+This module demonstrates a well-structured, database-agnostic domain component suitable for extraction into a dedicated microservice with minimal refactoring.
