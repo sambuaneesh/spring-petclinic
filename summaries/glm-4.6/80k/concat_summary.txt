@@ -1,0 +1,176 @@
+=== summary_chunk_1.txt ===
+
+
+# Spring PetClinic - Architectural Summary for Microservice Decomposition
+
+## Application Overview
+The Spring PetClinic is a Spring Boot 3.5.0 application demonstrating a veterinary clinic management system. It's built with Java 17 using the Spring Framework ecosystem and showcases typical web application patterns with database persistence.
+
+## Domain Models & Business Entities
+
+### Core Entities
+- **BaseEntity**: Abstract base class with auto-generated ID
+- **NamedEntity**: Extends BaseEntity, adds validated name field
+- **Person**: Extends BaseEntity, represents people (firstName, lastName)
+- **Owner**: Extends Person, manages pets (address, city, telephone, pets collection)
+- **Pet**: Extends NamedEntity, veterinary patients (name, birthDate, type, visits collection)
+- **PetType**: Extends NamedEntity, pet categorization (cat, dog, etc.)
+- **Visit**: Extends BaseEntity, clinical appointments (date, description)
+- **Vet**: Extends Person, clinic staff (specialties collection)
+- **Specialty**: Extends NamedEntity, veterinary specialties
+- **Vets**: DTO wrapper for vet list serialization
+
+### Key Relationships
+- Owner 1:N Pet (cascading)
+- Pet 1:N Visit (cascading)
+- Vet N:M Specialty (via join table)
+
+## Controllers (Web Layer)
+
+### Owner Management
+- **OwnerController**: 
+  - `GET/POST /owners/new` - Owner creation
+  - `GET/POST /owners/find` - Owner search
+  - `GET /owners?page=N` - Paginated owner listing
+  - `GET/POST /owners/{id}/edit` - Owner updates
+  - `GET /owners/{id}` - Owner details view
+
+### Pet Management
+- **PetController** (scoped to owner context):
+  - `GET/POST /owners/{ownerId}/pets/new` - Pet creation
+  - `GET/POST /owners/{ownerId}/pets/{petId}/edit` - Pet updates
+
+### Visit Management
+- **VisitController**:
+  - `GET/POST /owners/{ownerId}/pets/{petId}/visits/new` - Visit creation
+
+### Veterinary Management
+- **VetController**:
+  - `GET /vets.html?page=N` - Paginated vet list (HTML)
+  - `GET /vets` - Vet list as JSON API
+
+### System
+- **WelcomeController**: Home page (`GET /`)
+- **CrashController**: Error demonstration (`GET /oups`)
+
+## Data Access Layer
+
+### Repositories
+- **OwnerRepository**:
+  - `findByLastNameStartingWith(String, Pageable)` - Searchable with pagination
+  - `findById(Integer)` - Single owner lookup
+
+- **PetTypeRepository**:
+  - `findPetTypes()` - All pet types (cached)
+
+- **VetRepository** (cached):
+  - `findAll()` - All veterinarians
+  - `findAll(Pageable)` - Paginated vets
+
+## Database Schema
+
+### Core Tables
+```sql
+owners (id, first_name, last_name, address, city, telephone)
+pets (id, name, birth_date, type_id, owner_id)
+types (id, name)
+visits (id, pet_id, visit_date, description)
+vets (id, first_name, last_name)
+specialties (id, name)
+vet_specialties (vet_id, specialty_id) -- Join table
+```
+
+### Database Support
+- **Default**: H2 (in-memory, development)
+- **Production**: MySQL 9.2, PostgreSQL 17.5
+- **Schema initialization**: SQL scripts per database type
+- **Data loading**: Idempotent data insertion scripts
+
+## Configuration & Deployment
+
+### Application Configuration
+- **CacheConfiguration**: JCache with Caffeine implementation
+- **WebConfiguration**: i18n support with session-based locale resolution
+- **RuntimeHints**: GraalVM native image configuration
+
+### Build & Deployment
+- **Build Tools**: Maven or Gradle (Java 17)
+- **Containerization**: 
+  - `spring-boot:build-image` for native containers
+  - Docker Compose for database services
+- **Kubernetes**: 
+  - Manifests in `/k8s/`
+  - Separate database (`demo-db`) and application (`petclinic`) deployments
+  - Service exposure via NodePort (port 80)
+  - Health probes (`/livez`, `/readyz`)
+
+## Key Business Logic
+
+### Validation Rules
+- **Telephone**: 10-digit numeric pattern
+- **Pet Names**: Must be unique within owner
+- **Birth Dates**: Cannot be future-dated
+- **Required Fields**: Name validation across entities
+
+### Business Workflows
+1. Owner registration → Pet addition → Visit scheduling
+2. Vet listing with specialty filtering
+3. Search functionality across domains
+4. Pagination handling (5 items per page)
+
+## Cross-Cutting Concerns
+
+### Internationalization
+- Message bundles: 8 languages (EN, DE, ES, FA, KO, PT, RU, TR)
+- URL parameter language switching: `?lang=xx`
+- Session-based locale persistence
+
+### Caching Strategy
+- Vet lists cached at repository level
+- JCache abstraction with Caffeine provider
+- Cache statistics via JMX
+
+## Testing Architecture
+
+### Test Categories
+- **Integration Tests**: Full application context with Testcontainers
+- **Controller Tests**: MockMvc for web layer
+- **Service Tests**: Repository and business logic validation
+- **Database Tests**: Multi-database (MySQL, Postgres) compatibility
+
+### Test Infrastructure
+- **Testcontainers**: MySQL and PostgreSQL in Docker
+- **Docker Compose**: Service orchestration for tests
+- **Mocking**: Mockito for isolated unit tests
+
+## API Summary
+
+| Endpoint | Method | Purpose | Response |
+|------------|--------|---------|-----------|
+| `/` | GET | Home page | HTML |
+| `/owners/new` | GET/POST | Owner creation | HTML |
+| `/owners/find` | GET/POST | Owner search | HTML |
+| `/owners` | GET | Owner list | HTML (paginated) |
+| `/owners/{id}` | GET | Owner details | HTML |
+| `/owners/{id}/edit` | GET/POST | Owner update | HTML |
+| `/owners/{id}/pets/new` | GET/POST | Pet creation | HTML |
+| `/owners/{oid}/pets/{pid}/edit` | GET/POST | Pet update | HTML |
+| `/owners/{oid}/pets/{pid}/visits/new` | GET/POST | Visit creation | HTML |
+| `/vets.html` | GET | Vet list | HTML (paginated) |
+| `/vets` | GET | Vet list API | JSON |
+| `/oups` | GET | Error demo | Error page |
+
+## Microservice Decomposition Considerations
+
+1. **Owner Service**: Managing owner data and pet associations
+2. **Pet Service**: Pet catalog and type management
+3. **Visit Service**: Clinical appointment tracking
+4. **Vet Service**: Staff and specialty directory
+5. **API Gateway**: Request routing and composition
+6. **Shared Database**: Polyglot persistence or data synchronization
+7. **Message Bus**: Asynchronous communication between services
+8. **Service Discovery**: Dynamic service location
+9. **Circuit Breakers**: Fault tolerance between services
+10. **Distributed Tracing**: Request flow visibility
+
+This monolithic application demonstrates clear domain boundaries and relationships that map well to microservice architecture, with ownership and visit management being primary candidate services for decomposition.

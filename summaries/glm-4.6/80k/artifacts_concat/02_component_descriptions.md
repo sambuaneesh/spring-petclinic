@@ -1,0 +1,9 @@
+
+| Component Name | Responsibility | Interfaces | Depends On | Technologies |
+|---|---|---|---|---|
+| Owner Service | Manages owner data, including CRUD operations, search, and viewing details. Orchestrates pet operations within its context. | `GET /owners`, `GET /owners/find`, `POST /owners/find`, `GET /owners/new`, `POST /owners/new`, `GET /owners/{id}`, `GET /owners/{id}/edit`, `POST /owners/{id}/edit` | Database, Pet Service | Spring Boot, Spring MVC, Spring Data JPA, Thymeleaf, Validation |
+| Pet Service | Manages the pet catalog, including CRUD operations for pets and defining pet types. Scoped within an owner's context. | `GET /owners/{ownerId}/pets/new`, `POST /owners/{ownerId}/pets/new`, `GET /owners/{ownerId}/pets/{petId}/edit`, `POST /owners/{ownerId}/pets/{petId}/edit` | Database, Owner Service | Spring Boot, Spring MVC, Spring Data JPA, Thymeleaf, Validation |
+| Visit Service | Tracks and manages clinical appointments (visits) for pets. | `GET /owners/{ownerId}/pets/{petId}/visits/new`, `POST /owners/{ownerId}/pets/{petId}/visits/new` | Database, Pet Service | Spring Boot, Spring MVC, Spring Data JPA, Thymeleaf |
+| Vet Service | Provides a directory of veterinary staff and their specialties. Serves both web pages and JSON data, with caching enabled. | `GET /vets.html`, `GET /vets` | Database | Spring Boot, Spring MVC, Spring Data JPA, JCache, Caffeine, Jackson, Thymeleaf |
+| Infrastructure Service | Handles system-wide configurations like caching, internationalization (i18n), and serves static/system pages like the home and error pages. | `GET /`, `GET /oups` | Message Bundles | Spring Boot, Spring MVC, JCache, Caffeine, MessageSource |
+| Database | Provides persistent storage and handles schema/data management for all services. | JDBC/SQL | None | H2 (in-memory), MySQL 9.2, PostgreSQL 17.5, JDBC |
