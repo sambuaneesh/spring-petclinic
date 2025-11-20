@@ -1,0 +1,120 @@
+### Architectural Summary of Spring PetClinic Application
+
+#### Overview
+The Spring PetClinic application is a sample application demonstrating Spring Boot capabilities. It manages veterinary clinic operations including owners, pets, visits, and veterinarians. The application uses JPA for data persistence and Thymeleaf for rendering views. It supports multiple databases (H2, MySQL, PostgreSQL) and includes internationalization (i18n) support.
+
+#### Components and Responsibilities
+
+1. **PetClinicApplication**
+   - **Responsibility**: Main entry point of the application. Initializes and runs the Spring Boot application.
+   - **Dependencies**: Uses Spring Boot auto-configuration and component scanning.
+
+2. **Owner Module**
+   - **Components**:
+     - **Owner**: Represents an owner of a pet.
+     - **Pet**: Represents a pet owned by an owner.
+     - **Visit**: Represents a visit made by a pet to the clinic.
+     - **PetType**: Represents the type of a pet (e.g., cat, dog).
+     - **Specialty**: Represents a specialty area for a veterinarian.
+     - **Vet**: Represents a veterinarian.
+   - **Responsibilities**:
+     - Manage owners, their pets, and related visits.
+     - Manage pet types and specialties.
+     - Manage veterinarians and their specialties.
+
+3. **Controllers**
+   - **OwnerController**: Handles HTTP requests related to owners and their pets.
+     - **API Endpoints**:
+       - `GET /owners/new`: Show form for creating a new owner.
+       - `POST /owners/new`: Process creation of a new owner.
+       - `GET /owners/find`: Show form for finding owners.
+       - `GET /owners`: Process finding owners by last name.
+       - `GET /owners/{ownerId}/edit`: Show form for editing an owner.
+       - `POST /owners/{ownerId}/edit`: Process editing of an owner.
+       - `GET /owners/{ownerId}`: Display details of an owner.
+   - **PetController**: Handles HTTP requests related to pets.
+     - **API Endpoints**:
+       - `GET /owners/{ownerId}/pets/new`: Show form for creating a new pet.
+       - `POST /owners/{ownerId}/pets/new`: Process creation of a new pet.
+       - `GET /owners/{ownerId}/pets/{petId}/edit`: Show form for editing a pet.
+       - `POST /owners/{ownerId}/pets/{petId}/edit`: Process editing of a pet.
+   - **VisitController**: Handles HTTP requests related to visits.
+     - **API Endpoints**:
+       - `GET /owners/{ownerId}/pets/{petId}/visits/new`: Show form for creating a new visit.
+       - `POST /owners/{ownerId}/pets/{petId}/visits/new`: Process creation of a new visit.
+   - **VetController**: Handles HTTP requests related to veterinarians.
+     - **API Endpoints**:
+       - `GET /vets.html`: Show list of veterinarians.
+       - `GET /vets`: Return list of veterinarians in JSON format.
+   - **CrashController**: Demonstrates exception handling.
+     - **API Endpoints**:
+       - `GET /oups`: Trigger an exception to showcase error handling.
+   - **WelcomeController**: Handles the home page.
+     - **API Endpoints**:
+       - `GET /`: Show the welcome page.
+
+4. **Repositories**
+   - **OwnerRepository**: Manages persistence operations for owners.
+     - **Methods**:
+       - `findByLastNameStartingWith(String lastName, Pageable pageable)`: Find owners by last name.
+       - `findById(@Nonnull Integer id)`: Find owner by ID.
+   - **PetTypeRepository**: Manages persistence operations for pet types.
+     - **Methods**:
+       - `findPetTypes()`: Find all pet types.
+   - **VetRepository**: Manages persistence operations for veterinarians.
+     - **Methods**:
+       - `findAll()`: Find all veterinarians.
+       - `findAll(Pageable pageable)`: Find all veterinarians in pages.
+
+5. **Data Models**
+   - **BaseEntity**: Base class for entities with an ID.
+   - **NamedEntity**: Extends BaseEntity and adds a name field.
+   - **Person**: Extends NamedEntity and adds first name, last name, address, city, and telephone fields.
+   - **Owner**: Extends Person and manages a list of pets.
+   - **Pet**: Extends NamedEntity and includes birth date, type, and visits.
+   - **Visit**: Extends BaseEntity and includes visit date and description.
+   - **PetType**: Extends NamedEntity and represents the type of a pet.
+   - **Specialty**: Extends NamedEntity and represents a specialty area for a veterinarian.
+   - **Vet**: Extends Person and manages a list of specialties.
+   - **Vets**: Container class for a list of veterinarians, used for XML marshalling.
+
+6. **Service Dependencies and Communication Patterns**
+   - **Communication**: Controllers interact with repositories for data persistence. Repositories use JPA to communicate with the database.
+   - **Caching**: Uses JCache for caching veterinarian data.
+   - **Internationalization**: Uses `SessionLocaleResolver` and `LocaleChangeInterceptor` for handling locales and switching languages via URL parameter.
+
+7. **Key Business Logic and Algorithms**
+   - **Owner Management**: Includes pagination, search by last name, and CRUD operations.
+   - **Pet Management**: Includes CRUD operations and validation for duplicate pet names and birth dates.
+   - **Visit Management**: Includes scheduling visits and validation for future dates.
+   - **Vet Management**: Includes fetching veterinarians and their specialties.
+
+8. **Configuration and Deployment Details**
+   - **Database Configuration**: Supports H2 (default), MySQL, and PostgreSQL. Configurations are in `application.properties`, `application-mysql.properties`, and `application-postgres.properties`.
+   - **Docker Compose**: Provides configurations for MySQL and PostgreSQL databases.
+     - **Services**:
+       - `mysql`: MySQL database service.
+       - `postgres`: PostgreSQL database service.
+   - **Kubernetes Configuration**: Provided in `k8s/` directory.
+     - **Secrets**: Stores database credentials.
+     - **Services**: Defines service for accessing the application.
+     - **Deployments**: Deploys the application and database containers.
+   - **Build Tools**: Supports both Maven and Gradle for building the application.
+     - **Maven Wrapper**: Uses `mvnw` and `mvnw.cmd` scripts for Maven builds.
+     - **Gradle Wrapper**: Uses `gradlew` and `gradlew.bat` scripts for Gradle builds.
+   - **Continuous Integration**: GitHub Actions workflows for building and testing the application.
+     - **gradle-build.yml**: Builds the application using Gradle.
+     - **maven-build.yml**: Builds the application using Maven.
+     - **deploy-and-test-cluster.yml**: Deploys the application to a Kubernetes cluster and waits for pods to be ready.
+
+9. **Architectural Patterns and Frameworks Used**
+   - **Spring Boot**: Provides auto-configuration and simplifies bootstrapping.
+   - **Spring Data JPA**: Facilitates database interactions using repository interfaces.
+   - **Thymeleaf**: Template engine for generating HTML content.
+   - **JUnit 5**: Testing framework for unit and integration tests.
+   - **Testcontainers**: Provides lightweight, throwaway instances of databases for integration testing.
+   - **Maven/Gradle**: Build automation tools.
+   - **JCache**: Caching mechanism for JPA entities.
+   - **Internationalization (i18n)**: Supports multiple languages through resource bundles.
+
+This summary captures the essential architectural information of the Spring PetClinic application, including component names, responsibilities, API endpoints, database schemas, service dependencies, key business logic, configuration details, and frameworks used. This information is crucial for accurately decomposing the application into microservices.
