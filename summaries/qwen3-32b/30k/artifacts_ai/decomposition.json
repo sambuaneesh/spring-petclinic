@@ -1,0 +1,115 @@
+{
+  "tool": {
+    "decomposition": {
+      "Owner Management Service": [
+        {
+          "id": "Owner"
+        },
+        {
+          "id": "OwnerController"
+        },
+        {
+          "id": "OwnerRepository"
+        },
+        {
+          "id": "Person"
+        },
+        {
+          "id": "PetValidator"
+        },
+        {
+          "id": "PetTypeFormatter"
+        },
+        {
+          "id": "PetController"
+        }
+      ],
+      "Pet Information Service": [
+        {
+          "id": "Pet"
+        },
+        {
+          "id": "PetRepository"
+        },
+        {
+          "id": "PetType"
+        },
+        {
+          "id": "PetTypeRepository"
+        },
+        {
+          "id": "PetType"
+        },
+        {
+          "id": "PetTypeRepository"
+        },
+        {
+          "id": "PetValidator"
+        },
+        {
+          "id": "PetTypeFormatter"
+        },
+        {
+          "id": "PetController"
+        }
+      ],
+      "Medical Visit Service": [
+        {
+          "id": "Visit"
+        },
+        {
+          "id": "VisitController"
+        },
+        {
+          "id": "VisitRepository"
+        }
+      ],
+      "Veterinary Service": [
+        {
+          "id": "Vet"
+        },
+        {
+          "id": "VetController"
+        },
+        {
+          "id": "VetRepository"
+        },
+        {
+          "id": "Specialty"
+        },
+        {
+          "id": "Vets"
+        },
+        {
+          "id": "VetRepository"
+        }
+      ],
+      "Shared Infrastructure Service": [
+        {
+          "id": "BaseEntity"
+        },
+        {
+          "id": "NamedEntity"
+        },
+        {
+          "id": "PetClinicApplication"
+        },
+        {
+          "id": "WebConfiguration"
+        },
+        {
+          "id": "CacheConfiguration"
+        },
+        {
+          "id": "WelcomeController"
+        },
+        {
+          "id": "CrashController"
+        },
+        {
+          "id": "PetClinicRuntimeHints"
+        }
+      ]
+    }
+  }
+}
